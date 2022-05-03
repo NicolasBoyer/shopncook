@@ -1,4 +1,5 @@
 import { Server } from './server.js'
 import Routes from './routes.js'
 
-new Routes(new Server(9000, 'foodshop-nib.heroku.com'))
+// eslint-disable-next-line no-undef
+new Routes(new Server(process.env.PORT, 'foodshop-nib.heroku.com'))
