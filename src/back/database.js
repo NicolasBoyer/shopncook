@@ -5,16 +5,16 @@ import { Utils } from './utils.js'
  */
 export default class Database {
 	static async init () {
-		// todo créer les fichiers s'ils n'existent pas A am&liorer + pb de chargement image ...
+		// TODO pb de chargement image ...
 		const recipesJsonPath = 'recipes.json'
 		const ingredientsJsonPath = 'ingredients.json'
 		const listsJsonPath = 'lists.json'
 		await Utils.createFileFromBack(recipesJsonPath, '[]')
 		await Utils.createFileFromBack(ingredientsJsonPath, '[]')
 		await Utils.createFileFromBack(listsJsonPath, '[[]]')
-		this.recipesDB = JSON.parse(await Utils.readFileFromBack(recipesJsonPath))
-		this.ingredientsDB = JSON.parse(await Utils.readFileFromBack(ingredientsJsonPath))
-		this.listsDB = JSON.parse(await Utils.readFileFromBack(listsJsonPath))
+		this.recipesDB = JSON.parse(await Utils.readFile(recipesJsonPath))
+		this.ingredientsDB = JSON.parse(await Utils.readFile(ingredientsJsonPath))
+		this.listsDB = JSON.parse(await Utils.readFile(listsJsonPath))
 		return this
 	}
 
