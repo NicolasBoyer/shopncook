@@ -36,7 +36,7 @@ export default class Recipes extends HTMLElement {
 	}
 
 	search (pValue) {
-		this.recipes = (pValue ? this.savedRecipes.filter((pRecipe) => pRecipe.title.toLowerCase().includes(pValue.toLowerCase())) : Array.isArray(this.savedRecipes) && Object.keys(this.savedRecipes).length ? [this.savedRecipes] : this.savedRecipes).sort((a, b) => a.title.localeCompare(b.title))
+		this.recipes = (pValue ? this.savedRecipes.filter((pRecipe) => pRecipe.title.toLowerCase().includes(pValue.toLowerCase())) : !Array.isArray(this.savedRecipes) && Object.keys(this.savedRecipes).length ? [this.savedRecipes] : this.savedRecipes).sort((a, b) => a.title.localeCompare(b.title))
 		this.render()
 	}
 
