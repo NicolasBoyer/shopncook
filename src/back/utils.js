@@ -15,17 +15,17 @@ export class Utils {
 	}
 
 	static async readFileFromBack (pFile) {
-		return await fs.readFile(fromSrc(`back${pFile}`), 'utf8')
+		return await fs.readFile(pFile, 'utf8')
 	}
 
 	static async createFileFromBack (pFile, pInitText) {
 		// eslint-disable-next-line no-undef
-		const file = `${process.cwd()}/${fromSrc(`back${pFile}`)}`
+		// const file = `${process.cwd()}/${fromSrc(`back${pFile}`)}`
 		try {
-			await fs.writeFile(file, pInitText, { flag: 'wx' })
+			await fs.writeFile(pFile, pInitText, { flag: 'wx' })
 		} catch (e) {
 			console.log(e)
-			console.log(`Le fichier ${file} a déjà été créé !`)
+			console.log(`Le fichier ${pFile} a déjà été créé !`)
 		}
 	}
 
