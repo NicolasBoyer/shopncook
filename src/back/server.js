@@ -39,7 +39,7 @@ export const mimetype = Object.freeze({
 })
 
 export class Server {
-	constructor (pPort = 8000, pHost = 'localhost') {
+	constructor (pPort = 8000) {
 		const server = http.createServer((req, res) => {
 			const response = async (pMethod) => {
 				for (const pRoute of pMethod) {
@@ -83,9 +83,6 @@ export class Server {
 			}
 			if (req.method === 'POST') response(POST)
 		})
-		// server.listen(pPort, pHost, () => {
-		//	console.log(`Server is running on http://${pHost}:${pPort}`)
-		// })
 		server.listen(pPort)
 	}
 
