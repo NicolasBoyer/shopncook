@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
 	"dev": "nodemon src/back/dev.js",
-	"prod": "node src/back/prod.js"
+	"start": "node src/back/prod.js"
   },
   "author": "Nicolas Boyer",
   "license": "ISC",
