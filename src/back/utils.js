@@ -18,6 +18,15 @@ export class Utils {
 		return await fs.readFile(fromSrc(`back${pFile}`), 'utf8')
 	}
 
+	static async createFileFromBack (pFile, pInitText) {
+		const file = fromSrc(`back${pFile}`)
+		try {
+			await fs.writeFile(file, pInitText, { flag: 'wx' })
+		} catch (e) {
+			console.log(`Le fichier ${file} a déjà été créé`)
+		}
+	}
+
 	static async saveDB (db, json) {
 		return await fs.writeFile(fromSrc(`back/datas/${json}`), JSON.stringify(db, null, 2))
 	}

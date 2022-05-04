@@ -1,5 +1,4 @@
 import { Utils } from './utils.js'
-import fs from 'fs'
 
 /**
  * Permet la déclaration de la db (ici un fichier json) et de résoudre les requêtes passées dans la fonction request
@@ -8,11 +7,11 @@ export default class Database {
 	static async init () {
 		// todo créer les fichiers s'ils n'existent pas A am&liorer + pb de chargement image ...
 		const recipesJsonPath = '/datas/recipes.json'
-		const ingredientsJsonPath = '/datas/recipes.json'
-		const listsJsonPath = '/datas/recipes.json'
-		if (!fs.existsSync(recipesJsonPath)) fs.writeFileSync(recipesJsonPath, '')
-		if (!fs.existsSync(ingredientsJsonPath)) fs.writeFileSync(ingredientsJsonPath, '')
-		if (!fs.existsSync(listsJsonPath)) fs.writeFileSync(listsJsonPath, '')
+		const ingredientsJsonPath = '/datas/ingredients.json'
+		const listsJsonPath = '/datas/lists.json'
+		await Utils.createFileFromBack(recipesJsonPath, '[] ')
+		await Utils.createFileFromBack(ingredientsJsonPath, '[]')
+		await Utils.createFileFromBack(listsJsonPath, '[[]]')
 		this.recipesDB = JSON.parse(await Utils.readFileFromBack(recipesJsonPath))
 		this.ingredientsDB = JSON.parse(await Utils.readFileFromBack(ingredientsJsonPath))
 		this.listsDB = JSON.parse(await Utils.readFileFromBack(listsJsonPath))
