@@ -19,18 +19,15 @@ export class Utils {
 	}
 
 	static async createFileFromBack (pFile, pInitText) {
-		// eslint-disable-next-line no-undef
-		// const file = fromSrc(`back${pFile}`)
 		try {
 			await fs.writeFile(pFile, pInitText, { flag: 'wx' })
 		} catch (e) {
-			console.log(e)
 			console.log(`Le fichier ${pFile} a déjà été créé !`)
 		}
 	}
 
 	static async saveDB (db, json) {
-		return await fs.writeFile(fromSrc(`back/datas/${json}`), JSON.stringify(db, null, 2))
+		return await fs.writeFile(json, JSON.stringify(db, null, 2))
 	}
 
 	static async fragments (pFile, pClassName, pSubTitle = '') {
