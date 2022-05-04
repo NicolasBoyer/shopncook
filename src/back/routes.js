@@ -29,11 +29,11 @@ export default class Routes {
 		}, mimetype.JSON)
 
 		pServer.get('/lists.json', async (req, res) => {
-			res.end(await Utils.readFile('ingredients.json'))
+			res.end(await Utils.readFile('lists.json'))
 		}, mimetype.JSON)
 
 		pServer.get('/recipes.json', async (req, res) => {
-			res.end(await Utils.readFile('ingredients.json'))
+			res.end(await Utils.readFile('recipes.json'))
 		}, mimetype.JSON)
 
 		pServer.post('/db', async (req, res) => {
