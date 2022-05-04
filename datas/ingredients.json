@@ -1,0 +1,126 @@
+[
+  {
+    "title": "Beurre",
+    "recipes": [
+      "Tartiflette",
+      "Croque Monsieur",
+      "Sandwich",
+      null
+    ]
+  },
+  {
+    "title": "Sucre",
+    "recipes": []
+  },
+  {
+    "title": "Crème fraiche",
+    "recipes": [
+      "Tartiflette",
+      "Escalopes à la crème",
+      null
+    ]
+  },
+  {
+    "title": "Patates",
+    "recipes": [
+      "Tartiflette",
+      null
+    ]
+  },
+  {
+    "title": "Lardons",
+    "recipes": [
+      "Tartiflette"
+    ]
+  },
+  {
+    "title": "Oignons",
+    "recipes": [
+      "Tartiflette"
+    ]
+  },
+  {
+    "title": "Jambon",
+    "recipes": [
+      "Croque Monsieur",
+      "Sandwich",
+      "Cordons bleus"
+    ]
+  },
+  {
+    "title": "Baguette",
+    "recipes": [
+      "Sandwich"
+    ]
+  },
+  {
+    "title": "Fromage en tranche",
+    "recipes": [
+      "Sandwich"
+    ]
+  },
+  {
+    "title": "Comté",
+    "recipes": [
+      "Cordons bleus",
+      null
+    ]
+  },
+  {
+    "title": "Escalopes",
+    "recipes": [
+      "Escalopes à la crème",
+      "Cordons bleus"
+    ]
+  },
+  {
+    "title": "Champignons",
+    "recipes": [
+      "Escalopes à la crème"
+    ]
+  },
+  {
+    "title": "Roquefort",
+    "recipes": [
+      "Escalopes à la crème"
+    ]
+  },
+  {
+    "title": "Pain de mie",
+    "recipes": [
+      "Croque Monsieur"
+    ]
+  },
+  {
+    "title": "Lasagnes",
+    "recipes": [
+      "Lasagnes à la bolognaise",
+      "Lasagnes à la bolognaise"
+    ]
+  },
+  {
+    "title": "Tomates",
+    "recipes": [
+      "Lasagnes à la bolognaise",
+      "Lasagnes à la bolognaise"
+    ]
+  },
+  {
+    "title": "Sauce béchamel",
+    "recipes": [
+      "Lasagnes à la bolognaise",
+      "Lasagnes à la bolognaise"
+    ]
+  },
+  {
+    "title": "Mayonnaise",
+    "recipes": []
+  },
+  {
+    "title": "Crème liquide",
+    "recipes": [
+      null,
+      null
+    ]
+  }
+]
