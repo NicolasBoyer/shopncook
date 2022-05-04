@@ -4,7 +4,6 @@ import { Utils } from './utils.js'
 
 const GET = []
 const POST = []
-// const DELETE = []
 
 const includeFiles = [
 	{

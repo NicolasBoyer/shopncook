@@ -5,12 +5,6 @@ import { Utils } from './utils.js'
  */
 export default class Database {
 	static async init () {
-		// const recipesJsonPath = 'datas/recipes.json'
-		// const ingredientsJsonPath = 'datas/ingredients.json'
-		// const listsJsonPath = 'datas/lists.json'
-		// await Utils.createFileFromBack(recipesJsonPath, '[]')
-		// await Utils.createFileFromBack(ingredientsJsonPath, '[]')
-		// await Utils.createFileFromBack(listsJsonPath, '[[]]')
 		this.recipesDB = JSON.parse(await Utils.readFileFromDB('recipes.json'))
 		this.ingredientsDB = JSON.parse(await Utils.readFileFromDB('ingredients.json'))
 		this.listsDB = JSON.parse(await Utils.readFileFromDB('lists.json'))
