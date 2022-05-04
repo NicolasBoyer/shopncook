@@ -19,7 +19,8 @@ export class Utils {
 	}
 
 	static async createFileFromBack (pFile, pInitText) {
-		const file = fromSrc(`back${pFile}`)
+		// eslint-disable-next-line no-undef
+		const file = `${process.cwd()}/${fromSrc(`back${pFile}`)}`
 		try {
 			await fs.writeFile(file, pInitText, { flag: 'wx' })
 		} catch (e) {
