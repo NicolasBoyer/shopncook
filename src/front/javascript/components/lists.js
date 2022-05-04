@@ -54,6 +54,7 @@ export default class Lists extends HTMLElement {
 			<fs-recipes choiceMode/>
 		`, async () => {
 			if (this.recipeChoices.length) {
+				this.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
 				const newIngredients = this.savedIngredients.filter((pIngredient) => pIngredient.recipes.length && pIngredient.recipes.some((pRecipe) => this.recipeChoices.includes(pRecipe))).map((pIngredient) => pIngredient.title)
 				this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": "${newIngredients}" }` })
 				this.recipeChoices = []

@@ -5,7 +5,6 @@ import { Utils } from './utils.js'
  */
 export default class Database {
 	static async init () {
-		// TODO pb de chargement image ...
 		const recipesJsonPath = 'recipes.json'
 		const ingredientsJsonPath = 'ingredients.json'
 		const listsJsonPath = 'lists.json'
@@ -149,7 +148,7 @@ export default class Database {
 					return { title: pIngredient }
 				})).map(a => JSON.stringify(a)))].map(a => JSON.parse(a))
 				Utils.saveDB(Database.listsDB, 'lists.json')
-				return Database.listsDB[Database.listsDB.length - 1]
+				return resolvers.getListIngredients()
 			},
 
 			removeListIngredient (ingredient) {
