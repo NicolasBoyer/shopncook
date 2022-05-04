@@ -23,6 +23,7 @@ export class Utils {
 		try {
 			await fs.writeFile(file, pInitText, { flag: 'wx' })
 		} catch (e) {
+			console.log(e)
 			console.log(`Le fichier ${file} a déjà été créé !`)
 		}
 	}
