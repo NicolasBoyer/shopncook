@@ -25,7 +25,7 @@ class App {
 	}
 }
 
-new App()
+customElements.define('fs-header', Header)
 customElements.define('fs-toast', Toast)
 customElements.define('fs-confirm', Confirm)
 customElements.define('fs-propose', Propose)
@@ -33,4 +33,4 @@ customElements.define('fs-recipes', Recipes)
 customElements.define('fs-recipe', Recipe)
 customElements.define('fs-lists', Lists)
 customElements.define('fs-ingredients', Ingredients)
-customElements.define('fs-header', Header)
+new App()

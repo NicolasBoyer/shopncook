@@ -12,6 +12,9 @@ export default class Header extends HTMLElement {
 	constructor () {
 		super()
 		this.render()
+	}
+
+	connectedCallback () {
 		const image = this.querySelector('img')
 		image.style.transform = `translate3d(0, ${window.scrollY}px, 0)`
 		window.addEventListener('scroll', () => {
@@ -19,16 +22,6 @@ export default class Header extends HTMLElement {
 			if (window.scrollY >= this.getBoundingClientRect().height) this.firstElementChild.classList.add('titles')
 			else this.firstElementChild.classList.remove('titles')
 		})
-	}
-
-	connectedCallback () {
-		// const image = this.querySelector('img')
-		// image.style.transform = `translate3d(0, ${window.scrollY}px, 0)`
-		// window.addEventListener('scroll', () => {
-		//	image.style.transform = `translate3d(0, ${window.scrollY * 0.5}px, 0)`
-		//	if (window.scrollY >= this.getBoundingClientRect().height) this.firstElementChild.classList.add('titles')
-		//	else this.firstElementChild.classList.remove('titles')
-		// })
 	}
 
 	render () {
