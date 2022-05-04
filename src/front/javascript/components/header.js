@@ -1,16 +1,14 @@
-import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
-
 export default class Header extends HTMLElement {
-	get src () {
-		return this.getAttribute('src')
-	}
-
-	get alt () {
-		return this.getAttribute('alt')
-	}
+	// get src () {
+	//	return this.getAttribute('src')
+	// }
+	//
+	// get alt () {
+	//	return this.getAttribute('alt')
+	// }
 
 	connectedCallback () {
-		this.render()
+		// this.render()
 		const image = this.querySelector('img')
 		image.style.transform = `translate3d(0, ${window.scrollY}px, 0)`
 		window.addEventListener('scroll', () => {
@@ -20,11 +18,11 @@ export default class Header extends HTMLElement {
 		})
 	}
 
-	render () {
-		render(html`
-			<div class="image">
-				<img alt="${this.alt}" src="${this.src}"/>
-			</div>
-		`, this)
-	}
+	// render () {
+	//	render(html`
+	//		<div class="image">
+	//			<img alt="${this.alt}" src="${this.src}"/>
+	//		</div>
+	//	`, this)
+	// }
 }
