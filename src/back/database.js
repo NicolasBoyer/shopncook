@@ -1,5 +1,4 @@
 import { Utils } from './utils.js'
-import fs from 'fs'
 
 /**
  * Permet la déclaration de la db (ici un fichier json) et de résoudre les requêtes passées dans la fonction request
@@ -7,9 +6,9 @@ import fs from 'fs'
 export default class Database {
 	static async init () {
 		// todo créer les fichiers s'ils n'existent pas A am&liorer + pb de chargement image ...
-		if (!fs.existsSync('/datas/recipes.json')) fs.writeFile('/datas/recipes.json')
-		if (!fs.existsSync('/datas/ingredients.json')) fs.writeFile('/datas/ingredients.json')
-		if (!fs.existsSync('/datas/lists.json')) fs.writeFile('/datas/lists.json')
+		// if (!fs.existsSync('/datas/recipes.json')) fs.writeFile('/datas/recipes.json')
+		// if (!fs.existsSync('/datas/ingredients.json')) fs.writeFile('/datas/ingredients.json')
+		// if (!fs.existsSync('/datas/lists.json')) fs.writeFile('/datas/lists.json')
 		this.recipesDB = JSON.parse(await Utils.fromBack('/datas/recipes.json'))
 		this.ingredientsDB = JSON.parse(await Utils.fromBack('/datas/ingredients.json'))
 		this.listsDB = JSON.parse(await Utils.fromBack('/datas/lists.json'))
