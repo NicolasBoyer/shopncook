@@ -55,14 +55,14 @@ export default class Ingredients extends HTMLElement {
 												<span>${pIngredient}</span>
 											`}
 											${this.editMode === pIngredient ? html`
-												<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveIngredient(pIngredient, pEvent.target.closest('button').previousElementSibling.value)}">
+												<button class="valid" @pointerup="${(pEvent) => this.editAndSaveIngredient(pIngredient, pEvent.target.closest('button').previousElementSibling.value)}">
 													<svg class="valid">
 														<use href="#valid"></use>
 													</svg>
 													<span>Valider</span>
 												</button>
 											` : html`
-												<button class="edit" @pointerdown="${() => {
+												<button class="edit" @pointerup="${() => {
 													this.editMode = pIngredient
 													this.search()
 												}}">
@@ -73,14 +73,14 @@ export default class Ingredients extends HTMLElement {
 												</button>
 											`}
 											${this.editMode === pIngredient ? html`
-												<button type="button" class="undo" @pointerdown="${() => this.resetMode()}">
+												<button type="button" class="undo" @pointerup="${() => this.resetMode()}">
 													<svg class="undo">
 														<use href="#undo"></use>
 													</svg>
 													<span>Annuler</span>
 												</button>
 											` : html`
-												<button type="button" class="remove" @pointerdown="${() => this.removeIngredient(pIngredient)}">
+												<button type="button" class="remove" @pointerup="${() => this.removeIngredient(pIngredient)}">
 													<svg class="remove">
 														<use href="#remove"></use>
 													</svg>

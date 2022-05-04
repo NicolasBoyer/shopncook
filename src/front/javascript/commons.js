@@ -11,7 +11,7 @@ export class Commons {
 	}
 
 	static clearPropositionsOnBackgroundClick (pCb) {
-		document.body.addEventListener('pointerdown', (pEvent) => {
+		document.body.addEventListener('pointerup', (pEvent) => {
 			if (!pEvent.target.closest('div.propose')) {
 				this.setPropositions()
 				pCb()

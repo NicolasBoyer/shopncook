@@ -1,1 +1,38 @@
-[]
+[
+  {
+	"title": "Croissants",
+	"recipes": [
+	  "Croissant au jambon"
+	]
+  },
+  {
+	"title": "Jambon",
+	"recipes": [
+	  "Croissant au jambon"
+	]
+  },
+  {
+	"title": "Farine",
+	"recipes": [
+	  "Croissant au jambon"
+	]
+  },
+  {
+	"title": "Lait",
+	"recipes": [
+	  "Croissant au jambon"
+	]
+  },
+  {
+	"title": "Beurre",
+	"recipes": [
+	  "Croissant au jambon"
+	]
+  },
+  {
+	"title": "Muscade",
+	"recipes": [
+	  "Croissant au jambon"
+	]
+  }
+]

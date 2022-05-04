@@ -79,7 +79,7 @@ export default class Lists extends HTMLElement {
 		render(html`
 			<div class="title">
 				<h2>Votre liste</h2>
-				<button type="button" class="trash" @pointerdown="${() => this.clear()}">
+				<button type="button" class="trash" @pointerup="${() => this.clear()}">
 					<svg class="trash">
 						<use href="#trash"></use>
 					</svg>
@@ -103,7 +103,7 @@ export default class Lists extends HTMLElement {
 														if (pEvent.key === 'Escape') this.resetMode()
 													}}"/>
 												` : html`
-													<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerdown="${() => {
+													<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerup="${() => {
 														this.editAndSaveListIngredient(ingredientTitle, ingredientTitle, !isIngredientOrdered)
 														if (!isIngredientOrdered) this.orderedIngredients.push(ingredientTitle)
 														else this.orderedIngredients = this.orderedIngredients.filter((pOrderedIngredient) => ingredientTitle !== pOrderedIngredient)

@@ -17,7 +17,7 @@ class App {
 	setBackButton () {
 		if (location.pathname.split('/').filter((pPart) => pPart).length && history.length > 2) {
 			const bd = Dom.newDom(document.querySelector('fs-header > div:first-child'))
-			bd.elt('a', 'back').att('role', 'button').att('href', '#').listen('pointerdown', () => history.back())
+			bd.elt('a', 'back').att('role', 'button').att('href', '#').listen('pointerup', () => history.back())
 			bd.svg('back').up()
 			bd.elt('span').text('Retour').up()
 			bd.up()
