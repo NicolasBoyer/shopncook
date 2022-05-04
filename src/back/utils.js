@@ -14,20 +14,20 @@ export class Utils {
 		return fromSrc(`front${pFile}`)
 	}
 
-	static async readFile (pFile) {
-		return await fs.readFile(pFile, 'utf8')
+	static async readFileFromDB (pFile) {
+		return await fs.readFile(fromSrc(`datas/${pFile}`), 'utf8')
 	}
 
-	static async createFileFromBack (pFile, pInitText) {
-		try {
-			await fs.writeFile(pFile, pInitText, { flag: 'wx' })
-		} catch (e) {
-			console.log(`Le fichier ${pFile} a déjà été créé !`)
-		}
-	}
+	// static async createFileFromBack (pFile, pInitText) {
+	//	try {
+	//		await fs.writeFile(pFile, pInitText, { flag: 'wx' })
+	//	} catch (e) {
+	//		console.log(`Le fichier ${pFile} a déjà été créé !`)
+	//	}
+	// }
 
 	static async saveDB (db, json) {
-		return await fs.writeFile(json, JSON.stringify(db, null, 2))
+		return await fs.writeFile(fromSrc(`datas/${json}`), JSON.stringify(db, null, 2))
 	}
 
 	static async fragments (pFile, pClassName, pSubTitle = '') {
