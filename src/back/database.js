@@ -9,9 +9,9 @@ export default class Database {
 		const recipesJsonPath = '/datas/recipes.json'
 		const ingredientsJsonPath = '/datas/ingredients.json'
 		const listsJsonPath = '/datas/lists.json'
-		await Utils.createFileFromBack(recipesJsonPath, '[]')
-		await Utils.createFileFromBack(ingredientsJsonPath, '[]')
-		await Utils.createFileFromBack(listsJsonPath, '[[]]')
+		// await Utils.createFileFromBack(recipesJsonPath, '[]')
+		// await Utils.createFileFromBack(ingredientsJsonPath, '[]')
+		// await Utils.createFileFromBack(listsJsonPath, '[[]]')
 		this.recipesDB = JSON.parse(await Utils.readFileFromBack(recipesJsonPath))
 		this.ingredientsDB = JSON.parse(await Utils.readFileFromBack(ingredientsJsonPath))
 		this.listsDB = JSON.parse(await Utils.readFileFromBack(listsJsonPath))
