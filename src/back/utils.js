@@ -1,4 +1,5 @@
 import fs from 'fs/promises'
+import mkdirp from 'mkdirp'
 
 const fromSrc = (pFile) => `src/${pFile}`
 const fromTemplate = (pFile) => fromSrc(`front/html/templates/${pFile}`)
@@ -22,6 +23,7 @@ export class Utils {
 		// eslint-disable-next-line no-undef
 		const file = `${process.cwd()}/${fromSrc(`back${pFile}`)}`
 		try {
+			await mkdirp(file)
 			await fs.writeFile(file, pInitText, { flag: 'wx' })
 		} catch (e) {
 			console.log(e)
