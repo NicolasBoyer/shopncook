@@ -149,7 +149,7 @@ export default class Database {
 					return { title: pIngredient }
 				})).map(a => JSON.stringify(a)))].map(a => JSON.parse(a))
 				Utils.saveDB(Database.listsDB, 'lists.json')
-				return resolvers.getListIngredients()
+				return Database.listsDB[Database.listsDB.length - 1]
 			},
 
 			removeListIngredient (ingredient) {
