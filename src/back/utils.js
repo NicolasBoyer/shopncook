@@ -23,7 +23,7 @@ export class Utils {
 		try {
 			await fs.writeFile(file, pInitText, { flag: 'wx' })
 		} catch (e) {
-			console.log(`Le fichier ${file} a déjà été créé`)
+			console.log(`Le fichier ${file} a déjà été créé !`)
 		}
 	}
 
@@ -51,7 +51,7 @@ export class Utils {
 			// eslint-disable-next-line no-useless-escape
 			.replace(/[^\w\-]+/g, '') // Remove all non-word chars
 			// eslint-disable-next-line no-useless-escape
-			.replace(/\-\-+/g, '_') // Replace multiple - with single _
+			.replace(/--+/g, '_') // Replace multiple - with single _
 			.replace(/^-+/, '') // Trim - from start of text
 			.replace(/-+$/, '') // Trim - from end of text
 	}
