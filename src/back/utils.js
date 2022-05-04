@@ -14,7 +14,7 @@ export class Utils {
 		return fromSrc(`front${pFile}`)
 	}
 
-	static async fromBack (pFile) {
+	static async readFileFromBack (pFile) {
 		return await fs.readFile(fromSrc(`back${pFile}`), 'utf8')
 	}
 
