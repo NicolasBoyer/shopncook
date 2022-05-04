@@ -6,11 +6,15 @@ export default class Lists extends HTMLElement {
 	async connectedCallback () {
 		Commons.clearPropositionsOnBackgroundClick(() => this.render())
 		this.ingredients = await this.getListIngredients()
-		this.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
+		this.savedIngredients = await this.getIngredients()
 		Commons.savedIngredients = this.savedIngredients.map((pIngredient) => pIngredient.title)
 		this.recipeChoices = []
 		this.orderedIngredients = this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient.title)
 		this.render()
+	}
+
+	async getIngredients () {
+		return await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
 	}
 
 	async getListIngredients () {
@@ -54,7 +58,7 @@ export default class Lists extends HTMLElement {
 			<fs-recipes choiceMode/>
 		`, async () => {
 			if (this.recipeChoices.length) {
-				this.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
+				this.savedIngredients = await this.getIngredients()
 				const newIngredients = this.savedIngredients.filter((pIngredient) => pIngredient.recipes.length && pIngredient.recipes.some((pRecipe) => this.recipeChoices.includes(pRecipe))).map((pIngredient) => pIngredient.title)
 				this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": "${newIngredients}" }` })
 				this.recipeChoices = []
