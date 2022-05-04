@@ -83,9 +83,10 @@ export class Server {
 			}
 			if (req.method === 'POST') response(POST)
 		})
-		server.listen(pPort, pHost, () => {
-			console.log(`Server is running on http://${pHost}:${pPort}`)
-		})
+		// server.listen(pPort, pHost, () => {
+		//	console.log(`Server is running on http://${pHost}:${pPort}`)
+		// })
+		server.listen(pPort)
 	}
 
 	get (pPath, pCallback, pType = mimetype.HTML) {
