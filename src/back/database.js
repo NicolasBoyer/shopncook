@@ -6,9 +6,9 @@ import { Utils } from './utils.js'
 export default class Database {
 	static async init () {
 		// todo créer les fichiers s'ils n'existent pas A am&liorer + pb de chargement image ...
-		const recipesJsonPath = 'recipes.json'
-		const ingredientsJsonPath = 'ingredients.json'
-		const listsJsonPath = 'lists.json'
+		const recipesJsonPath = '/datas/recipes.json'
+		const ingredientsJsonPath = '/datas/ingredients.json'
+		const listsJsonPath = '/datas/lists.json'
 		await Utils.createFileFromBack(recipesJsonPath, '[]')
 		await Utils.createFileFromBack(ingredientsJsonPath, '[]')
 		await Utils.createFileFromBack(listsJsonPath, '[[]]')
