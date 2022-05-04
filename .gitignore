@@ -1,2 +1,4 @@
 /node_modules
-/datas/*
+ingredients.json
+lists.json
+recipes.json
