@@ -2,6 +2,9 @@ import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
 import { Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 
+// TODO Categories, compteurs,websocket, non slection au click,input de saisie au dessus sur list et recette, tri ingrédients recette alpha
+// TODO créer des instances quand on se connecte qui initialise la base de donnée et une fois que la base existe on se connecte dessus via des compte ?
+
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
 		Commons.clearPropositionsOnBackgroundClick(() => this.render())
@@ -26,8 +29,15 @@ export default class Lists extends HTMLElement {
 		this.render()
 	}
 
-	async editAndSaveListIngredient (oldIngredient, newIngredient, ordered = false) {
-		this.ingredients = await Utils.request('/db', 'POST', { body: `{ "editListIngredient": { "oldIngredient": "${oldIngredient}", "newIngredient": "${newIngredient}", "ordered": ${ordered} } }` })
+	async editAndSaveListIngredient (oldIngredient, pEvent) {
+		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'editIngredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
+		const size = input.nextElementSibling.value
+		this.ingredients = await Utils.request('/db', 'POST', { body: `{ "editListIngredient": { "oldIngredient": "${oldIngredient}", "newIngredient": "${input.value}", "size":"${size}" } }` })
+		this.resetMode()
+	}
+
+	async editListIngredientOrdered (ingredient, ordered) {
+		this.ingredients = await Utils.request('/db', 'POST', { body: `{ "editListIngredient": { "oldIngredient": "${ingredient}", "ordered": ${ordered} } }` })
 		this.resetMode()
 	}
 
@@ -41,9 +51,10 @@ export default class Lists extends HTMLElement {
 
 	async saveListIngredient (pEvent) {
 		Commons.setPropositions()
-		const input = pEvent.target.tagName === 'INPUT' ? pEvent.target : pEvent.target.closest('button').previousElementSibling
+		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'newIngredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
+		const size = input.nextElementSibling.value
 		if (input && input.value) {
-			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredient": "${input.value}" }` })
+			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredient": { "value": "${input.value}", "size": "${size}" } }` })
 			if (!Commons.savedIngredients.includes(input.value)) Commons.savedIngredients.push(input.value)
 			input.value = ''
 			this.render()
@@ -89,29 +100,62 @@ export default class Lists extends HTMLElement {
 			<aside>
 				<nav>
 					<ul>
+						<li>
+							<div class="addListIngredient grid">
+								<input name="newIngredient" type="text" @keyup="${(pEvent) => {
+									Commons.managePropositions(pEvent, () => this.saveListIngredient(pEvent))
+									this.render()
+								}}"/>
+								<input name="size" type="text" @keyup="${(pEvent) => {
+									if (pEvent.key === 'Enter') this.saveListIngredient(pEvent)
+									this.render()
+								}}"/>
+								<button type="button" class="add" @pointerdown="${(pEvent) => this.saveListIngredient(pEvent)}">
+									<svg class="add">
+										<use href="#add"></use>
+									</svg>
+									<span>Ajouter un ingrédient</span>
+								</button>
+								<button type="button" class="addList" @pointerdown="${() => this.addListIngredientByRecipe()}">
+									<svg class="addList">
+										<use href="#addList"></use>
+									</svg>
+									<span>Ajouter des ingrédients</span>
+								</button>
+								<fs-propose list="${Commons.propositions}" @listReset="${() => {
+									Commons.setPropositions()
+									this.render()
+								}}"></fs-propose>
+							</div>
+						</li>
 						${!this.ingredients.length ? html`
 							<li>Aucun ingrédient ...</li>` : this.ingredients.map(
 								(pIngredient) => {
 									const ingredientTitle = pIngredient.title
+									const ingredientSize = pIngredient.size
 									const isIngredientOrdered = this.orderedIngredients.includes(ingredientTitle)
 									return html`
 										<li>
-											<div class="editListIngredient">
+											<div class="editListIngredient ${this.editMode === ingredientTitle ? 'grid' : ''}">
 												${this.editMode === ingredientTitle ? html`
-													<input name="${ingredientTitle}" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
-														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(ingredientTitle, pEvent.target.value)
+													<input name="editIngredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
+														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(ingredientTitle, pEvent)
+														if (pEvent.key === 'Escape') this.resetMode()
+													}}"/>
+													<input name="size" type="text" value="${ingredientSize}" @keyup="${(pEvent) => {
+														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(ingredientTitle, pEvent)
 														if (pEvent.key === 'Escape') this.resetMode()
 													}}"/>
 												` : html`
 													<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerup="${() => {
-														this.editAndSaveListIngredient(ingredientTitle, ingredientTitle, !isIngredientOrdered)
+														this.editListIngredientOrdered(ingredientTitle, !isIngredientOrdered)
 														if (!isIngredientOrdered) this.orderedIngredients.push(ingredientTitle)
 														else this.orderedIngredients = this.orderedIngredients.filter((pOrderedIngredient) => ingredientTitle !== pOrderedIngredient)
 														if (this.orderedIngredients.length === this.ingredients.length) this.clear()
-													}}">${ingredientTitle}</a>
+													}}">${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</a>
 												`}
 												${this.editMode === ingredientTitle ? html`
-													<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(ingredientTitle, pEvent.target.closest('button').previousElementSibling.value)}">
+													<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(ingredientTitle, pEvent)}">
 														<svg class="valid">
 															<use href="#valid"></use>
 														</svg>
@@ -148,30 +192,6 @@ export default class Lists extends HTMLElement {
 									`
 								}
 						)}
-						<li>
-							<div class="addListIngredient grid">
-								<input name="newIngredient" type="text" @keyup="${(pEvent) => {
-									Commons.managePropositions(pEvent, () => this.saveListIngredient(pEvent))
-									this.render()
-								}}"/>
-								<button type="button" class="add" @pointerdown="${(pEvent) => this.saveListIngredient(pEvent)}">
-									<svg class="add">
-										<use href="#add"></use>
-									</svg>
-									<span>Ajouter un ingrédient</span>
-								</button>
-								<button type="button" class="addList" @pointerdown="${() => this.addListIngredientByRecipe()}">
-									<svg class="addList">
-										<use href="#addList"></use>
-									</svg>
-									<span>Ajouter des ingrédients</span>
-								</button>
-								<fs-propose list="${Commons.propositions}" @listReset="${() => {
-									Commons.setPropositions()
-									this.render()
-								}}"></fs-propose>
-							</div>
-						</li>
 					</ul>
 				</nav>
 			</aside>
