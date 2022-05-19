@@ -23,11 +23,17 @@ export default class Lists extends HTMLElement {
 		this.render()
 	}
 
-	async editAndSaveListIngredient (id, pEvent) {
-		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'editIngredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
-		const size = input.nextElementSibling.value
-		this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}", "id": "${id}", "size":"${size}" } ] } }` })
-		this.resetMode()
+	async editAndSaveListIngredient (pEvent, id) {
+		Commons.setPropositions()
+		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
+		const sizeInput = input.nextElementSibling
+		if (input && input.value) {
+			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}, "size": "${sizeInput.value}" } ] } }` })
+			if (!id && Commons.savedIngredients && !Commons.savedIngredients.some((pIngredient) => pIngredient.title === input.value)) Commons.savedIngredients.push({ title: input.value })
+			input.value = ''
+			sizeInput.value = ''
+			this.resetMode()
+		}
 	}
 
 	async editListIngredientOrdered (id, ordered) {
@@ -41,19 +47,6 @@ export default class Lists extends HTMLElement {
 			this.render()
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
-	}
-
-	async saveListIngredient (pEvent) {
-		Commons.setPropositions()
-		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'newIngredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
-		const sizeInput = input.nextElementSibling
-		if (input && input.value) {
-			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}", "size": "${sizeInput.value}" } ] } }` })
-			if (Commons.savedIngredients && !Commons.savedIngredients.some((pIngredient) => pIngredient.title === input.value)) Commons.savedIngredients.push({ title: input.value })
-			input.value = ''
-			sizeInput.value = ''
-			this.render()
-		}
 	}
 
 	addListIngredientByRecipe () {
@@ -96,15 +89,14 @@ export default class Lists extends HTMLElement {
 					<ul>
 						<li>
 							<div class="addListIngredient grid">
-								<input name="newIngredient" type="text" @keyup="${(pEvent) => {
-									Commons.managePropositions(pEvent, () => this.saveListIngredient(pEvent))
+								<input name="ingredient" type="text" @keyup="${(pEvent) => {
+									Commons.managePropositions(pEvent, () => this.editAndSaveListIngredient(pEvent))
 									this.render()
 								}}"/>
 								<input name="size" type="text" @keyup="${(pEvent) => {
-									if (pEvent.key === 'Enter') this.saveListIngredient(pEvent)
-									this.render()
+									if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent)
 								}}"/>
-								<button type="button" class="add" @pointerdown="${(pEvent) => this.saveListIngredient(pEvent)}">
+								<button type="button" class="add" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(pEvent)}">
 									<svg class="add">
 										<use href="#add"></use>
 									</svg>
@@ -133,12 +125,12 @@ export default class Lists extends HTMLElement {
 										<li>
 											<div class="editListIngredient ${this.editMode === ingredientId ? 'grid' : ''}">
 												${this.editMode === ingredientId ? html`
-													<input name="editIngredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
-														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(ingredientId, pEvent)
+													<input name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
+														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent, ingredientId)
 														if (pEvent.key === 'Escape') this.resetMode()
 													}}"/>
 													<input name="size" type="text" value="${ingredientSize}" @keyup="${(pEvent) => {
-														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(ingredientId, pEvent)
+														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent, ingredientId)
 														if (pEvent.key === 'Escape') this.resetMode()
 													}}"/>
 												` : html`
@@ -150,7 +142,7 @@ export default class Lists extends HTMLElement {
 													}}">${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</a>
 												`}
 												${this.editMode === ingredientId ? html`
-													<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(ingredientId, pEvent)}">
+													<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(pEvent, ingredientId)}">
 														<svg class="valid">
 															<use href="#valid"></use>
 														</svg>
