@@ -22,8 +22,6 @@ export default class Database {
 		this.lists = db.collection('lists')
 	}
 
-	// TODO revérif le code et voir si possible de le refactoriser + utilisation des ?
-
 	/**
 	 * Retourne ou enregistre des informations dans la db (des fichiers json) en fonction des requêtes reçues dans le resolver
 	 * Exemple : { "getRecipes": {"map": "title"} } reçu dans request et traité par la fonction get et résolu par la constante resolvers.
