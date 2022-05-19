@@ -20,6 +20,7 @@ export default class Database {
 		this.ingredients = db.collection('ingredients')
 		this.recipes = db.collection('recipes')
 		this.lists = db.collection('lists')
+		this.categories = db.collection('categories')
 	}
 
 	/**
@@ -111,7 +112,7 @@ export default class Database {
 					const { id, ...currentIngredient } = ingredient
 					if (ingredient.title) currentIngredient.title = ingredient.title
 					ingredient.filter = ingredient.id ? { _id: new ObjectId(ingredient.id) } : { title: ingredient.title }
-					if (!ingredient.id) currentIngredient.size = (await Database.lists.findOne(ingredient.filter))?.size
+					if (!ingredient.id) currentIngredient.size = (await Database.lists.findOne(ingredient.filter))?.size || ingredient.size
 					isEdit = !!ingredient.id
 					newIngredients.push(currentIngredient)
 				}
@@ -136,6 +137,22 @@ export default class Database {
 			async clearListIngredients () {
 				await Database.lists.deleteMany({})
 				return resolvers.getListIngredients()
+			},
+
+			async getCategories () {
+				return await Database.categories.find().toArray()
+			},
+
+			async setCategory (args) {
+				await Database.categories.updateOne({ _id: new ObjectId(args.id) }, { $set: { title: args.title } }, { upsert: true })
+				return await resolvers.getCategories()
+			},
+
+			async removeCategory (id) {
+				// const objectId = new ObjectId(id)
+				await Database.categories.deleteOne({ _id: new ObjectId(id) })
+				// await Database.ingredients.updateMany({}, { $pull: { recipes: { $in: [objectId] } } })
+				return await resolvers.getCategories()
 			}
 		}
 		const reqArr = []
