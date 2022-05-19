@@ -173,6 +173,7 @@ h2 {
 
 .editListIngredient a {
 	cursor: pointer;
+	user-select: none;
 }
 
 a.ordered {
@@ -207,10 +208,12 @@ a.ordered {
 	font-size: 1.7rem;
 }
 
-.home li > div.grid.addListIngredient {
-	grid-template-columns: 1fr 2rem 2rem;
+.home li > div.grid.addListIngredient,
+.home li > div.grid.editListIngredient {
+	grid-template-columns: 1fr 6rem 2rem 2rem;
 	align-items: center;
 	position: relative;
+	display: grid;
 }
 
 .recipes li > div.ingredients {
@@ -330,6 +333,7 @@ a.ordered {
 	position: static;
 	font-size: 85%;
 	padding: 0;
+	text-align: center;
 }
 
 .notFound #main {

@@ -2,12 +2,13 @@ import { Utils } from './utils.js'
 
 export class Commons {
 	static async getIngredients () {
-		this.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": { "map": "title" } }' })
+		this.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
 		return this.savedIngredients
 	}
 
 	static setPropositions (pValue) {
-		this.propositions = pValue ? this.savedIngredients.filter((pIngredient) => pIngredient.toLowerCase().includes(pValue.toLowerCase())) : []
+		if (!this.savedIngredients || !this.savedIngredients.length) return
+		this.propositions = pValue ? this.savedIngredients.length && this.savedIngredients.map((pIngredient) => pIngredient.title).filter((pIngredient) => pIngredient.toLowerCase().includes(pValue.toLowerCase())) : []
 	}
 
 	static clearPropositionsOnBackgroundClick (pCb) {
@@ -19,7 +20,7 @@ export class Commons {
 		})
 	}
 
-	static managePropositions (pEvent, pEnterFunction) {
+	static async managePropositions (pEvent, pEnterFunction) {
 		const input = pEvent.target
 		this.setPropositions(input.value)
 		if (pEvent.key === 'Enter') pEnterFunction(pEvent)

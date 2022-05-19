@@ -8,18 +8,11 @@ const replaceTagAndGetHtml = (pFileContents, pTag, pReplace) => {
 	pFileContents.split(/\r?\n/).forEach((pLine) => (html += pLine.trim()))
 	return html.replace(pTag, pReplace)
 }
+const salt = 'XSzAx9x4qn9BFZGk'
 
 export class Utils {
 	static fromFront (pFile) {
 		return fromSrc(`front${pFile}`)
-	}
-
-	static async readFileFromDB (pFile) {
-		return await fs.readFile(fromSrc(`datas/${pFile}`), 'utf8')
-	}
-
-	static async saveDB (db, json) {
-		return await fs.writeFile(fromSrc(`datas/${json}`), JSON.stringify(db, null, 2))
 	}
 
 	static async fragments (pFile, pClassName, pSubTitle = '') {
@@ -45,5 +38,27 @@ export class Utils {
 			.replace(/--+/g, '_') // Replace multiple - with single _
 			.replace(/^-+/, '') // Trim - from start of text
 			.replace(/-+$/, '') // Trim - from end of text
+	}
+
+	static crypt (text) {
+		const textToChars = (text) => text.split('').map((c) => c.charCodeAt(0))
+		const byteHex = (n) => ('0' + Number(n).toString(16)).substr(-2)
+		const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code)
+		return text
+			.split('')
+			.map(textToChars)
+			.map(applySaltToChar)
+			.map(byteHex)
+			.join('')
+	}
+
+	static decrypt (encoded) {
+		const textToChars = (text) => text.split('').map((c) => c.charCodeAt(0))
+		const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code)
+		return encoded?.match(/.{1,2}/g)
+			.map((hex) => parseInt(hex, 16))
+			.map(applySaltToChar)
+			.map((charCode) => String.fromCharCode(charCode))
+			.join('')
 	}
 }

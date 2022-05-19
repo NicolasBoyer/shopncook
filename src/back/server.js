@@ -1,6 +1,7 @@
 import http from 'http'
 import fs from 'fs'
 import { Utils } from './utils.js'
+import Database from './database.js'
 
 const GET = []
 const POST = []
@@ -39,7 +40,7 @@ export const mimetype = Object.freeze({
 
 export class Server {
 	constructor (pPort = 8000) {
-		const server = http.createServer((req, res) => {
+		const server = http.createServer(async (req, res) => {
 			const response = async (pMethod) => {
 				for (const pRoute of pMethod) {
 					const pathArr = pRoute.path.split('/')
@@ -56,6 +57,7 @@ export class Server {
 						}
 						switch (pRoute.type) {
 							case mimetype.HTML:
+
 								res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
 								break
 							case mimetype.JSON:
@@ -78,6 +80,13 @@ export class Server {
 						return
 					}
 				}
+				const credentials = req.headers?.cookie?.split('; ').filter((cookie) => cookie.includes('_ma'))[0]
+				if (!credentials || !await Database.auth(Utils.decrypt(credentials?.split('=')[1]))) {
+					res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
+					res.end(await Utils.fragments('login.html', 'login', 'Connexion à la BDD'))
+					return
+				}
+				Database.init()
 				response(GET)
 			}
 			if (req.method === 'POST') response(POST)

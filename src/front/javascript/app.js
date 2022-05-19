@@ -7,6 +7,7 @@ import Ingredients from './components/ingredients.js'
 import Recipe from './components/recipe.js'
 import Lists from './components/lists.js'
 import Header from './components/header.js'
+import Login from './components/login.js'
 
 class App {
 	constructor () {
@@ -33,4 +34,5 @@ customElements.define('fs-recipes', Recipes)
 customElements.define('fs-recipe', Recipe)
 customElements.define('fs-lists', Lists)
 customElements.define('fs-ingredients', Ingredients)
+customElements.define('fs-login', Login)
 new App()

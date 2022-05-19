@@ -10,10 +10,10 @@ export default class Recipe extends HTMLElement {
 		this.title = 'Ajouter une recette'
 		this.isInEditMode = splitUrl.includes('edit')
 		if (this.isInEditMode) {
-			const id = splitUrl[splitUrl.length - 1]
-			const currentRecipe = await Utils.request('/db', 'POST', { body: `{ "getRecipes": { "slug": "${id}" } }` })
+			const currentRecipe = await Utils.request('/db', 'POST', { body: `{ "getRecipes": { "slug": "${splitUrl[splitUrl.length - 1]}" } }` })
 			if (Array.isArray(currentRecipe)) location.href = location.origin + '/404.html'
 			this.currentRecipeTitle = currentRecipe.title
+			this.currentRecipeId = currentRecipe._id
 			this.submitButtonName = 'Modifier'
 			this.title = 'Modifier une recette'
 			this.newIngredients = currentRecipe.ingredients
@@ -35,17 +35,16 @@ export default class Recipe extends HTMLElement {
 				const splitUrl = location.pathname.split('/')
 				const isEdit = splitUrl.includes('edit')
 				const plainFormData = Object.fromEntries(new FormData(form).entries())
-				const recipeRequest = isEdit ? `{ "editRecipe": { "recipe": "${plainFormData.recipe}", "oldRecipe": "${this.currentRecipeTitle}" } }` : `{ "setRecipe": "${plainFormData.recipe}" }`
-				const ingredientsRequest = `{ "setIngredients": { ${isEdit ? `"oldRecipe": "${this.currentRecipeTitle}",` : ''} "recipe": "${plainFormData.recipe}", "ingredients": ${JSON.stringify((Object.keys(plainFormData).map((key) => key !== 'recipe' && plainFormData[key]).filter((ingredients) => ingredients)))}} }`
-				const response = await Utils.request('/db', 'POST', { body: `[${recipeRequest}, ${ingredientsRequest}]` })
+				const id = plainFormData.id
+				const response = await Utils.request('/db', 'POST', { body: `{ "setRecipe": { "title": "${plainFormData.recipe}", ${id ? `"id": "${id}",` : ''} "ingredients": ${JSON.stringify(Object.keys(plainFormData).map((key) => key !== 'recipe' && key !== 'id' && { title: plainFormData[key] }).filter((ingredient) => ingredient))}} }` })
 				if (isEdit) location.href = '/recipes'
 				else {
 					this.newIngredients = []
 					document.querySelectorAll('input').forEach((input) => {
 						input.value = ''
 					})
-					Utils.toast('success', Object.keys(response[0])[0] === 'error' ? 'Recette mise à jour' : 'Recette enregistrée')
-					Commons.savedIngredients = response[1].map((pIngredient) => pIngredient.title)
+					Utils.toast('success', 'Recette enregistrée')
+					Commons.savedIngredients = response[1]
 					this.render()
 				}
 			} catch (error) {
@@ -79,6 +78,7 @@ export default class Recipe extends HTMLElement {
 				<label>
 					<span>Nom</span>
 					<input name="recipe" required type="text" value="${this.currentRecipeTitle || ''}">
+					<input name="id" type="hidden" value="${this.currentRecipeId || ''}">
 				</label>
 				<fieldset class="ingredients">
 					<legend>Ingrédients</legend>

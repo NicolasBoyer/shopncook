@@ -29,14 +29,14 @@ export default class Recipes extends HTMLElement {
 
 	async removeRecipe (pRecipe) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
-			this.savedRecipes = await Utils.request('/db', 'POST', { body: `{ "removeRecipe": "${pRecipe.title}" }` })
+			this.savedRecipes = await Utils.request('/db', 'POST', { body: `{ "removeRecipe": "${pRecipe._id}" }` })
 			this.search()
 			Utils.toast('success', 'Recette supprimée')
 		})
 	}
 
 	search (pValue) {
-		this.recipes = (pValue ? this.savedRecipes.filter((pRecipe) => pRecipe.title.toLowerCase().includes(pValue.toLowerCase())) : !Array.isArray(this.savedRecipes) && Object.keys(this.savedRecipes).length ? [this.savedRecipes] : this.savedRecipes).sort((a, b) => a.title.localeCompare(b.title))
+		this.recipes = (pValue && Array.isArray(this.savedRecipes) ? this.savedRecipes.filter((pRecipe) => pRecipe.title.toLowerCase().includes(pValue.toLowerCase())) : !Array.isArray(this.savedRecipes) && Object.keys(this.savedRecipes).length ? [this.savedRecipes] : this.savedRecipes).sort((a, b) => a.title.localeCompare(b.title))
 		this.render()
 	}
 
@@ -57,7 +57,7 @@ export default class Recipes extends HTMLElement {
 										${this.choiceMode ? html`
 											<label for="${pRecipe.slug}">
 												<input type="checkbox" id="${pRecipe.slug}" name="${pRecipe.slug}" value="${pRecipe.title}" @change="${(pEvent) => {
-													const value = pEvent.target.value
+													const value = pRecipe._id
 													if (pEvent.target.checked) choices.push(value)
 													else choices = choices.filter((pChoice) => pChoice !== value)
 													document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail: { choices } }))

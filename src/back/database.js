@@ -1,15 +1,28 @@
+import { MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
 
 /**
  * Permet la déclaration de la db (ici un fichier json) et de résoudre les requêtes passées dans la fonction request
  */
 export default class Database {
-	static async init () {
-		this.recipesDB = JSON.parse(await Utils.readFileFromDB('recipes.json'))
-		this.ingredientsDB = JSON.parse(await Utils.readFileFromDB('ingredients.json'))
-		this.listsDB = JSON.parse(await Utils.readFileFromDB('lists.json'))
-		return this
+	static async auth (credentials) {
+		try {
+			const splitCredentials = credentials.split(':')
+			this.client = await MongoClient.connect(`mongodb+srv://${splitCredentials[0]}:${encodeURIComponent(splitCredentials[1])}@cluster0.camsv.mongodb.net/foodshop?retryWrites=true&w=majority`)
+			return true
+		} catch (e) {
+			return false
+		}
 	}
+
+	static init () {
+		const db = this.client.db('foodshop')
+		this.ingredients = db.collection('ingredients')
+		this.recipes = db.collection('recipes')
+		this.lists = db.collection('lists')
+	}
+
+	// TODO revérif le code et voir si possible de le refactoriser + utilisation des ?
 
 	/**
 	 * Retourne ou enregistre des informations dans la db (des fichiers json) en fonction des requêtes reçues dans le resolver
@@ -17,145 +30,113 @@ export default class Database {
 	 * Retourne ce qui est traité dans la fonction getRecipes : les titres des recettes dans un array
 	 * À chaque requête doit correspondre une fonction. La key étant la fonction, la value les arguments
 	 * Autres exemples :
-	 * { "getRecipes": {"title": "Tartiflette"} } retourne la recette tartiflette avec ses ingrédients via un objet
-	 * { "setRecipe": {"title": "Tagliatelle à la carbonara"} } enregistre {"title": "Tagliatelle à la carbonara"} dans la db recipes.json
+	 * { "getRecipes": {"slug": "Tartiflette"} } retourne la recette tartiflette avec ses ingrédients via un objet
+	 * { "setRecipe": {"slug": "Tagliatelle à la carbonara"} } enregistre {"slug": "Tagliatelle à la carbonara"} dans la db recipes.json
 	 * @param datas requête à traiter par la fonction
 	 * @returns {*|[]|*[]} retourne un array si request est un array sinon un objet
 	 */
-	static request (datas) {
+	static async request (datas) {
 		const resolvers = {
-			getRecipes (args) {
-				let recipes = Database.recipesDB.reduce((arr, recipe) => {
-					const entry = { title: recipe, slug: Utils.slugify(recipe) }
-					entry.ingredients = Database.ingredientsDB.filter((ingredient) => {
-						if (ingredient.recipes) return ingredient.recipes.includes(recipe)
-					}).map((ingredient) => ingredient.title)
-					arr.push(entry)
-					return arr
-				}, [])
-				if (args.title) recipes = recipes.filter((recipe) => recipe.title === args.title)
-				if (args.slug) recipes = recipes.filter((recipe) => recipe.slug === args.slug)
-				if (args.map) recipes = recipes.map((recipe) => recipe[args.map])
+			async getRecipes (args) {
+				let recipes = []
+				if (args && args.slug) recipes.push(await Database.recipes.findOne({ slug: args.slug }))
+				else recipes = await Database.recipes.find().toArray()
+				if (args && args.map) recipes = recipes.map((ingredient) => ingredient[args.map])
+				else {
+					for (const recipe of recipes) {
+						recipe.ingredients = (await Database.ingredients.find({ recipes: { $in: [recipe._id] } }).toArray()).map((ingredient) => ingredient.title)
+					}
+				}
 				return recipes.length === 1 ? recipes[0] : recipes
 			},
 
-			getIngredients (args) {
-				let ingredients = Database.ingredientsDB
-				if (args.recipeTitle) ingredients = ingredients.filter((ingredient) => ingredient.recipes && ingredient.recipes.includes(args.recipeTitle))
-				if (args.map) ingredients = ingredients.map((ingredient) => ingredient[args.map])
+			async setRecipe (args) {
+				const title = args.title
+				const updateResult = await Database.recipes.updateOne({ _id: new ObjectId(args.id) }, { $set: { title, slug: Utils.slugify(title) } }, { upsert: true })
+				args.recipeId = args.id || updateResult.upsertedId
+				const ingredients = await resolvers.setIngredients(args)
+				return [await resolvers.getRecipes(), ingredients]
+			},
+
+			async removeRecipe (id) {
+				const objectId = new ObjectId(id)
+				await Database.recipes.deleteOne({ _id: objectId })
+				await Database.ingredients.updateMany({}, { $pull: { recipes: { $in: [objectId] } } })
+				return await resolvers.getRecipes()
+			},
+
+			async getIngredients (args) {
+				let ingredients = await Database.ingredients.find().toArray()
+				if (args && args.map) ingredients = ingredients.map((ingredient) => ingredient[args.map])
 				return ingredients
 			},
 
-			setRecipe (recipe) {
-				if (Database.recipesDB.includes(recipe)) {
-					return { error: `La recette ${recipe} a déjà été enregistrée` }
-				}
-				Database.recipesDB.push(recipe)
-				Utils.saveDB(Database.recipesDB, 'recipes.json')
-				return { success: 'Recette enregistrée' }
-			},
-
-			editRecipe (args) {
-				Database.recipesDB[Database.recipesDB.indexOf(args.oldRecipe)] = args.recipe
-				Utils.saveDB(Database.recipesDB, 'recipes.json')
-				return { success: 'Recette enregistrée' }
-			},
-
-			removeRecipe (recipe) {
-				Database.recipesDB.splice(Database.recipesDB.indexOf(recipe), 1)
-				Database.ingredientsDB.filter((ingredient) => ingredient.recipes && ingredient.recipes.includes(recipe)).map((ingredient) => {
-					ingredient.recipes.splice(ingredient.recipes.indexOf(recipe), 1)
-					return ingredient
-				})
-				Utils.saveDB(Database.recipesDB, 'recipes.json')
-				Utils.saveDB(Database.ingredientsDB, 'ingredients.json')
-				return resolvers.getRecipes({})
-			},
-
-			editIngredient (args) {
-				Database.ingredientsDB.filter((ingredient) => ingredient.title === args.oldIngredient).map((ingredient) => {
-					ingredient.title = args.newIngredient
-					return ingredient
-				})
-				Utils.saveDB(Database.ingredientsDB, 'ingredients.json')
-				return Database.ingredientsDB
-			},
-
-			setIngredients (args) {
-				args.ingredients.forEach((ingredient) => {
+			async setIngredients (args) {
+				const newIngredients = []
+				for (const ingredient of args.ingredients) {
 					let currentIngredient
-					currentIngredient = Database.ingredientsDB.filter((pIngredient) => pIngredient.title === ingredient)[0]
-					if (!currentIngredient) {
-						currentIngredient = { title: ingredient }
-						Database.ingredientsDB.push(currentIngredient)
-					}
+					const objectId = new ObjectId(ingredient.id)
+					ingredient.filter = ingredient.id ? { _id: objectId } : { title: ingredient.title }
+					currentIngredient = ingredient.id ? await Database.ingredients.findOne({ _id: objectId }) : await Database.ingredients.findOne({ title: ingredient.title })
+					if (currentIngredient && !args.ingredients.some((pIngredient) => pIngredient._id === currentIngredient._id) && currentIngredient.recipes && args.recipeId && currentIngredient.recipes.includes(args.recipeId)) currentIngredient.recipes.splice(currentIngredient.recipes.indexOf(args.recipeId), 1)
+					if (!currentIngredient) currentIngredient = {}
+					currentIngredient.title = ingredient.title
 					if (!currentIngredient.recipes) currentIngredient.recipes = []
-					if (!currentIngredient.recipes.includes(args.recipe)) currentIngredient.recipes.push(args.recipe)
-				})
-				if (args.oldRecipe) {
-					Database.ingredientsDB.filter((ingredient) => ingredient.recipes && ingredient.recipes.includes(args.oldRecipe)).map((ingredient) => {
-						ingredient.recipes[ingredient.recipes.indexOf(args.oldRecipe)] = args.recipe
-						return ingredient
+					if (args.ingredients.some((pIngredient) => pIngredient._id === ingredient.id) && args.recipeId && !currentIngredient.recipes.includes(args.recipeId)) currentIngredient.recipes.push(args.recipeId)
+					newIngredients.push(currentIngredient)
+				}
+				await Database.ingredients.bulkWrite(newIngredients.map((ingredient, index) =>
+					({
+						updateOne: {
+							filter: args.ingredients[index].filter,
+							update: { $set: ingredient },
+							upsert: true
+						}
 					})
+				))
+				return await resolvers.getIngredients()
+			},
+
+			async removeIngredient (id) {
+				await Database.ingredients.deleteOne({ _id: new ObjectId(id) })
+				return await resolvers.getIngredients()
+			},
+
+			async getListIngredients () {
+				return await Database.lists.find().toArray()
+			},
+
+			async setListIngredients (args) {
+				const newIngredients = []
+				let isEdit = false
+				for (const ingredient of args.ingredients) {
+					const { id, ...currentIngredient } = ingredient
+					if (ingredient.title) currentIngredient.title = ingredient.title
+					ingredient.filter = ingredient.id ? { _id: new ObjectId(ingredient.id) } : { title: ingredient.title }
+					if (!ingredient.id) currentIngredient.size = (await Database.lists.findOne(ingredient.filter))?.size
+					isEdit = !!ingredient.id
+					newIngredients.push(currentIngredient)
 				}
-				Database.ingredientsDB.forEach((ingredient) => {
-					if (!args.ingredients.includes(ingredient.title) && ingredient.recipes && ingredient.recipes.includes(args.recipe)) ingredient.recipes.splice(ingredient.recipes.indexOf(args.recipe), 1)
-				})
-				Utils.saveDB(Database.ingredientsDB, 'ingredients.json')
-				return Database.ingredientsDB
-			},
-
-			removeIngredient (ingredient) {
-				Database.ingredientsDB = Database.ingredientsDB.map((pIngredient) => {
-					if (pIngredient.title !== ingredient) return pIngredient
-				}).filter((pIngredient) => pIngredient)
-				Utils.saveDB(Database.ingredientsDB, 'ingredients.json')
-				return Database.ingredientsDB
-			},
-
-			getListIngredients () {
-				return Database.listsDB[Database.listsDB.length - 1]
-			},
-
-			editListIngredient (args) {
-				const currentList = resolvers.getListIngredients()
-				currentList.filter((ingredient) => ingredient.title === args.oldIngredient).map((ingredient) => {
-					ingredient.title = args.newIngredient
-					ingredient.ordered = args.ordered
-					return ingredient
-				})
-				Utils.saveDB(Database.listsDB, 'lists.json')
-				return currentList
-			},
-
-			setListIngredient (ingredient) {
-				if (!resolvers.getListIngredients().some((pIngredient) => pIngredient.title === ingredient)) {
-					Database.listsDB[Database.listsDB.length - 1].push({ title: ingredient })
-					Utils.saveDB(Database.listsDB, 'lists.json')
-					this.setIngredients({ ingredients: [ingredient] })
-				}
+				await Database.lists.bulkWrite(newIngredients.map((ingredient, index) =>
+					({
+						updateOne: {
+							filter: args.ingredients[index].filter,
+							update: { $set: ingredient },
+							upsert: true
+						}
+					})
+				))
+				if (!isEdit) await this.setIngredients(args)
 				return resolvers.getListIngredients()
 			},
 
-			setListIngredients (ingredients) {
-				Database.listsDB[Database.listsDB.length - 1] = [...new Set(resolvers.getListIngredients().concat(ingredients.split(',').map((pIngredient) => {
-					return { title: pIngredient }
-				})).map(a => JSON.stringify(a)))].map(a => JSON.parse(a))
-				Utils.saveDB(Database.listsDB, 'lists.json')
-				return resolvers.getListIngredients()
+			async removeListIngredient (id) {
+				await Database.lists.deleteOne({ _id: new ObjectId(id) })
+				return await resolvers.getListIngredients()
 			},
 
-			removeListIngredient (ingredient) {
-				Database.listsDB[Database.listsDB.length - 1] = resolvers.getListIngredients().map((pIngredient) => {
-					if (pIngredient.title !== ingredient) return pIngredient
-				}).filter((pIngredient) => pIngredient)
-				Utils.saveDB(Database.listsDB, 'lists.json')
-				return Database.listsDB[Database.listsDB.length - 1]
-			},
-
-			clearListIngredients () {
-				Database.listsDB[Database.listsDB.length - 1] = []
-				Utils.saveDB(Database.listsDB, 'lists.json')
+			async clearListIngredients () {
+				await Database.lists.deleteMany({})
 				return resolvers.getListIngredients()
 			}
 		}
@@ -173,6 +154,6 @@ export default class Database {
 		const func = Object.keys(datas)
 		resolver = resolvers[func]
 		if (!resolver) return { error: `no resolver function for ${func}` }
-		return resolvers[Object.keys(datas)](Object.values(datas)[0])
+		return await resolvers[Object.keys(datas)](Object.values(datas)[0])
 	}
 }

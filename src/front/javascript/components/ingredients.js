@@ -9,8 +9,8 @@ export default class Ingredients extends HTMLElement {
 		this.querySelector('input').addEventListener('keyup', (pEvent) => this.search(pEvent.target.value))
 	}
 
-	async editAndSaveIngredient (oldIngredient, newIngredient) {
-		Commons.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "editIngredient": { "oldIngredient": "${oldIngredient}", "newIngredient": "${newIngredient}" } }` })).map((pIngredient) => pIngredient.title)
+	async editAndSaveIngredient (id, title) {
+		Commons.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${title}", "id": "${id}" } ] } }` }))
 		this.resetMode()
 	}
 
@@ -19,16 +19,16 @@ export default class Ingredients extends HTMLElement {
 		this.search()
 	}
 
-	async removeIngredient (pIngredient) {
+	async removeIngredient (id) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
-			Commons.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${pIngredient}" }` })).map((pIngredient) => pIngredient.title)
+			Commons.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${id}" }` }))
 			this.search()
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
 	}
 
 	search (pValue) {
-		this.ingredients = (pValue ? Commons.savedIngredients.filter((pIngredient) => pIngredient.toLowerCase().includes(pValue.toLowerCase())) : Commons.savedIngredients).sort((a, b) => a.localeCompare(b))
+		this.ingredients = (pValue ? Commons.savedIngredients.filter((pIngredient) => pIngredient.title.toLowerCase().includes(pValue.toLowerCase())) : Commons.savedIngredients).sort((a, b) => a.title.localeCompare(b.title))
 		this.render()
 	}
 
@@ -43,53 +43,57 @@ export default class Ingredients extends HTMLElement {
 					<ul>
 						${!this.ingredients.length ? html`
 							<li>Aucun résultat</li>` : this.ingredients.map(
-								(pIngredient) => html`
-									<li>
-										<div>
-											${this.editMode === pIngredient ? html`
-												<input name="${pIngredient}" required type="text" value="${pIngredient}" @keyup="${(pEvent) => {
-													if (pEvent.key === 'Enter') this.editAndSaveIngredient(pIngredient, pEvent.target.value)
-													if (pEvent.key === 'Escape') this.resetMode()
-												}}"/>
-											` : html`
-												<span>${pIngredient}</span>
-											`}
-											${this.editMode === pIngredient ? html`
-												<button class="valid" @pointerup="${(pEvent) => this.editAndSaveIngredient(pIngredient, pEvent.target.closest('button').previousElementSibling.value)}">
-													<svg class="valid">
-														<use href="#valid"></use>
-													</svg>
-													<span>Valider</span>
-												</button>
-											` : html`
-												<button class="edit" @pointerup="${() => {
-													this.editMode = pIngredient
-													this.search()
-												}}">
-													<svg class="edit">
-														<use href="#edit"></use>
-													</svg>
-													<span>Modifier</span>
-												</button>
-											`}
-											${this.editMode === pIngredient ? html`
-												<button type="button" class="undo" @pointerup="${() => this.resetMode()}">
-													<svg class="undo">
-														<use href="#undo"></use>
-													</svg>
-													<span>Annuler</span>
-												</button>
-											` : html`
-												<button type="button" class="remove" @pointerup="${() => this.removeIngredient(pIngredient)}">
-													<svg class="remove">
-														<use href="#remove"></use>
-													</svg>
-													<span>Supprimer</span>
-												</button>
-											`}
-										</div>
-									</li>
-								`
+								(pIngredient) => {
+									const ingredientTitle = pIngredient.title
+									const ingredientId = pIngredient._id
+									return html`
+										<li>
+											<div>
+												${this.editMode === ingredientId ? html`
+													<input name="${ingredientId}" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
+														if (pEvent.key === 'Enter') this.editAndSaveIngredient(ingredientId, pEvent.target.value)
+														if (pEvent.key === 'Escape') this.resetMode()
+													}}"/>
+												` : html`
+													<span>${ingredientTitle}</span>
+												`}
+												${this.editMode === ingredientId ? html`
+													<button class="valid" @pointerup="${(pEvent) => this.editAndSaveIngredient(ingredientId, pEvent.target.closest('button').previousElementSibling.value)}">
+														<svg class="valid">
+															<use href="#valid"></use>
+														</svg>
+														<span>Valider</span>
+													</button>
+												` : html`
+													<button class="edit" @pointerup="${() => {
+														this.editMode = ingredientId
+														this.search()
+													}}">
+														<svg class="edit">
+															<use href="#edit"></use>
+														</svg>
+														<span>Modifier</span>
+													</button>
+												`}
+												${this.editMode === ingredientId ? html`
+													<button type="button" class="undo" @pointerup="${() => this.resetMode()}">
+														<svg class="undo">
+															<use href="#undo"></use>
+														</svg>
+														<span>Annuler</span>
+													</button>
+												` : html`
+													<button type="button" class="remove" @pointerup="${() => this.removeIngredient(ingredientId)}">
+														<svg class="remove">
+															<use href="#remove"></use>
+														</svg>
+														<span>Supprimer</span>
+													</button>
+												`}
+											</div>
+										</li>
+									`
+								}
 						)}
 					</ul>
 				</nav>
