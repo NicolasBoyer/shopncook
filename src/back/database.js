@@ -43,7 +43,7 @@ export default class Database {
 				if (args && args.map) recipes = recipes.map((ingredient) => ingredient[args.map])
 				else {
 					for (const recipe of recipes) {
-						recipe.ingredients = (await Database.ingredients.find({ recipes: { $in: [recipe._id] } }).toArray()).map((ingredient) => ingredient.title)
+						recipe.ingredients = (await Database.ingredients.find({ recipes: { $in: [recipe._id.toString()] } }).toArray()).map((ingredient) => ingredient.title)
 					}
 				}
 				return recipes.length === 1 ? recipes[0] : recipes
@@ -52,7 +52,7 @@ export default class Database {
 			async setRecipe (args) {
 				const title = args.title
 				const updateResult = await Database.recipes.updateOne({ _id: new ObjectId(args.id) }, { $set: { title, slug: Utils.slugify(title) } }, { upsert: true })
-				args.recipeId = args.id || updateResult.upsertedId
+				args.recipeId = args.id || updateResult.upsertedId.toString()
 				const ingredients = await resolvers.setIngredients(args)
 				return [await resolvers.getRecipes(), ingredients]
 			},
@@ -60,7 +60,7 @@ export default class Database {
 			async removeRecipe (id) {
 				const objectId = new ObjectId(id)
 				await Database.recipes.deleteOne({ _id: objectId })
-				await Database.ingredients.updateMany({}, { $pull: { recipes: { $in: [objectId] } } })
+				await Database.ingredients.updateMany({}, { $pull: { recipes: { $in: [id] } } })
 				return await resolvers.getRecipes()
 			},
 
@@ -110,9 +110,15 @@ export default class Database {
 				let isEdit = false
 				for (const ingredient of args.ingredients) {
 					const { id, ...currentIngredient } = ingredient
+					console.log(ingredient)
 					if (ingredient.title) currentIngredient.title = ingredient.title
 					ingredient.filter = ingredient.id ? { _id: new ObjectId(ingredient.id) } : { title: ingredient.title }
-					if (!ingredient.id) currentIngredient.size = (await Database.lists.findOne(ingredient.filter))?.size || ingredient.size
+					if (!ingredient.id) {
+						const listIngredient = await Database.lists.findOne(ingredient.filter)
+						currentIngredient.size = listIngredient?.size || ingredient.size
+						// TODO ici à voir
+						currentIngredient.category = listIngredient?.category || ingredient.category || ''
+					}
 					isEdit = !!ingredient.id
 					newIngredients.push(currentIngredient)
 				}

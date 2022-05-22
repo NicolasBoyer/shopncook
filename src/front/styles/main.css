@@ -16,6 +16,7 @@
 	--modal-overlay-background-color: rgb(226 224 213 / 80%);
 	--secondary: #787159;
 	--secondary-hover: #625941;
+	--tooltip-background-color: #805d00;
 }
 
 /*** HTML TAG ***/
@@ -219,6 +220,10 @@ a.ordered {
 	align-items: center;
 	position: relative;
 	display: grid;
+}
+
+.home li > div.grid.addListIngredient {
+	grid-template-columns: 1fr 6rem 2rem 2rem 2rem;
 }
 
 .categories li > div.grid.addCategory {

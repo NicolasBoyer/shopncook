@@ -2,6 +2,15 @@ import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
 import { Utils } from '../utils.js'
 
 export default class Categories extends HTMLElement {
+	get choiceMode () {
+		return this.hasAttribute('choiceMode')
+	}
+
+	set choiceMode (pValue) {
+		if (pValue) this.setAttribute('choiceMode', '')
+		else this.removeAttribute('choiceMode')
+	}
+
 	async connectedCallback () {
 		this.categories = await this.getCategories()
 		this.render()
@@ -36,29 +45,39 @@ export default class Categories extends HTMLElement {
 	render () {
 		this.categories.sort((a, b) => a.title.localeCompare(b.title))
 		render(html`
-			<h2>Liste des catégories</h2>
+			${!this.choiceMode ? html`<h2>Liste des catégories</h2>` : ''}
 			<aside>
 				<nav>
 					<ul>
 						<li>
-							<div class="addCategory grid">
-								<input name="newCategory" type="text" @keyup="${(pEvent) => {
-									if (pEvent.key === 'Enter') this.editAndSaveCategory(pEvent)
-								}}"/>
-								<button type="button" class="add" @pointerdown="${(pEvent) => this.editAndSaveCategory(pEvent)}">
-									<svg class="add">
-										<use href="#add"></use>
-									</svg>
-									<span>Ajouter une catégorie</span>
-								</button>
-							</div>
+							${!this.choiceMode
+									? html`
+										<div class="addCategory grid">
+											<input name="newCategory" type="text" @keyup="${(pEvent) => {
+												if (pEvent.key === 'Enter') this.editAndSaveCategory(pEvent)
+											}}"/>
+											<button type="button" class="add" @pointerdown="${(pEvent) => this.editAndSaveCategory(pEvent)}">
+												<svg class="add">
+													<use href="#add"></use>
+												</svg>
+												<span>Ajouter une catégorie</span>
+											</button>
+										</div>
+									`
+									: ''}
 						</li>
 						${!this.categories.length ? html`
 							<li>Aucune catégorie ...</li>` : this.categories.map(
 								(pCategory) => {
 									const categoryTitle = pCategory.title
 									const categoryId = pCategory._id
-									return html`
+									return this.choiceMode ? html`
+										<label for="${categoryId}">
+											<input type="radio" id="${categoryId}" name="category" value="${categoryTitle}"
+												   @change="${() => document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail: { id: categoryId, title: categoryTitle } }))}">
+											${categoryTitle}
+										</label>
+									` : html`
 										<li>
 											<div class="editCategory ${this.editMode === categoryId ? 'grid' : ''}">
 												${this.editMode === categoryId ? html`

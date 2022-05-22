@@ -26,9 +26,11 @@ export default class Lists extends HTMLElement {
 	async editAndSaveListIngredient (pEvent, id) {
 		Commons.setPropositions()
 		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
+		const categoryButton = input.parentElement.querySelector('button.setCategory')
+		const categoryId = categoryButton?.getAttribute('data-id')
 		const sizeInput = input.nextElementSibling
 		if (input && input.value) {
-			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}, "size": "${sizeInput.value}" } ] } }` })
+			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${categoryId ? `, "category": "${categoryId}"` : ''}, "size": "${sizeInput.value}" } ] } }` })
 			if (!id && Commons.savedIngredients && !Commons.savedIngredients.some((pIngredient) => pIngredient.title === input.value)) Commons.savedIngredients.push({ title: input.value })
 			input.value = ''
 			sizeInput.value = ''
@@ -62,6 +64,23 @@ export default class Lists extends HTMLElement {
 				this.recipeChoices = []
 				this.render()
 			}
+		})
+	}
+
+	setCategory (pEvent) {
+		// TODO choicemode pour categories
+		let id, title
+		document.body.addEventListener('modalConfirm', (pEvent) => {
+			id = pEvent.detail.id
+			title = pEvent.detail.title
+		})
+		const button = pEvent.currentTarget
+		Utils.confirm(html`
+			<fs-categories choiceMode/>
+		`, async () => {
+			// TODO ici
+			button.setAttribute('data-tooltip', title)
+			button.setAttribute('data-id', id)
 		})
 	}
 
@@ -107,6 +126,12 @@ export default class Lists extends HTMLElement {
 										<use href="#addList"></use>
 									</svg>
 									<span>Ajouter des ingrédients</span>
+								</button>
+								<button type="button" class="setCategory" @pointerdown="${(pEvent) => this.setCategory(pEvent)}">
+									<svg class="setCategory">
+										<use href="#setCategory"></use>
+									</svg>
+									<span>Associer une catégorie</span>
 								</button>
 								<fs-propose list="${Commons.propositions}" @listReset="${() => {
 									Commons.setPropositions()
