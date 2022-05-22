@@ -222,10 +222,6 @@ a.ordered {
 	display: grid;
 }
 
-.home li > div.grid.addListIngredient {
-	grid-template-columns: 1fr 6rem 2rem 2rem 2rem;
-}
-
 .categories li > div.grid.addCategory {
 	grid-template-columns: 1fr 2rem;
 }

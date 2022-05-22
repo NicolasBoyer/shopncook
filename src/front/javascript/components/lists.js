@@ -93,6 +93,7 @@ export default class Lists extends HTMLElement {
 	}
 
 	render () {
+		// TODO en cours sur category présent si pas de category
 		render(html`
 			<div class="title">
 				<h2>Votre liste</h2>
@@ -126,12 +127,6 @@ export default class Lists extends HTMLElement {
 										<use href="#addList"></use>
 									</svg>
 									<span>Ajouter des ingrédients</span>
-								</button>
-								<button type="button" class="setCategory" @pointerdown="${(pEvent) => this.setCategory(pEvent)}">
-									<svg class="setCategory">
-										<use href="#setCategory"></use>
-									</svg>
-									<span>Associer une catégorie</span>
 								</button>
 								<fs-propose list="${Commons.propositions}" @listReset="${() => {
 									Commons.setPropositions()
@@ -197,6 +192,12 @@ export default class Lists extends HTMLElement {
 															<use href="#remove"></use>
 														</svg>
 														<span>Supprimer</span>
+													</button>
+													<button type="button" class="setCategory" @pointerdown="${(pEvent) => this.setCategory(pEvent)}">
+														<svg class="setCategory">
+															<use href="#setCategory"></use>
+														</svg>
+														<span>Associer une catégorie</span>
 													</button>
 												`}
 											</div>
