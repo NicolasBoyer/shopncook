@@ -34,10 +34,8 @@ export class Utils {
 		}
 	}
 
-	// TODO ws déplacer l'url
 	static initWsConnection (onClientsMessage, onOpenMessage = () => {}) {
-		console.log(location)
-		this.wsConnection = new WebSocket(`ws://${location.host}`)
+		this.wsConnection = new WebSocket(`${location.protocol === 'http:' ? 'ws:' : 'wss:'}//${location.host}`)
 		this.wsConnection.onopen = onOpenMessage
 		this.wsConnection.onerror = (error) => {
 			console.error('WebSocket Error ' + error)
