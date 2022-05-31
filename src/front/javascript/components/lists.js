@@ -1,4 +1,5 @@
 import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
+import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate'
 import { Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 
@@ -6,12 +7,17 @@ import { Commons } from '../commons.js'
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
+		Utils.initWsConnection(async (event) => {
+			this.ingredients = JSON.parse(await event.data.text())
+			this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
+			this.render()
+			autoAnimate(document.querySelector('ul'))
+		})
 		Commons.clearPropositionsOnBackgroundClick(() => this.render())
 		this.ingredients = await this.getListIngredients()
 		await Commons.getIngredients()
 		this.recipeChoices = []
-		this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
-		this.render()
+		Utils.wsConnection.send(JSON.stringify(this.ingredients))
 	}
 
 	async getListIngredients () {
@@ -20,7 +26,7 @@ export default class Lists extends HTMLElement {
 
 	resetMode () {
 		this.editMode = null
-		this.render()
+		Utils.wsConnection.send(JSON.stringify(this.ingredients))
 	}
 
 	async editAndSaveListIngredient (pEvent, id) {
@@ -46,7 +52,7 @@ export default class Lists extends HTMLElement {
 	async removeListIngredient (id) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
 			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "removeListIngredient": "${id}" }` })
-			this.render()
+			Utils.wsConnection.send(JSON.stringify(this.ingredients))
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
 	}
@@ -62,7 +68,7 @@ export default class Lists extends HTMLElement {
 				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes && pIngredient.recipes.length && pIngredient.recipes.some((pRecipeId) => this.recipeChoices.includes(pRecipeId))).map((pIngredient) => ({ title: pIngredient.title }))
 				this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
 				this.recipeChoices = []
-				this.render()
+				Utils.wsConnection.send(JSON.stringify(this.ingredients))
 			}
 		})
 	}
@@ -88,7 +94,7 @@ export default class Lists extends HTMLElement {
 		Utils.confirm(html`<h3>Voulez vous vider la liste ?</h3>`, async () => {
 			this.orderedIngredients = []
 			this.ingredients = await Utils.request('/db', 'POST', { body: '{ "clearListIngredients": "" }' })
-			this.render()
+			Utils.wsConnection.send(JSON.stringify(this.ingredients))
 		})
 	}
 
@@ -159,7 +165,7 @@ export default class Lists extends HTMLElement {
 														if (!isIngredientOrdered) this.orderedIngredients.push(ingredientId)
 														else this.orderedIngredients = this.orderedIngredients.filter((pOrderedIngredient) => ingredientId !== pOrderedIngredient)
 														if (this.orderedIngredients.length === this.ingredients.length) this.clear()
-													}}">${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</a>
+													}}"><span>${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</span></a>
 												`}
 												${this.editMode === ingredientId ? html`
 													<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(pEvent, ingredientId)}">

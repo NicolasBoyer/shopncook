@@ -110,7 +110,6 @@ export default class Database {
 				let isEdit = false
 				for (const ingredient of args.ingredients) {
 					const { id, ...currentIngredient } = ingredient
-					console.log(ingredient)
 					if (ingredient.title) currentIngredient.title = ingredient.title
 					ingredient.filter = ingredient.id ? { _id: new ObjectId(ingredient.id) } : { title: ingredient.title }
 					if (!ingredient.id) {

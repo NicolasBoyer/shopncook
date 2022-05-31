@@ -33,6 +33,15 @@ export class Utils {
 			}
 		}
 	}
+
+	static initWsConnection (onClientsMessage, onOpenMessage = () => {}) {
+		this.wsConnection = new WebSocket('ws://localhost:8000')
+		this.wsConnection.onopen = onOpenMessage
+		this.wsConnection.onerror = (error) => {
+			console.error('WebSocket Error ' + error)
+		}
+		this.wsConnection.onmessage = onClientsMessage
+	}
 }
 
 export class Dom {

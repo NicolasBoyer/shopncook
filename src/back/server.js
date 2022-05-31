@@ -2,6 +2,7 @@ import http from 'http'
 import fs from 'fs'
 import { Utils } from './utils.js'
 import Database from './database.js'
+import { WebSocketServer } from 'ws'
 
 const GET = []
 const POST = []
@@ -57,13 +58,13 @@ export class Server {
 						}
 						switch (pRoute.type) {
 							case mimetype.HTML:
-
 								res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
 								break
 							case mimetype.JSON:
 								res.writeHead(200, { 'Content-Type': 'application/json' })
 								break
 						}
+						// webSocketServer.emit('connection', 'blop')
 						pRoute.callback(req, res)
 						return
 					}
@@ -90,6 +91,12 @@ export class Server {
 				response(GET)
 			}
 			if (req.method === 'POST') response(POST)
+		})
+		const webSocketServer = new WebSocketServer({ server })
+		webSocketServer.on('connection', (ws) => {
+			ws.on('message', (data) => {
+				webSocketServer.clients.forEach((client) => client.send(data))
+			})
 		})
 		server.listen(pPort)
 	}
