@@ -3,7 +3,7 @@ import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate'
 import { Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 
-// TODO Categories, websocket
+// TODO Categories
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
