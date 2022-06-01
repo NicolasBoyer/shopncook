@@ -58,8 +58,7 @@ export default class Database {
 			},
 
 			async removeRecipe (id) {
-				const objectId = new ObjectId(id)
-				await Database.recipes.deleteOne({ _id: objectId })
+				await Database.recipes.deleteOne({ _id: new ObjectId(id) })
 				await Database.ingredients.updateMany({}, { $pull: { recipes: { $in: [id] } } })
 				return await resolvers.getRecipes()
 			},
@@ -80,6 +79,7 @@ export default class Database {
 					if (currentIngredient && !args.ingredients.some((pIngredient) => pIngredient._id === currentIngredient._id) && currentIngredient.recipes && args.recipeId && currentIngredient.recipes.includes(args.recipeId)) currentIngredient.recipes.splice(currentIngredient.recipes.indexOf(args.recipeId), 1)
 					if (!currentIngredient) currentIngredient = {}
 					currentIngredient.title = ingredient.title
+					currentIngredient.category = ingredient.category || currentIngredient.category || ''
 					if (!currentIngredient.recipes) currentIngredient.recipes = []
 					if (args.ingredients.some((pIngredient) => pIngredient._id === ingredient.id) && args.recipeId && !currentIngredient.recipes.includes(args.recipeId)) currentIngredient.recipes.push(args.recipeId)
 					newIngredients.push(currentIngredient)
@@ -108,6 +108,7 @@ export default class Database {
 			async setListIngredients (args) {
 				const newIngredients = []
 				let isEdit = false
+				let isNewCategory = false
 				for (const ingredient of args.ingredients) {
 					const { id, ...currentIngredient } = ingredient
 					if (ingredient.title) currentIngredient.title = ingredient.title
@@ -115,9 +116,9 @@ export default class Database {
 					if (!ingredient.id) {
 						const listIngredient = await Database.lists.findOne(ingredient.filter)
 						currentIngredient.size = listIngredient?.size || ingredient.size
-						// TODO ici à voir
 						currentIngredient.category = listIngredient?.category || ingredient.category || ''
 					}
+					isNewCategory = !!ingredient.category
 					isEdit = !!ingredient.id
 					newIngredients.push(currentIngredient)
 				}
@@ -130,7 +131,11 @@ export default class Database {
 						}
 					})
 				))
-				if (!isEdit) await this.setIngredients(args)
+				if (!isEdit) await resolvers.setIngredients(args)
+				if (isNewCategory && args.ingredients.length === 1) {
+					delete args.ingredients[0].id
+					await resolvers.setIngredients(args)
+				}
 				return resolvers.getListIngredients()
 			},
 
@@ -154,9 +159,9 @@ export default class Database {
 			},
 
 			async removeCategory (id) {
-				// const objectId = new ObjectId(id)
 				await Database.categories.deleteOne({ _id: new ObjectId(id) })
-				// await Database.ingredients.updateMany({}, { $pull: { recipes: { $in: [objectId] } } })
+				await Database.ingredients.updateMany({}, { $unset: { category: id } })
+				await Database.lists.updateMany({}, { $unset: { category: id } })
 				return await resolvers.getCategories()
 			}
 		}
@@ -167,13 +172,13 @@ export default class Database {
 				const func = Object.keys(data)
 				resolver = resolvers[func]
 				if (!resolver) return { error: `no resolver function for ${func}` }
-				reqArr.push(resolver(Object.values(data)[0]))
+				reqArr.push(await resolver(Object.values(data)[0]))
 			}
 			return reqArr
 		}
 		const func = Object.keys(datas)
 		resolver = resolvers[func]
 		if (!resolver) return { error: `no resolver function for ${func}` }
-		return await resolvers[Object.keys(datas)](Object.values(datas)[0])
+		return await resolver(Object.values(datas)[0])
 	}
 }

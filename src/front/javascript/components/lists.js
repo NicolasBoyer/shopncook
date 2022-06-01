@@ -3,8 +3,6 @@ import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate'
 import { Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 
-// TODO Categories
-
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
 		Utils.initWsConnection(async (event) => {
@@ -14,14 +12,12 @@ export default class Lists extends HTMLElement {
 			autoAnimate(document.querySelector('ul'))
 		})
 		Commons.clearPropositionsOnBackgroundClick(() => this.render())
-		this.ingredients = await this.getListIngredients()
-		await Commons.getIngredients()
+		const response = await Utils.request('/db', 'POST', { body: '[{ "getListIngredients": "" }, { "getCategories": "" }, { "getIngredients": "" }]' })
+		this.ingredients = response[0]
+		this.categories = response[1]
+		Commons.savedIngredients = response[2]
 		this.recipeChoices = []
 		Utils.wsConnection.send(JSON.stringify(this.ingredients))
-	}
-
-	async getListIngredients () {
-		return await Utils.request('/db', 'POST', { body: '{ "getListIngredients": "" }' })
 	}
 
 	resetMode () {
@@ -32,11 +28,10 @@ export default class Lists extends HTMLElement {
 	async editAndSaveListIngredient (pEvent, id) {
 		Commons.setPropositions()
 		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
-		const categoryButton = input.parentElement.querySelector('button.setCategory')
-		const categoryId = categoryButton?.getAttribute('data-id')
 		const sizeInput = input.nextElementSibling
 		if (input && input.value) {
-			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${categoryId ? `, "category": "${categoryId}"` : ''}, "size": "${sizeInput.value}" } ] } }` })
+			const category = Commons.savedIngredients.map((pIngredient) => pIngredient.title === input.value && pIngredient.category).filter((pIngredient) => pIngredient)[0]
+			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${category ? `, "category": "${category}"` : ''}, "size": "${sizeInput.value}" } ] } }` })
 			if (!id && Commons.savedIngredients && !Commons.savedIngredients.some((pIngredient) => pIngredient.title === input.value)) Commons.savedIngredients.push({ title: input.value })
 			input.value = ''
 			sizeInput.value = ''
@@ -65,7 +60,10 @@ export default class Lists extends HTMLElement {
 			<fs-recipes choiceMode/>
 		`, async () => {
 			if (this.recipeChoices.length) {
-				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes && pIngredient.recipes.length && pIngredient.recipes.some((pRecipeId) => this.recipeChoices.includes(pRecipeId))).map((pIngredient) => ({ title: pIngredient.title }))
+				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes && pIngredient.recipes.length && pIngredient.recipes.some((pRecipeId) => this.recipeChoices.includes(pRecipeId))).map((pIngredient) => ({
+					title: pIngredient.title,
+					category: pIngredient.category
+				}))
 				this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
 				this.recipeChoices = []
 				Utils.wsConnection.send(JSON.stringify(this.ingredients))
@@ -73,20 +71,18 @@ export default class Lists extends HTMLElement {
 		})
 	}
 
-	setCategory (pEvent) {
-		// TODO choicemode pour categories
-		let id, title
+	setCategory (pEvent, ingredientId, ingredientTitle) {
+		let categoryId
 		document.body.addEventListener('modalConfirm', (pEvent) => {
-			id = pEvent.detail.id
-			title = pEvent.detail.title
+			categoryId = pEvent.detail.id
 		})
-		const button = pEvent.currentTarget
 		Utils.confirm(html`
 			<fs-categories choiceMode/>
 		`, async () => {
-			// TODO ici
-			button.setAttribute('data-tooltip', title)
-			button.setAttribute('data-id', id)
+			const response = await Utils.request('/db', 'POST', { body: `[{ "setListIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }, { "getIngredients": "" }]` })
+			this.ingredients = response[0]
+			Commons.savedIngredients = response[1]
+			Utils.wsConnection.send(JSON.stringify(this.ingredients))
 		})
 	}
 
@@ -99,7 +95,85 @@ export default class Lists extends HTMLElement {
 	}
 
 	render () {
-		// TODO en cours sur category présent si pas de category
+		const listIngredient = (pIngredient) => {
+			const ingredientId = pIngredient._id
+			const ingredientTitle = pIngredient.title
+			const ingredientSize = pIngredient.size
+			const isIngredientOrdered = this.orderedIngredients && this.orderedIngredients.includes(ingredientId)
+			return html`
+				<li>
+					<div class="editListIngredient ${this.editMode === ingredientId ? 'grid' : ''}">
+						${this.editMode === ingredientId ? html`
+							<input name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
+								if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent, ingredientId)
+								if (pEvent.key === 'Escape') this.resetMode()
+							}}"/>
+							<input name="size" type="text" value="${ingredientSize}" @keyup="${(pEvent) => {
+								if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent, ingredientId)
+								if (pEvent.key === 'Escape') this.resetMode()
+							}}"/>
+						` : html`
+							<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerup="${() => {
+								this.editListIngredientOrdered(ingredientId, !isIngredientOrdered)
+								if (!isIngredientOrdered) this.orderedIngredients.push(ingredientId)
+								else this.orderedIngredients = this.orderedIngredients.filter((pOrderedIngredient) => ingredientId !== pOrderedIngredient)
+								if (this.orderedIngredients.length === this.ingredients.length) this.clear()
+							}}"><span>${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</span></a>
+						`}
+						${this.editMode === ingredientId ? html`
+							<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(pEvent, ingredientId)}">
+								<svg class="valid">
+									<use href="#valid"></use>
+								</svg>
+								<span>Valider</span>
+							</button>
+						` : html`
+							<button class="edit" @pointerdown="${() => {
+								this.editMode = ingredientId
+								this.render()
+							}}" .disabled="${isIngredientOrdered}">
+								<svg class="edit">
+									<use href="#edit"></use>
+								</svg>
+								<span>Modifier</span>
+							</button>
+						`}
+						${this.editMode === ingredientId ? html`
+							<button type="button" class="undo" @pointerdown="${() => this.resetMode()}">
+								<svg class="undo">
+									<use href="#undo"></use>
+								</svg>
+								<span>Annuler</span>
+							</button>
+						` : html`
+							<button type="button" class="remove" @pointerdown="${() => this.removeListIngredient(ingredientId)}" .disabled="${isIngredientOrdered}">
+								<svg class="remove">
+									<use href="#remove"></use>
+								</svg>
+								<span>Supprimer</span>
+							</button>
+							${!pIngredient.category ? html`
+								<button type="button" class="setCategory" @pointerdown="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle)}" .disabled="${isIngredientOrdered}">
+									<svg class="setCategory">
+										<use href="#setCategory"></use>
+									</svg>
+									<span>Associer une catégorie</span>
+								</button>
+							` : ''
+							}
+						`}
+					</div>
+				</li>
+			`
+		}
+		const getCategoryTitle = (pCategoryId) => this.categories.map((pCategory) => pCategory._id === pCategoryId && pCategory.title).filter((pCategory) => pCategory)[0]
+		const ingredientsByCategory = this.ingredients.filter((pIngredient) => pIngredient.category).sort((a, b) => getCategoryTitle(a.category).localeCompare(getCategoryTitle(b.category))).reduce((group, ingredient) => {
+			const categoryId = ingredient.category
+			const category = getCategoryTitle(categoryId)
+			group[category] = group[category] ?? []
+			group[category].push(ingredient)
+			return group
+		}, {})
 		render(html`
 			<div class="title">
 				<h2>Votre liste</h2>
@@ -140,77 +214,25 @@ export default class Lists extends HTMLElement {
 								}}"></fs-propose>
 							</div>
 						</li>
-						${!this.ingredients.length ? html`
-							<li>Aucun ingrédient ...</li>` : this.ingredients.map(
-								(pIngredient) => {
-									const ingredientTitle = pIngredient.title
-									const ingredientId = pIngredient._id
-									const ingredientSize = pIngredient.size
-									const isIngredientOrdered = this.orderedIngredients && this.orderedIngredients.includes(ingredientId)
-									return html`
-										<li>
-											<div class="editListIngredient ${this.editMode === ingredientId ? 'grid' : ''}">
-												${this.editMode === ingredientId ? html`
-													<input name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
-														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent, ingredientId)
-														if (pEvent.key === 'Escape') this.resetMode()
-													}}"/>
-													<input name="size" type="text" value="${ingredientSize}" @keyup="${(pEvent) => {
-														if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent, ingredientId)
-														if (pEvent.key === 'Escape') this.resetMode()
-													}}"/>
-												` : html`
-													<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerup="${() => {
-														this.editListIngredientOrdered(ingredientId, !isIngredientOrdered)
-														if (!isIngredientOrdered) this.orderedIngredients.push(ingredientId)
-														else this.orderedIngredients = this.orderedIngredients.filter((pOrderedIngredient) => ingredientId !== pOrderedIngredient)
-														if (this.orderedIngredients.length === this.ingredients.length) this.clear()
-													}}"><span>${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</span></a>
-												`}
-												${this.editMode === ingredientId ? html`
-													<button class="valid" @pointerdown="${(pEvent) => this.editAndSaveListIngredient(pEvent, ingredientId)}">
-														<svg class="valid">
-															<use href="#valid"></use>
-														</svg>
-														<span>Valider</span>
-													</button>
-												` : html`
-													<button class="edit" @pointerdown="${() => {
-														this.editMode = ingredientId
-														this.render()
-													}}" .disabled="${isIngredientOrdered}">
-														<svg class="edit">
-															<use href="#edit"></use>
-														</svg>
-														<span>Modifier</span>
-													</button>
-												`}
-												${this.editMode === ingredientId ? html`
-													<button type="button" class="undo" @pointerdown="${() => this.resetMode()}">
-														<svg class="undo">
-															<use href="#undo"></use>
-														</svg>
-														<span>Annuler</span>
-													</button>
-												` : html`
-													<button type="button" class="remove" @pointerdown="${() => this.removeListIngredient(ingredientId)}" .disabled="${isIngredientOrdered}">
-														<svg class="remove">
-															<use href="#remove"></use>
-														</svg>
-														<span>Supprimer</span>
-													</button>
-													<button type="button" class="setCategory" @pointerdown="${(pEvent) => this.setCategory(pEvent)}">
-														<svg class="setCategory">
-															<use href="#setCategory"></use>
-														</svg>
-														<span>Associer une catégorie</span>
-													</button>
-												`}
-											</div>
-										</li>
-									`
-								}
-						)}
+						${!this.ingredients.length
+								? html`
+									<li>Aucun ingrédient ...</li>`
+								: html`
+									${this.ingredients.filter((pIngredient) => !pIngredient.category).map((pIngredient) => listIngredient(pIngredient))}
+									${Object.keys(ingredientsByCategory).map((pCategory, pIndex) => {
+										return html`
+											<ul>
+												<li>
+													<div class="category">${pCategory}</div>
+													<ul>
+														${Object.values(ingredientsByCategory)[pIndex].sort((a, b) => a.title.localeCompare(b.title)).map((pIngredient) => listIngredient(pIngredient))}
+													</ul>
+												</li>
+											</ul>
+										`
+									})}
+								`
+						}
 					</ul>
 				</nav>
 			</aside>

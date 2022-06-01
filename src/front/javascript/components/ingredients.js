@@ -1,16 +1,17 @@
 import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
 import { Utils } from '../utils.js'
-import { Commons } from '../commons.js'
 
 export default class Ingredients extends HTMLElement {
 	async connectedCallback () {
-		await Commons.getIngredients()
+		const response = await Utils.request('/db', 'POST', { body: '[{ "getIngredients": "" }, { "getCategories": "" }]' })
+		this.savedIngredients = response[0]
+		this.categories = response[1]
 		this.search()
 		this.querySelector('input').addEventListener('keyup', (pEvent) => this.search(pEvent.target.value))
 	}
 
 	async editAndSaveIngredient (id, title) {
-		Commons.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${title}", "id": "${id}" } ] } }` }))
+		this.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${title}", "id": "${id}" } ] } }` }))
 		this.resetMode()
 	}
 
@@ -21,14 +22,27 @@ export default class Ingredients extends HTMLElement {
 
 	async removeIngredient (id) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
-			Commons.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${id}" }` }))
+			this.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${id}" }` }))
 			this.search()
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
 	}
 
+	setCategory (pEvent, ingredientId, ingredientTitle, selectedCategoryId) {
+		let categoryId
+		document.body.addEventListener('modalConfirm', (pEvent) => {
+			categoryId = pEvent.detail.id
+		})
+		Utils.confirm(html`
+			<fs-categories choiceMode="${selectedCategoryId}"/>
+		`, async () => {
+			this.savedIngredients = await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }` })
+			this.search()
+		})
+	}
+
 	search (pValue) {
-		this.ingredients = (pValue ? Commons.savedIngredients.filter((pIngredient) => pIngredient.title.toLowerCase().includes(pValue.toLowerCase())) : Commons.savedIngredients).sort((a, b) => a.title.localeCompare(b.title))
+		this.ingredients = (pValue ? this.savedIngredients.filter((pIngredient) => pIngredient.title.toLowerCase().includes(pValue.toLowerCase())) : this.savedIngredients).sort((a, b) => a.title.localeCompare(b.title))
 		this.render()
 	}
 
@@ -45,6 +59,7 @@ export default class Ingredients extends HTMLElement {
 							<li>Aucun résultat</li>` : this.ingredients.map(
 								(pIngredient) => {
 									const ingredientTitle = pIngredient.title
+									const category = this.categories.map((pCategory) => pCategory._id === pIngredient.category && pCategory.title).filter((pCategory) => pCategory)[0]
 									const ingredientId = pIngredient._id
 									return html`
 										<li>
@@ -55,7 +70,7 @@ export default class Ingredients extends HTMLElement {
 														if (pEvent.key === 'Escape') this.resetMode()
 													}}"/>
 												` : html`
-													<span>${ingredientTitle}</span>
+													<span>${ingredientTitle}${category ? html` (${category})` : ''}</span>
 												`}
 												${this.editMode === ingredientId ? html`
 													<button class="valid" @pointerup="${(pEvent) => this.editAndSaveIngredient(ingredientId, pEvent.target.closest('button').previousElementSibling.value)}">
@@ -88,6 +103,12 @@ export default class Ingredients extends HTMLElement {
 															<use href="#remove"></use>
 														</svg>
 														<span>Supprimer</span>
+													</button>
+													<button type="button" class="setCategory" @pointerdown="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle, pIngredient.category)}">
+														<svg class="setCategory">
+															<use href="#setCategory"></use>
+														</svg>
+														<span>Associer une catégorie</span>
 													</button>
 												`}
 											</div>

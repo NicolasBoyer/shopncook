@@ -18,7 +18,7 @@ export default class Recipe extends HTMLElement {
 			this.title = 'Modifier une recette'
 			this.newIngredients = currentRecipe.ingredients
 		} else this.newIngredients = []
-		await Commons.getIngredients()
+		Commons.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
 		document.body.style.display = 'flex'
 		this.render()
 		this.setFormListener()

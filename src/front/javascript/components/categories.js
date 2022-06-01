@@ -3,21 +3,18 @@ import { Utils } from '../utils.js'
 
 export default class Categories extends HTMLElement {
 	get choiceMode () {
-		return this.hasAttribute('choiceMode')
+		const choiceMode = this.getAttribute('choiceMode')
+		return choiceMode !== null ? choiceMode : null
 	}
 
 	set choiceMode (pValue) {
-		if (pValue) this.setAttribute('choiceMode', '')
+		if (pValue) this.setAttribute('choiceMode', pValue)
 		else this.removeAttribute('choiceMode')
 	}
 
 	async connectedCallback () {
-		this.categories = await this.getCategories()
+		this.categories = await Utils.request('/db', 'POST', { body: '{ "getCategories": "" }' })
 		this.render()
-	}
-
-	async getCategories () {
-		return await Utils.request('/db', 'POST', { body: '{ "getCategories": "" }' })
 	}
 
 	resetMode () {
@@ -45,12 +42,12 @@ export default class Categories extends HTMLElement {
 	render () {
 		this.categories.sort((a, b) => a.title.localeCompare(b.title))
 		render(html`
-			${!this.choiceMode ? html`<h2>Liste des catégories</h2>` : ''}
+			${this.choiceMode === null ? html`<h2>Liste des catégories</h2>` : ''}
 			<aside>
 				<nav>
 					<ul>
 						<li>
-							${!this.choiceMode
+							${this.choiceMode === null
 									? html`
 										<div class="addCategory grid">
 											<input name="newCategory" type="text" @keyup="${(pEvent) => {
@@ -71,9 +68,9 @@ export default class Categories extends HTMLElement {
 								(pCategory) => {
 									const categoryTitle = pCategory.title
 									const categoryId = pCategory._id
-									return this.choiceMode ? html`
+									return this.choiceMode !== null ? html`
 										<label for="${categoryId}">
-											<input type="radio" id="${categoryId}" name="category" value="${categoryTitle}"
+											<input type="radio" id="${categoryId}" name="category" value="${categoryTitle}" .checked="${this.choiceMode === categoryId}"
 												   @change="${() => document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail: { id: categoryId, title: categoryTitle } }))}">
 											${categoryTitle}
 										</label>

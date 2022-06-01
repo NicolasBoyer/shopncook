@@ -1,11 +1,4 @@
-import { Utils } from './utils.js'
-
 export class Commons {
-	static async getIngredients () {
-		this.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
-		return this.savedIngredients
-	}
-
 	static setPropositions (pValue) {
 		if (!this.savedIngredients || !this.savedIngredients.length) return
 		this.propositions = pValue ? this.savedIngredients.length && this.savedIngredients.map((pIngredient) => pIngredient.title).filter((pIngredient) => pIngredient.toLowerCase().includes(pValue.toLowerCase())) : []
@@ -33,3 +26,5 @@ export class Commons {
 		}
 	}
 }
+
+Commons.savedIngredients = []

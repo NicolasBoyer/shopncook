@@ -172,6 +172,15 @@ h2 {
 	margin: 0 1rem;
 }
 
+.home .category {
+	background: var(--primary-focus);
+	font-weight: bold;
+	padding: 0.2rem 0.5rem;
+	border-radius: 0.3rem;
+	margin-top: 2rem;
+	font-size: 110%;
+}
+
 .editListIngredient a {
 	cursor: pointer;
 	user-select: none;
