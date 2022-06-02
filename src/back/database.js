@@ -160,8 +160,8 @@ export default class Database {
 
 			async removeCategory (id) {
 				await Database.categories.deleteOne({ _id: new ObjectId(id) })
-				await Database.ingredients.updateMany({}, { $unset: { category: id } })
-				await Database.lists.updateMany({}, { $unset: { category: id } })
+				await Database.ingredients.updateMany({ category: id }, { $unset: { category: '' } })
+				await Database.lists.updateMany({ category: id }, { $unset: { category: '' } })
 				return await resolvers.getCategories()
 			}
 		}
