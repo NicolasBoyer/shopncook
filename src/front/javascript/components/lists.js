@@ -5,19 +5,23 @@ import { Commons } from '../commons.js'
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
-		await Utils.initWsConnection(async (event) => {
-			this.ingredients = JSON.parse(await event.data.text())
-			this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
-			this.render()
-			autoAnimate(document.querySelector('ul'))
-		})
-		Commons.clearPropositionsOnBackgroundClick(() => this.render())
-		const response = await Utils.request('/db', 'POST', { body: '[{ "getListIngredients": "" }, { "getCategories": "" }, { "getIngredients": "" }]' })
-		this.ingredients = response[0]
-		this.categories = response[1]
-		Commons.savedIngredients = response[2]
-		this.recipeChoices = []
-		Utils.wsConnection.send(JSON.stringify(this.ingredients))
+		await Utils.initWsConnection(
+			async (event) => {
+				this.ingredients = JSON.parse(await event.data.text())
+				this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
+				this.render()
+				autoAnimate(document.querySelector('ul'))
+			},
+			async () => {
+				Commons.clearPropositionsOnBackgroundClick(() => this.render())
+				const response = await Utils.request('/db', 'POST', { body: '[{ "getListIngredients": "" }, { "getCategories": "" }, { "getIngredients": "" }]' })
+				this.ingredients = response[0]
+				this.categories = response[1]
+				Commons.savedIngredients = response[2]
+				this.recipeChoices = []
+				Utils.wsConnection.send(JSON.stringify(this.ingredients))
+			}
+		)
 	}
 
 	resetMode () {

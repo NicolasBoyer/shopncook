@@ -34,7 +34,7 @@ export class Utils {
 		}
 	}
 
-	static async initWsConnection (onClientsMessage, onOpenMessage = () => {}) {
+	static initWsConnection (onClientsMessage, onOpenMessage = () => {}) {
 		this.wsConnection = new WebSocket(`${location.protocol === 'http:' ? 'ws:' : 'wss:'}//${location.host}`)
 		this.wsConnection.onopen = onOpenMessage
 		this.wsConnection.onerror = (error) => {
