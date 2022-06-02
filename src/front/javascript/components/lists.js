@@ -5,7 +5,7 @@ import { Commons } from '../commons.js'
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
-		Utils.initWsConnection(async (event) => {
+		await Utils.initWsConnection(async (event) => {
 			this.ingredients = JSON.parse(await event.data.text())
 			this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
 			this.render()
