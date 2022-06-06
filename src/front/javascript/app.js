@@ -26,12 +26,11 @@ class App {
 				console.error(`${err.name}, ${err.message}`)
 			}
 		}
-		const handleVisibilityChange = async () => {
+		document.addEventListener('visibilitychange', async () => {
 			if (wakeLock !== null && document.visibilityState === 'visible') {
 				await requestWakeLock()
 			}
-		}
-		document.addEventListener('visibilitychange', handleVisibilityChange)
+		})
 		await requestWakeLock()
 	}
 
