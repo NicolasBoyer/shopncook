@@ -14,6 +14,25 @@ class App {
 	constructor () {
 		this.setBackButton()
 		Utils.confirm('', null, true)
+		this.wakeLock()
+	}
+
+	async wakeLock () {
+		let wakeLock = null
+		const requestWakeLock = async () => {
+			try {
+				wakeLock = await navigator.wakeLock.request()
+			} catch (err) {
+				console.error(`${err.name}, ${err.message}`)
+			}
+		}
+		const handleVisibilityChange = async () => {
+			if (wakeLock !== null && document.visibilityState === 'visible') {
+				await requestWakeLock()
+			}
+		}
+		document.addEventListener('visibilitychange', handleVisibilityChange)
+		await requestWakeLock()
 	}
 
 	setBackButton () {
