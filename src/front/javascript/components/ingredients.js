@@ -17,7 +17,7 @@ export default class Ingredients extends HTMLElement {
 
 	resetMode () {
 		this.editMode = null
-		this.search()
+		this.search(this.querySelector('input').value)
 	}
 
 	async removeIngredient (id) {
@@ -82,7 +82,7 @@ export default class Ingredients extends HTMLElement {
 												` : html`
 													<button class="edit" @pointerup="${() => {
 														this.editMode = ingredientId
-														this.search()
+														this.search(this.querySelector('input').value)
 													}}">
 														<svg class="edit">
 															<use href="#edit"></use>
