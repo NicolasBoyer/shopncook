@@ -1,8 +1,8 @@
 import http from 'http'
 import fs from 'fs'
 import { Utils } from './utils.js'
-import Database from './database.js'
 import { WebSocketServer } from 'ws'
+import Database from './database.js'
 
 const GET = []
 const POST = []
@@ -81,13 +81,17 @@ export class Server {
 						return
 					}
 				}
-				const credentials = req.headers?.cookie?.split('; ').filter((cookie) => cookie.includes('_ma'))[0]
-				if (!credentials || !await Database.auth(Utils.decrypt(credentials?.split('=')[1]))) {
-					res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
-					res.end(await Utils.fragments('login.html', 'login', 'Connexion à la BDD'))
-					return
+				if (req.url.includes('/app')) {
+					const credentials = req.headers?.cookie?.split('; ').filter((cookie) => cookie.includes('_ma'))[0]
+					// TODO ne pas tester l'auth à chaque connection !!!
+					if (!credentials || !await Database.auth(Utils.decrypt(credentials?.split('=')[1]))) {
+						res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
+						res.end(await Utils.fragments('login.html', 'login', 'Connexion à la BDD'))
+						return
+					}
+					Database.init()
 				}
-				Database.init()
+
 				response(GET)
 			}
 			if (req.method === 'POST') response(POST)

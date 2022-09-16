@@ -5,42 +5,46 @@ import Database from './database.js'
 export default class Routes {
 	constructor (pServer) {
 		pServer.get('/', async (req, res) => {
+			res.end(await Utils.fragments('presentation.html', 'presentation', '', 'home.html'))
+		})
+
+		pServer.get('/app', async (req, res) => {
 			res.end(await Utils.fragments('home.html', 'home'))
 		})
 
-		pServer.get('/recipe/add', async (req, res) => {
+		pServer.get('/app/recipe/add', async (req, res) => {
 			res.end(await Utils.fragments('recipe.html', 'recipe', 'Les recettes'))
 		})
 
-		pServer.get('/recipe/edit/:id', async (req, res) => {
+		pServer.get('/app/recipe/edit/:id', async (req, res) => {
 			res.end(await Utils.fragments('recipe.html', 'recipe', 'Les recettes'))
 		})
 
-		pServer.get('/recipes', async (req, res) => {
+		pServer.get('/app/recipes', async (req, res) => {
 			res.end(await Utils.fragments('recipes.html', 'recipes', 'Les recettes'))
 		})
 
-		pServer.get('/ingredients', async (req, res) => {
+		pServer.get('/app/ingredients', async (req, res) => {
 			res.end(await Utils.fragments('ingredients.html', 'ingredients', 'Les ingrédients'))
 		})
 
-		pServer.get('/categories', async (req, res) => {
+		pServer.get('/app/categories', async (req, res) => {
 			res.end(await Utils.fragments('categories.html', 'categories', 'Les catégories'))
 		})
 
-		pServer.get('/ingredients.json', async (req, res) => {
+		pServer.get('/app/ingredients.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getIngredients: {} })))
 		}, mimetype.JSON)
 
-		pServer.get('/lists.json', async (req, res) => {
+		pServer.get('/app/lists.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getListIngredients: {} })))
 		}, mimetype.JSON)
 
-		pServer.get('/recipes.json', async (req, res) => {
+		pServer.get('/app/recipes.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getRecipes: {} })))
 		}, mimetype.JSON)
 
-		pServer.get('/categories.json', async (req, res) => {
+		pServer.get('/app/categories.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getCategories: {} })))
 		}, mimetype.JSON)
 

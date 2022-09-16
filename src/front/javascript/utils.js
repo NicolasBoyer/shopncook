@@ -1,15 +1,24 @@
 import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
 
 export class Utils {
-	static toast (type, message) {
-		const bd = Dom.newDom(document.body)
-		bd.elt('fs-toast').att('type', type).att('message', message)
+	static helpers ({ confirmMessage = '', cbConfirm = null, isConfirmInit = true, loaderVisible = false } = {}) {
+		render(html`
+			<fs-loader ?visible="${loaderVisible}"></fs-loader>
+			<fs-confirm .message="${confirmMessage}" ?open="${isConfirmInit ? !isConfirmInit : Math.random()}" @modalConfirm="${() => cbConfirm()}"></fs-confirm>
+		`, document.body)
+	}
+
+	static loader (visible) {
+		this.helpers({ loaderVisible: visible })
 	}
 
 	static confirm (message, cbConfirm, isInit) {
-		render(html`
-			<fs-confirm .message="${message}" ?open="${isInit ? !isInit : Math.random()}" @modalConfirm="${() => cbConfirm()}"></fs-confirm>
-		`, document.body)
+		this.helpers({ confirmMessage: message, cbConfirm, isConfirmInit: isInit })
+	}
+
+	static toast (type, message) {
+		const bd = Dom.newDom(document.body)
+		bd.elt('fs-toast').att('type', type).att('message', message)
 	}
 
 	static async request (pUrl, pMethod = 'GET', pOptions, pReturnType) {

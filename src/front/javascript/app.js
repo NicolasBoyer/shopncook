@@ -9,11 +9,29 @@ import Lists from './components/lists.js'
 import Header from './components/header.js'
 import Login from './components/login.js'
 import Categories from './components/categories.js'
+import AnimatedSection from './components/animatedSection.js'
+import Loader from './components/loader.js'
+import LoadingBlock from './components/loadingBlock.js'
 
 class App {
+	// TODO images pour la page de home
+	// TODO catégorie acheté quand rayé
+	// TODO size dans recette (transformer size avec une unité)
+	// TODO Liste des plats de la semaine
+	// TODO Liste de ce qui est présent dans le congelé
+	// TODO Choix pour activer les fonctionnalités
+	// TODO différencier swipe et appui sur bouton comme quand on raye
+	// TODO Bug si on choisi dans liste alors qu'un bouton est en dessous
+	// TODO section animée pour gérer la page de présentation
+	// TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
+	// TODO permettre de rendre payant
+	// TODO supprimer la possibilité de mettre un seul espace
+	// TODO minifier et combiner les fichiers js clients dans app.js
+	// TODO faire en sorte de mettre en cache certaines requetes pour ne pas à avoir les faire à chaque fois ...
+
 	constructor () {
 		this.setBackButton()
-		Utils.confirm('', null, true)
+		Utils.helpers()
 		this.wakeLock()
 	}
 
@@ -45,6 +63,9 @@ class App {
 	}
 }
 
+// TODO définir le js que si c utile ou plutot à charger en arrière plan
+new App()
+customElements.define('fs-loader', Loader)
 customElements.define('fs-header', Header)
 customElements.define('fs-toast', Toast)
 customElements.define('fs-confirm', Confirm)
@@ -55,4 +76,5 @@ customElements.define('fs-lists', Lists)
 customElements.define('fs-ingredients', Ingredients)
 customElements.define('fs-categories', Categories)
 customElements.define('fs-login', Login)
-new App()
+customElements.define('fs-loading-block', LoadingBlock)
+customElements.define('fs-animated-section', AnimatedSection)

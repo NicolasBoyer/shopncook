@@ -15,9 +15,9 @@ export class Utils {
 		return fromSrc(`front${pFile}`)
 	}
 
-	static async fragments (pFile, pClassName, pSubTitle = '') {
+	static async fragments (pFile, pClassName, pSubTitle = '', pTemplateHtml = 'page.html') {
 		const fragment = await fs.readFile(fromFragments(pFile), 'utf8')
-		let template = await fs.readFile(fromTemplate('page.html'), 'utf8')
+		let template = await fs.readFile(fromTemplate(pTemplateHtml), 'utf8')
 		template = replaceTagAndGetHtml(template, '§§title§§', `<div class="subtitle">${pSubTitle}</div>`)
 		template = replaceTagAndGetHtml(template, '§§className§§', pClassName)
 		return replaceTagAndGetHtml(template, '§§content§§', fragment)
