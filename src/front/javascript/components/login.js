@@ -12,7 +12,7 @@ export default class Login extends HTMLElement {
 		form.addEventListener('submit', async (pEvent) => {
 			pEvent.preventDefault()
 			await Utils.request('/auth', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })
-			location.href = '/'
+			location.href = '/app'
 		})
 	}
 
