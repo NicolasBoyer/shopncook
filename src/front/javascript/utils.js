@@ -13,7 +13,7 @@ export class Utils {
 	}
 
 	static confirm (message, cbConfirm, isInit) {
-		this.helpers({ confirmMessage: message, cbConfirm, isConfirmInit: isInit })
+		this.helpers({ confirmMessage: message, cbConfirm, isConfirmInit: false })
 	}
 
 	static toast (type, message) {
