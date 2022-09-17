@@ -15,7 +15,6 @@ import LoadingBlock from './components/loadingBlock.js'
 
 class App {
 	// TODO images pour la page de home
-	// TODO catégorie acheté quand rayé
 	// TODO size dans recette (transformer size avec une unité)
 	// TODO Liste des plats de la semaine
 	// TODO Liste de ce qui est présent dans le congelé

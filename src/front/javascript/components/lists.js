@@ -5,6 +5,9 @@ import { Commons } from '../commons.js'
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
+		this.strings = {
+			ordered: 'Acheté'
+		}
 		await Utils.initWsConnection(
 			async (event) => {
 				this.ingredients = JSON.parse(await event.data.text())
@@ -173,7 +176,7 @@ export default class Lists extends HTMLElement {
 		const getCategoryTitle = (pCategoryId) => this.categories.map((pCategory) => pCategory._id === pCategoryId && pCategory.title).filter((pCategory) => pCategory)[0]
 		const ingredientsByCategory = this.ingredients.filter((pIngredient) => pIngredient.category).sort((a, b) => getCategoryTitle(a.category).localeCompare(getCategoryTitle(b.category))).reduce((group, ingredient) => {
 			const categoryId = ingredient.category
-			const category = getCategoryTitle(categoryId)
+			const category = !ingredient.ordered ? getCategoryTitle(categoryId) : this.strings.ordered
 			group[category] = group[category] ?? []
 			group[category].push(ingredient)
 			return group
@@ -223,16 +226,14 @@ export default class Lists extends HTMLElement {
 									<li>Aucun ingrédient ...</li>`
 								: html`
 									${this.ingredients.filter((pIngredient) => !pIngredient.category).map((pIngredient) => listIngredient(pIngredient))}
-									${Object.keys(ingredientsByCategory).map((pCategory, pIndex) => {
+									${Object.entries(ingredientsByCategory).sort(([a, av], [b, bv]) => a === this.strings.ordered ? 1 : b === this.strings.ordered ? -1 : a.localeCompare(b)).map(([pCategory, pValue]) => {
 										return html`
-											<ul>
-												<li>
-													<div class="category">${pCategory}</div>
-													<ul>
-														${Object.values(ingredientsByCategory)[pIndex].sort((a, b) => a.title.localeCompare(b.title)).map((pIngredient) => listIngredient(pIngredient))}
-													</ul>
-												</li>
-											</ul>
+											<li>
+												<div class="category">${pCategory}</div>
+												<ul>
+													${pValue.sort((a, b) => a.title.localeCompare(b.title)).map((pIngredient) => listIngredient(pIngredient))}
+												</ul>
+											</li>
 										`
 									})}
 								`
