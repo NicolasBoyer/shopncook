@@ -120,7 +120,7 @@ export default class Lists extends HTMLElement {
 								if (pEvent.key === 'Escape') this.resetMode()
 							}}"/>
 						` : html`
-							<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerdown="${() => {
+							<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerup="${() => {
 								this.editListIngredientOrdered(ingredientId, !isIngredientOrdered)
 								if (!isIngredientOrdered) this.orderedIngredients.push(ingredientId)
 								else this.orderedIngredients = this.orderedIngredients.filter((pOrderedIngredient) => ingredientId !== pOrderedIngredient)

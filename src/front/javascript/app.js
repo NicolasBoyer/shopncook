@@ -23,7 +23,6 @@ class App {
 	// TODO section animée pour gérer la page de présentation
 	// TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
 	// TODO permettre de rendre payant
-	// TODO supprimer la possibilité de mettre un seul espace
 	// TODO minifier et combiner les fichiers js clients dans app.js
 	// TODO faire en sorte de mettre en cache certaines requetes pour ne pas à avoir les faire à chaque fois ...
 
