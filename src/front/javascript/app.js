@@ -19,7 +19,6 @@ class App {
 	// TODO Liste des plats de la semaine
 	// TODO Liste de ce qui est présent dans le congelé
 	// TODO Choix pour activer les fonctionnalités
-	// TODO différencier swipe et appui sur bouton comme quand on raye
 	// TODO section animée pour gérer la page de présentation
 	// TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
 	// TODO permettre de rendre payant

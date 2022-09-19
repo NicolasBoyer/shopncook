@@ -104,7 +104,7 @@ export default class Ingredients extends HTMLElement {
 														</svg>
 														<span>Supprimer</span>
 													</button>
-													<button type="button" class="setCategory" @pointerdown="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle, pIngredient.category)}">
+													<button type="button" class="setCategory" @pointerup="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle, pIngredient.category)}">
 														<svg class="setCategory">
 															<use href="#setCategory"></use>
 														</svg>
