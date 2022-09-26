@@ -484,11 +484,6 @@ fs-animated-section > div {
 	align-items: center;
 }
 
-/* TODO A supprimer ? */
-/*fs-animated-section > div > div {*/
-/*	text-align: center;*/
-/*}*/
-
 /*** PRESENTATIONS ***/
 .presentation #main {
 	max-width: unset;
@@ -503,14 +498,6 @@ fs-animated-section > div {
 	margin: 0;
 	padding: 1rem;
 }
-
-/*.presentation .left .grid {*/
-/*	grid-template-columns: 1fr 2fr;*/
-/*}*/
-
-/*.presentation .right .grid {*/
-/*	grid-template-columns: 2fr 1fr;*/
-/*}*/
 
 .presentation img {
 	max-width: 100%;
@@ -576,18 +563,6 @@ fs-animated-section > div {
 	padding: 0;
 	margin: 0;
 }
-
-/*.presentation section.right {*/
-/*	background: var(--modal-overlay-background-color);*/
-/*}*/
-
-/*.presentation section.left h2 {*/
-/*	text-align: left;*/
-/*}*/
-
-/*.presentation section.right h2 {*/
-/*	text-align: right;*/
-/*}*/
 
 .presentation .infos {
 	padding: 2rem 0 3rem 0;
