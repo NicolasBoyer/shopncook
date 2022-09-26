@@ -5,11 +5,11 @@ export default class Recipes extends HTMLElement {
 	static get observedAttributes () { return ['choiceMode'] }
 
 	get choiceMode () {
-		return this.hasAttribute('choiceMode')
+		return this.getAttribute('choiceMode')
 	}
 
 	set choiceMode (pValue) {
-		if (pValue) this.setAttribute('choiceMode', '')
+		if (pValue) this.setAttribute('choiceMode', pValue)
 		else this.removeAttribute('choiceMode')
 	}
 
@@ -56,11 +56,15 @@ export default class Recipes extends HTMLElement {
 									<li>
 										${this.choiceMode ? html`
 											<label for="${pRecipe.slug}">
-												<input type="checkbox" id="${pRecipe.slug}" name="${pRecipe.slug}" value="${pRecipe.title}" @change="${(pEvent) => {
+												<input type="${this.choiceMode}" id="${pRecipe.slug}" name="${this.choiceMode === 'checkbox' ? pRecipe.slug : 'recipe'}" value="${pRecipe.title}" @change="${(pEvent) => {
 													const value = pRecipe._id
 													if (pEvent.target.checked) choices.push(value)
 													else choices = choices.filter((pChoice) => pChoice !== value)
-													document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail: { choices } }))
+													let detail = { choices }
+													if (this.choiceMode === 'radio') {
+														detail = { ...detail, title: pRecipe.title }
+													}
+													document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail }))
 												}}">
 												${pRecipe.title}
 											</label>

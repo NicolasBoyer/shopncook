@@ -21,6 +21,7 @@ export default class Database {
 		this.recipes = db.collection('recipes')
 		this.lists = db.collection('lists')
 		this.categories = db.collection('categories')
+		this.dishes = db.collection('dishes')
 	}
 
 	/**
@@ -163,6 +164,20 @@ export default class Database {
 				await Database.ingredients.updateMany({ category: id }, { $unset: { category: '' } })
 				await Database.lists.updateMany({ category: id }, { $unset: { category: '' } })
 				return await resolvers.getCategories()
+			},
+
+			async getDishes () {
+				return await Database.dishes.find().toArray()
+			},
+
+			async setDish (args) {
+				await Database.dishes.updateOne({ _id: new ObjectId(args._id) }, { $set: { day: args.day, time: args.time, name: args.name } }, { upsert: true })
+				return await resolvers.getDishes()
+			},
+
+			async clearDishes () {
+				await Database.dishes.deleteMany({})
+				return resolvers.getDishes()
 			}
 		}
 		const reqArr = []

@@ -64,7 +64,7 @@ export default class Lists extends HTMLElement {
 			this.recipeChoices = pEvent.detail.choices
 		})
 		Utils.confirm(html`
-			<fs-recipes choiceMode/>
+			<fs-recipes choiceMode="checkbox"/>
 		`, async () => {
 			if (this.recipeChoices.length) {
 				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes && pIngredient.recipes.length && pIngredient.recipes.some((pRecipeId) => this.recipeChoices.includes(pRecipeId))).map((pIngredient) => ({

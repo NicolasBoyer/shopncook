@@ -160,17 +160,20 @@ h2 {
 	--grid-spacing-vertical: 1rem;
 }
 
-.home .title {
+.home .title,
+.dishes .title {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-.home .title h2 {
+.home .title h2,
+.dishes .title h2 {
 	margin: 0;
 }
 
-.home .title button {
+.home .title button,
+.dishes .title button {
 	margin: 0 1rem;
 }
 
@@ -276,6 +279,7 @@ a.ordered {
 .ingredients ul a,
 .home ul button,
 .home .title button,
+.dishes .title button,
 .categories ul button {
 	width: 2rem;
 	height: 2rem;
@@ -291,14 +295,16 @@ a.ordered {
 .ingredients ul a > span,
 .home ul button > span,
 .home .title button > span,
-.categories ul button > span {
+.categories ul button > span,
+.dishes button > span {
 	display: none;
 }
 
 .recipes svg,
 .ingredients svg,
 .home svg,
-.categories svg {
+.categories svg,
+.dishes svg {
 	width: 1rem;
 	height: 1rem;
 	stroke: currentColor;
@@ -713,4 +719,113 @@ fs-animated-section > div {
 	100% {
 		transform: rotate(360deg);
 	}
+}
+
+/*** DISHES ***/
+@media (max-width: 992px) {
+	fs-dishes > .content {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+
+	fs-dishes > .content > .grid {
+		border: none !important;
+		padding: 0 !important;
+	}
+
+	fs-dishes > .content > .grid > div,
+	fs-dishes summary {
+		border-bottom: var(--border-width) solid var(--table-border-color) !important;
+		border-right: var(--border-width) solid var(--table-border-color) !important;
+		min-height: 4rem;
+	}
+
+	fs-dishes > .content > .grid:last-child > div,
+	fs-dishes > .content > .grid:last-child summary {
+		border-right: none !important;
+	}
+
+	fs-dishes > .content > .grid > div:first-child {
+		padding: calc(var(--spacing) / 2) 0;
+		border-bottom: calc(var(--border-width) * 3) solid var(--table-border-color) !important;
+	}
+}
+
+fs-dishes > .title {
+	margin-bottom: 2.625rem;
+}
+
+fs-dishes > .content > .grid {
+	border-bottom: var(--border-width) solid var(--table-border-color);
+	min-height: 6rem;
+}
+
+fs-dishes > .content > .grid:first-child {
+	padding: calc(var(--spacing) / 2) 0;
+	border-bottom: calc(var(--border-width) * 3) solid var(--table-border-color);
+	min-height: auto;
+}
+
+fs-dishes > .content > .grid > *,
+fs-dishes > .content > .grid summary {
+	font-size: 0.875em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	margin: 0;
+	border-radius: 0;
+	background: none;
+	color: unset;
+	border: none;
+}
+
+details[role=list] summary + ul {
+	font-size: 0.875em;
+}
+
+details[role=list] summary + ul > li {
+	padding: 0;
+}
+
+fs-dishes > .content > .grid summary {
+	width: 100%;
+	height: 100%;
+	user-select: none;
+}
+
+fs-dishes > .content > .grid summary::after {
+	display: none;
+}
+
+fs-dishes > .content > .grid summary:hover,
+details[open] summary {
+	background: var(--modal-overlay-background-color);
+}
+
+fs-dishes > .content > .grid summary[role=button]:focus,
+fs-dishes > .content > .grid details button:focus {
+	--box-shadow: none;
+}
+
+fs-dishes > .content > .grid details button {
+	background: none;
+	border: none;
+	color: unset;
+	font-size: 1em;
+	margin: 0;
+	padding: calc(var(--form-element-spacing-vertical) * .5) var(--form-element-spacing-horizontal);
+	border-radius: 0;
+}
+
+fs-dishes > .content > .grid details button:hover {
+	background-color: var(--dropdown-hover-background-color);
+}
+
+fs-dishes > .content > .grid:first-child > * {
+	font-size: 1em;
+}
+
+fs-dishes > .content > .grid > div:first-child {
+	font-size: 1em;
 }

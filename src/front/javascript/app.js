@@ -12,17 +12,19 @@ import Categories from './components/categories.js'
 import AnimatedSection from './components/animatedSection.js'
 import Loader from './components/loader.js'
 import LoadingBlock from './components/loadingBlock.js'
+import Dishes from './components/dishes.js'
 
 class App {
 	// TODO images pour la page de home
 	// TODO size dans recette (transformer size avec une unité)
-	// TODO Liste des plats de la semaine
 	// TODO Liste de ce qui est présent dans le congelé
 	// TODO Choix pour activer les fonctionnalités
 	// TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
 	// TODO permettre de rendre payant
 	// TODO minifier et combiner les fichiers js clients dans app.js
 	// TODO faire en sorte de mettre en cache certaines requetes pour ne pas à avoir les faire à chaque fois ...
+	// TODO gérer pb deconnexion websocket
+	// TODO repasser sur les var && et remplacer par var?. si possible
 
 	constructor () {
 		this.setBackButton()
@@ -73,3 +75,4 @@ customElements.define('fs-categories', Categories)
 customElements.define('fs-login', Login)
 customElements.define('fs-loading-block', LoadingBlock)
 customElements.define('fs-animated-section', AnimatedSection)
+customElements.define('fs-dishes', Dishes)

@@ -32,6 +32,10 @@ export default class Routes {
 			res.end(await Utils.fragments('categories.html', 'categories', 'Les catégories'))
 		})
 
+		pServer.get('/app/dishes', async (req, res) => {
+			res.end(await Utils.fragments('dishes.html', 'dishes', 'Les plats de la semaine'))
+		})
+
 		pServer.get('/app/ingredients.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getIngredients: {} })))
 		}, mimetype.JSON)
@@ -46,6 +50,10 @@ export default class Routes {
 
 		pServer.get('/app/categories.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getCategories: {} })))
+		}, mimetype.JSON)
+
+		pServer.get('/app/dishes.json', async (req, res) => {
+			res.end(JSON.stringify(await Database.request({ getDishes: {} })))
 		}, mimetype.JSON)
 
 		pServer.post('/db', async (req, res) => {
