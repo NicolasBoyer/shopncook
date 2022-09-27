@@ -48,6 +48,11 @@ export class Utils {
 		this.wsConnection.onopen = onOpenMessage
 		this.wsConnection.onerror = (error) => {
 			console.error('WebSocket Error ' + error)
+			this.wsConnection.close()
+		}
+		this.wsConnection.onclose = (e) => {
+			console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason)
+			setTimeout(() => this.initWsConnection(onClientsMessage, onOpenMessage), 1000)
 		}
 		this.wsConnection.onmessage = onClientsMessage
 	}
