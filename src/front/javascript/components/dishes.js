@@ -23,7 +23,7 @@ export default class Dishes extends HTMLElement {
 		})
 		Utils.confirm(isEdit ? html`
 			<label for="firstname">
-				<input type="text" value="${dish?.name}" @change="${(pEvent) => document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail: { dishName: pEvent.target.value } }))}"/>
+				<input type="text" value="${dish?.name}" @input="${(pEvent) => document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail: { dishName: pEvent.target.value } }))}"/>
 			</label>
 		` : html`
 			<fs-recipes choiceMode="radio"/>
