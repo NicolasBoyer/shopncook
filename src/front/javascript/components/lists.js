@@ -1,5 +1,5 @@
-import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
-import autoAnimate from 'https://cdn.jsdelivr.net/npm/@formkit/auto-animate'
+import { html, render } from '../thirdParty/litHtml.js'
+import autoAnimate from '../thirdParty/autoAnimate.js'
 import { Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 

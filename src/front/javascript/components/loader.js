@@ -1,4 +1,4 @@
-import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
+import { html, render } from '../thirdParty/litHtml.js'
 
 export default class Loader extends HTMLElement {
 	static get observedAttributes () { return ['visible'] }

@@ -1,4 +1,4 @@
-import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
+import { html, render } from './thirdParty/litHtml.js'
 
 export class Utils {
 	static helpers ({ confirmMessage = '', cbConfirm = null, isConfirmInit = true, loaderVisible = false } = {}) {

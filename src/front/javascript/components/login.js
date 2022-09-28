@@ -1,4 +1,4 @@
-import { html, render } from 'https://cdn.jsdelivr.net/npm/lit-html'
+import { html, render } from '../thirdParty/litHtml.js'
 import { Utils } from '../utils.js'
 
 export default class Login extends HTMLElement {

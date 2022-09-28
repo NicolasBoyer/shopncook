@@ -23,8 +23,11 @@ class App {
 	// TODO permettre de rendre payant
 	// TODO minifier et combiner les fichiers js clients dans app.js
 	// TODO faire en sorte de mettre en cache certaines requetes pour ne pas à avoir les faire à chaque fois ...
-	// TODO gérer pb deconnexion websocket
 	// TODO repasser sur les var && et remplacer par var?. si possible
+	// TODO renommer home.html en list.html
+	// TODO Si possible de plus minifier
+	// TODO mettre en place unh système ou le js ne se reload pas
+	// TODO récupérer les fonts dans les sources
 
 	constructor () {
 		this.setBackButton()
