@@ -9,7 +9,7 @@ export default class Routes {
 		})
 
 		pServer.get('/app', async (req, res) => {
-			res.end(await Utils.fragments('home.html', 'home'))
+			res.end(await Utils.fragments('lists.html', 'home'))
 		})
 
 		pServer.get('/app/recipe/add', async (req, res) => {
