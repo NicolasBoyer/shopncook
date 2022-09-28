@@ -88,14 +88,14 @@ export default class Recipe extends HTMLElement {
 									<label>
 										<input name="ingredient_${pIndex + 1}" required type="text" value="${pText}"/>
 									</label>
-									<button type="button" class="remove" @pointerup="${() => this.removeIngredient(pIndex)}">
+									<button type="button" class="remove" @click="${() => this.removeIngredient(pIndex)}">
 										<svg class="minus">
 											<use href="#minus"></use>
 										</svg>
 										<span>Supprimer un ingrédient</span>
 									</button>
 									${this.isInEditMode && this.newIngredients.length - 1 === pIndex ? html`
-										<button type="button" class="add" @pointerup="${(pEvent) => {
+										<button type="button" class="add" @click="${(pEvent) => {
 											this.isInEditMode = false
 											this.addIngredient(pEvent)
 										}}">
@@ -121,7 +121,7 @@ export default class Recipe extends HTMLElement {
 										}}"
 								/>
 							</label>
-							<button type="button" class="add" @pointerup="${(pEvent) => this.addIngredient(pEvent)}">
+							<button type="button" class="add" @click="${(pEvent) => this.addIngredient(pEvent)}">
 								<svg class="add">
 									<use href="#add"></use>
 								</svg>

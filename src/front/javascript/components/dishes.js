@@ -65,7 +65,7 @@ export default class Dishes extends HTMLElement {
 		render(html`
 			<div class="title">
 				<h2>Les plats de la semaine</h2>
-				<button type="button" class="trash" @pointerup="${() => this.clear()}">
+				<button type="button" class="trash" @click="${() => this.clear()}">
 					<svg class="trash">
 						<use href="#trash"></use>
 					</svg>

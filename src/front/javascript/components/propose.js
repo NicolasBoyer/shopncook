@@ -33,7 +33,7 @@ export default class Propose extends HTMLElement {
 						(pText) => html`
 							<a
 									href="#"
-									@pointerup="${(pEvent) => {
+									@click="${(pEvent) => {
 										pEvent.preventDefault()
 										this.resetList(pText)
 									}}"

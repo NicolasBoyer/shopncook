@@ -120,7 +120,7 @@ export default class Lists extends HTMLElement {
 								if (pEvent.key === 'Escape') this.resetMode()
 							}}"/>
 						` : html`
-							<a class="${isIngredientOrdered ? 'ordered' : ''}" @pointerup="${() => {
+							<a class="${isIngredientOrdered ? 'ordered' : ''}" @click="${() => {
 								this.editListIngredientOrdered(ingredientId, !isIngredientOrdered)
 								if (!isIngredientOrdered) this.orderedIngredients.push(ingredientId)
 								else this.orderedIngredients = this.orderedIngredients.filter((pOrderedIngredient) => ingredientId !== pOrderedIngredient)
@@ -128,14 +128,14 @@ export default class Lists extends HTMLElement {
 							}}"><span>${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</span></a>
 						`}
 						${this.editMode === ingredientId ? html`
-							<button class="valid" @pointerup="${(pEvent) => this.editAndSaveListIngredient(pEvent, ingredientId)}">
+							<button class="valid" @click="${(pEvent) => this.editAndSaveListIngredient(pEvent, ingredientId)}">
 								<svg class="valid">
 									<use href="#valid"></use>
 								</svg>
 								<span>Valider</span>
 							</button>
 						` : html`
-							<button class="edit" @pointerup="${() => {
+							<button class="edit" @click="${() => {
 								this.editMode = ingredientId
 								this.render()
 							}}" .disabled="${isIngredientOrdered}">
@@ -146,21 +146,21 @@ export default class Lists extends HTMLElement {
 							</button>
 						`}
 						${this.editMode === ingredientId ? html`
-							<button type="button" class="undo" @pointerup="${() => this.resetMode()}">
+							<button type="button" class="undo" @click="${() => this.resetMode()}">
 								<svg class="undo">
 									<use href="#undo"></use>
 								</svg>
 								<span>Annuler</span>
 							</button>
 						` : html`
-							<button type="button" class="remove" @pointerup="${() => this.removeListIngredient(ingredientId)}" .disabled="${isIngredientOrdered}">
+							<button type="button" class="remove" @click="${() => this.removeListIngredient(ingredientId)}" .disabled="${isIngredientOrdered}">
 								<svg class="remove">
 									<use href="#remove"></use>
 								</svg>
 								<span>Supprimer</span>
 							</button>
 							${!pIngredient.category ? html`
-								<button type="button" class="setCategory" @pointerup="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle)}" .disabled="${isIngredientOrdered}">
+								<button type="button" class="setCategory" @click="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle)}" .disabled="${isIngredientOrdered}">
 									<svg class="setCategory">
 										<use href="#setCategory"></use>
 									</svg>
@@ -184,7 +184,7 @@ export default class Lists extends HTMLElement {
 		render(html`
 			<div class="title">
 				<h2>Votre liste</h2>
-				<button type="button" class="trash" @pointerup="${() => this.clear()}">
+				<button type="button" class="trash" @click="${() => this.clear()}">
 					<svg class="trash">
 						<use href="#trash"></use>
 					</svg>
@@ -203,13 +203,13 @@ export default class Lists extends HTMLElement {
 								<input name="size" type="text" @keyup="${(pEvent) => {
 									if (pEvent.key === 'Enter') this.editAndSaveListIngredient(pEvent)
 								}}"/>
-								<button type="button" class="add" @pointerup="${(pEvent) => this.editAndSaveListIngredient(pEvent)}">
+								<button type="button" class="add" @click="${(pEvent) => this.editAndSaveListIngredient(pEvent)}">
 									<svg class="add">
 										<use href="#add"></use>
 									</svg>
 									<span>Ajouter un ingrédient</span>
 								</button>
-								<button type="button" class="addList" @pointerup="${() => this.addListIngredientByRecipe()}">
+								<button type="button" class="addList" @click="${() => this.addListIngredientByRecipe()}">
 									<svg class="addList">
 										<use href="#addList"></use>
 									</svg>

@@ -53,7 +53,7 @@ export default class Categories extends HTMLElement {
 											<input name="newCategory" type="text" @keyup="${(pEvent) => {
 												if (pEvent.key === 'Enter') this.editAndSaveCategory(pEvent)
 											}}"/>
-											<button type="button" class="add" @pointerup="${(pEvent) => this.editAndSaveCategory(pEvent)}">
+											<button type="button" class="add" @click="${(pEvent) => this.editAndSaveCategory(pEvent)}">
 												<svg class="add">
 													<use href="#add"></use>
 												</svg>
@@ -85,14 +85,14 @@ export default class Categories extends HTMLElement {
 													<span>${categoryTitle}</span>
 												`}
 												${this.editMode === categoryId ? html`
-													<button class="valid" @pointerup="${(pEvent) => this.editAndSaveCategory(pEvent, categoryId)}">
+													<button class="valid" @click="${(pEvent) => this.editAndSaveCategory(pEvent, categoryId)}">
 														<svg class="valid">
 															<use href="#valid"></use>
 														</svg>
 														<span>Valider</span>
 													</button>
 												` : html`
-													<button class="edit" @pointerup="${() => {
+													<button class="edit" @click="${() => {
 														this.editMode = categoryId
 														this.render()
 													}}">
@@ -103,14 +103,14 @@ export default class Categories extends HTMLElement {
 													</button>
 												`}
 												${this.editMode === categoryId ? html`
-													<button type="button" class="undo" @pointerup="${() => this.resetMode()}">
+													<button type="button" class="undo" @click="${() => this.resetMode()}">
 														<svg class="undo">
 															<use href="#undo"></use>
 														</svg>
 														<span>Annuler</span>
 													</button>
 												` : html`
-													<button type="button" class="remove" @pointerup="${() => this.removeCategory(categoryId)}">
+													<button type="button" class="remove" @click="${() => this.removeCategory(categoryId)}">
 														<svg class="remove">
 															<use href="#remove"></use>
 														</svg>

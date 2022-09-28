@@ -77,7 +77,7 @@ export default class Recipes extends HTMLElement {
 													</svg>
 													<span>Éditer</span>
 												</a>
-												<button type="button" class="remove" @pointerup="${() => this.removeRecipe(pRecipe)}">
+												<button type="button" class="remove" @click="${() => this.removeRecipe(pRecipe)}">
 													<svg class="remove">
 														<use href="#remove"></use>
 													</svg>

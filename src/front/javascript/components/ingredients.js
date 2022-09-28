@@ -73,14 +73,14 @@ export default class Ingredients extends HTMLElement {
 													<span>${ingredientTitle}${category ? html` (${category})` : ''}</span>
 												`}
 												${this.editMode === ingredientId ? html`
-													<button class="valid" @pointerup="${(pEvent) => this.editAndSaveIngredient(ingredientId, pEvent.target.closest('button').previousElementSibling.value)}">
+													<button class="valid" @click="${(pEvent) => this.editAndSaveIngredient(ingredientId, pEvent.target.closest('button').previousElementSibling.value)}">
 														<svg class="valid">
 															<use href="#valid"></use>
 														</svg>
 														<span>Valider</span>
 													</button>
 												` : html`
-													<button class="edit" @pointerup="${() => {
+													<button class="edit" @click="${() => {
 														this.editMode = ingredientId
 														this.search(this.querySelector('input').value)
 													}}">
@@ -91,20 +91,20 @@ export default class Ingredients extends HTMLElement {
 													</button>
 												`}
 												${this.editMode === ingredientId ? html`
-													<button type="button" class="undo" @pointerup="${() => this.resetMode()}">
+													<button type="button" class="undo" @click="${() => this.resetMode()}">
 														<svg class="undo">
 															<use href="#undo"></use>
 														</svg>
 														<span>Annuler</span>
 													</button>
 												` : html`
-													<button type="button" class="remove" @pointerup="${() => this.removeIngredient(ingredientId)}">
+													<button type="button" class="remove" @click="${() => this.removeIngredient(ingredientId)}">
 														<svg class="remove">
 															<use href="#remove"></use>
 														</svg>
 														<span>Supprimer</span>
 													</button>
-													<button type="button" class="setCategory" @pointerup="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle, pIngredient.category)}">
+													<button type="button" class="setCategory" @click="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle, pIngredient.category)}">
 														<svg class="setCategory">
 															<use href="#setCategory"></use>
 														</svg>
