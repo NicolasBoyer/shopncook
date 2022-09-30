@@ -13,6 +13,7 @@ import AnimatedSection from './components/animatedSection.js'
 import Loader from './components/loader.js'
 import LoadingBlock from './components/loadingBlock.js'
 import Dishes from './components/dishes.js'
+import Link from './components/link.js'
 
 class App {
 	// TODO images pour la page de home
@@ -24,10 +25,10 @@ class App {
 	// TODO minifier et combiner les fichiers js clients dans app.js
 	// TODO faire en sorte de mettre en cache certaines requetes pour ne pas à avoir les faire à chaque fois ...
 	// TODO repasser sur les var && et remplacer par var?. si possible
-	// TODO renommer home.html en list.html
 	// TODO Si possible de plus minifier
-	// TODO mettre en place unh système ou le js ne se reload pas
 	// TODO récupérer les fonts dans les sources
+	// TODO si on met un / derrière app ça marche pas
+	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
 
 	constructor () {
 		this.setBackButton()
@@ -55,7 +56,7 @@ class App {
 	setBackButton () {
 		if (location.pathname.split('/').filter((pPart) => pPart).length && history.length > 2) {
 			const bd = Dom.newDom(document.querySelector('fs-header > div:first-child'))
-			bd.elt('a', 'back').att('role', 'button').att('href', '#').listen('pointerup', () => history.back())
+			bd.elt('a', 'back').att('role', 'button').att('href', '#').listen('click', () => history.back())
 			bd.svg('back').up()
 			bd.elt('span').text('Retour').up()
 			bd.up()
@@ -63,7 +64,6 @@ class App {
 	}
 }
 
-// TODO définir le js que si c utile ou plutot à charger en arrière plan
 new App()
 customElements.define('fs-loader', Loader)
 customElements.define('fs-header', Header)
@@ -79,3 +79,4 @@ customElements.define('fs-login', Login)
 customElements.define('fs-loading-block', LoadingBlock)
 customElements.define('fs-animated-section', AnimatedSection)
 customElements.define('fs-dishes', Dishes)
+customElements.define('fs-link', Link)

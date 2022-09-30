@@ -20,6 +20,7 @@ export default class LoadingBlock extends HTMLElement {
 	}
 
 	render () {
+		// TODO vérifier que le slot fonctionne bien
 		render(html`
 			<slot></slot>
 		`, this)

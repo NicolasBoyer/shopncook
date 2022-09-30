@@ -70,7 +70,7 @@ export class Server {
 					}
 				}
 				res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
-				res.end(await Utils.fragments('404.html', 'notFound', '404 : Page non trouvée'))
+				res.end(await Utils.page('404.html', 'notFound', '404 : Page non trouvée'))
 			}
 			if (req.method === 'GET') {
 				const url = Utils.fromFront(req.url)
@@ -86,7 +86,7 @@ export class Server {
 					// TODO ne pas tester l'auth à chaque connection !!!
 					if (!credentials || !await Database.auth(Utils.decrypt(credentials?.split('=')[1]))) {
 						res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
-						res.end(await Utils.fragments('login.html', 'login', 'Connexion à la BDD'))
+						res.end(await Utils.page('login.html', 'login', 'Connexion à la BDD'))
 						return
 					}
 					Database.init()

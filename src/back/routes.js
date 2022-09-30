@@ -5,36 +5,22 @@ import Database from './database.js'
 export default class Routes {
 	constructor (pServer) {
 		pServer.get('/', async (req, res) => {
-			res.end(await Utils.fragments('presentation.html', 'presentation', '', 'home.html'))
+			res.end(await Utils.page('presentation.html', 'presentation', '', 'home.html'))
 		})
 
-		pServer.get('/app', async (req, res) => {
-			res.end(await Utils.fragments('lists.html', 'home'))
-		})
+		this.request(pServer, '/app', 'lists.html', 'home', '')
 
-		pServer.get('/app/recipe/add', async (req, res) => {
-			res.end(await Utils.fragments('recipe.html', 'recipe', 'Les recettes'))
-		})
+		this.request(pServer, '/app/recipe/add', 'recipe.html', 'recipe', 'Les recettes')
 
-		pServer.get('/app/recipe/edit/:id', async (req, res) => {
-			res.end(await Utils.fragments('recipe.html', 'recipe', 'Les recettes'))
-		})
+		this.request(pServer, '/app/recipe/edit/:id', 'recipe.html', 'recipe', 'Les recettes')
 
-		pServer.get('/app/recipes', async (req, res) => {
-			res.end(await Utils.fragments('recipes.html', 'recipes', 'Les recettes'))
-		})
+		this.request(pServer, '/app/recipes', 'recipes.html', 'recipes', 'Les recettes')
 
-		pServer.get('/app/ingredients', async (req, res) => {
-			res.end(await Utils.fragments('ingredients.html', 'ingredients', 'Les ingrédients'))
-		})
+		this.request(pServer, '/app/ingredients', 'ingredients.html', 'ingredients', 'Les ingrédients')
 
-		pServer.get('/app/categories', async (req, res) => {
-			res.end(await Utils.fragments('categories.html', 'categories', 'Les catégories'))
-		})
+		this.request(pServer, '/app/categories', 'categories.html', 'categories', 'Les catégories')
 
-		pServer.get('/app/dishes', async (req, res) => {
-			res.end(await Utils.fragments('dishes.html', 'dishes', 'Les plats de la semaine'))
-		})
+		this.request(pServer, '/app/dishes', 'dishes.html', 'dishes', 'Les plats de la semaine')
 
 		pServer.get('/app/ingredients.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getIngredients: {} })))
@@ -75,6 +61,21 @@ export default class Routes {
 				if (await Database.auth(credentials)) res.writeHead(200, { 'Set-Cookie': `_ma=${Utils.crypt(credentials)}; expires=Tue, 19 Jan 2038 03:14:07 GMT` })
 				res.end(JSON.stringify('{}'))
 			})
+		})
+	}
+
+	/**
+	 * Permet de faire un GET et un POST en même temps sur un fichier
+	 * GET : retourne une page html
+	 * POST : retourne un JSON contenant un fragment html, une classe et un titre
+	 */
+	request (pServer, pPath, pFile, pClassName, pTitle) {
+		pServer.get(pPath, async (req, res) => {
+			res.end(await Utils.page(pFile, pClassName, pTitle))
+		})
+
+		pServer.post(pPath, async (req, res) => {
+			res.end(JSON.stringify({ text: await Utils.fragment(pFile), class: pClassName, title: pTitle }))
 		})
 	}
 }

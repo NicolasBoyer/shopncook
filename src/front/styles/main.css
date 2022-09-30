@@ -20,7 +20,8 @@
 }
 
 /*** HTML TAG ***/
-a[role='button'] {
+a[role='button'],
+fs-link[role='button'] {
 	display: flex;
 	align-items: center;
 	justify-content: center;
