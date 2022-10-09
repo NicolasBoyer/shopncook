@@ -27,7 +27,6 @@ class App {
 	// TODO repasser sur les var && et remplacer par var?. si possible
 	// TODO Si possible de plus minifier
 	// TODO récupérer les fonts dans les sources
-	// TODO si on met un / derrière app ça marche pas
 	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
 	// TODO revoir les erreurs en loc autoanimate
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
