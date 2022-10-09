@@ -77,7 +77,6 @@ export default class Database {
 					const objectId = new ObjectId(ingredient.id)
 					ingredient.filter = ingredient.id ? { _id: objectId } : { title: ingredient.title }
 					currentIngredient = ingredient.id ? await Database.ingredients.findOne({ _id: objectId }) : await Database.ingredients.findOne({ title: ingredient.title })
-					if (currentIngredient && !args.ingredients.some((pIngredient) => pIngredient._id === currentIngredient._id) && currentIngredient.recipes && args.recipeId && currentIngredient.recipes.includes(args.recipeId)) currentIngredient.recipes.splice(currentIngredient.recipes.indexOf(args.recipeId), 1)
 					if (!currentIngredient) currentIngredient = {}
 					currentIngredient.title = ingredient.title
 					currentIngredient.category = ingredient.category || currentIngredient.category || ''
@@ -85,10 +84,14 @@ export default class Database {
 					if (args.ingredients.some((pIngredient) => pIngredient._id === ingredient.id) && args.recipeId && !currentIngredient.recipes.includes(args.recipeId)) currentIngredient.recipes.push(args.recipeId)
 					newIngredients.push(currentIngredient)
 				}
-				await Database.ingredients.bulkWrite(newIngredients.map((ingredient, index) =>
+				let ingredients = []
+				if (args.recipeId) {
+					ingredients = (await Database.ingredients.find({ recipes: Utils.slugify(args.recipeId) }).toArray()).filter((pIngredient) => !args.ingredients.some((pArgIngredient) => pArgIngredient.title === pIngredient.title)).map((pIngredient) => pIngredient.recipes.splice(pIngredient.recipes.indexOf(args.recipeId), 1) && pIngredient)
+				}
+				await Database.ingredients.bulkWrite([...newIngredients, ...ingredients].map((ingredient, index) =>
 					({
 						updateOne: {
-							filter: args.ingredients[index].filter,
+							filter: args.ingredients[index]?.filter || { _id: new ObjectId(ingredient._id) },
 							update: { $set: ingredient },
 							upsert: true
 						}
