@@ -17,6 +17,7 @@
 	--secondary: #787159;
 	--secondary-hover: #625941;
 	--tooltip-background-color: #805d00;
+	--background-color-loader: rgb(237 240 243 / 60%);
 }
 
 /*** HTML TAG ***/
@@ -468,6 +469,10 @@ fs-loader {
 	height: 100vh;
 	background: var(--accordion-border-color);
 	width: 100%;
+}
+
+.recipe fs-loader {
+	background: var(--background-color-loader);
 }
 
 .spinner {

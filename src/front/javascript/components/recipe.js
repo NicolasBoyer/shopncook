@@ -44,8 +44,10 @@ export default class Recipe extends HTMLElement {
 					this.currentRecipe.ingredients = ingredients.map((pIngredient) => pIngredient.title)
 					Caches.set(this.slug, this.currentRecipe)
 				}
+				Utils.loader(true)
 				const response = await Utils.request('/db', 'POST', { body: `{ "setRecipe": { "title": "${plainFormData.recipe}", ${id ? `"id": "${id}",` : ''} "ingredients": ${JSON.stringify(ingredients)}} }` })
 				Caches.set('recipes', response[0])
+				Utils.loader(false)
 				if (isEdit) location.href = '/app/recipes'
 				else {
 					this.newIngredients = []
