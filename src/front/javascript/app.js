@@ -33,6 +33,8 @@ class App {
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket
 	// TODO Mise en place de test auto ?
+	// TODO home à passer sur mobile
+	// TODO ajouter bouton effacer dans dishes
 
 	constructor () {
 		this.setBackButton()
