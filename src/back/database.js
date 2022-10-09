@@ -178,8 +178,9 @@ export default class Database {
 				return await resolvers.getDishes()
 			},
 
-			async clearDishes () {
-				await Database.dishes.deleteMany({})
+			async clearDishes (id) {
+				if (id) await Database.dishes.deleteOne({ _id: new ObjectId(id) })
+				else await Database.dishes.deleteMany({})
 				return resolvers.getDishes()
 			}
 		}

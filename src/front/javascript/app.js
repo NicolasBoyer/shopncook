@@ -23,7 +23,6 @@ class App {
 	// TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
 	// TODO permettre de rendre payant
 	// TODO minifier et combiner les fichiers js clients dans app.js
-	// TODO faire en sorte de mettre en cache certaines requetes pour ne pas à avoir les faire à chaque fois ...
 	// TODO repasser sur les var && et remplacer par var?. si possible
 	// TODO Si possible de plus minifier
 	// TODO récupérer les fonts dans les sources
@@ -33,7 +32,6 @@ class App {
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
-	// TODO ajouter bouton effacer dans dishes
 
 	constructor () {
 		this.setBackButton()

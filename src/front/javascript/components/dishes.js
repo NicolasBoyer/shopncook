@@ -57,9 +57,10 @@ export default class Dishes extends HTMLElement {
 		this.render()
 	}
 
-	clear () {
-		Utils.confirm(html`<h3>Voulez vous effacer les plats de la semaine ?</h3>`, async () => {
-			this.dishes = await Utils.request('/db', 'POST', { body: '{ "clearDishes": "" }' })
+	clear (pEvent, id) {
+		if (pEvent) pEvent.target.closest('details').removeAttribute('open')
+		Utils.confirm(html`<h3>Voulez vous effacer ${id ? 'ce plat' : 'les plats de la semaine'} ?</h3>`, async () => {
+			this.dishes = await Utils.request('/db', 'POST', { body: `{ "clearDishes": "${id}" }` })
 			Caches.set('dishes', this.dishes)
 			this.refresh()
 		})
@@ -100,6 +101,9 @@ export default class Dishes extends HTMLElement {
 											</li>
 											<li>
 												<button @click="${(pEvent) => this.openModal(pEvent, dish)}">Ajouter</button>
+											</li>
+											<li>
+												<button @click="${(pEvent) => this.clear(pEvent, dish._id)}">Effacer</button>
 											</li>
 										</ul>
 									</details>
