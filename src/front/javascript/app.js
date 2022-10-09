@@ -32,6 +32,7 @@ class App {
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
+	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé avec le .closes sur le client dans server.js
 
 	constructor () {
 		this.setBackButton()

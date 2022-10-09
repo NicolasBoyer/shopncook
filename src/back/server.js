@@ -83,7 +83,6 @@ export class Server {
 				}
 				if (req.url.includes('/app')) {
 					const credentials = req.headers?.cookie?.split('; ').filter((cookie) => cookie.includes('_ma'))[0]
-					// TODO ne pas tester l'auth à chaque connection !!!
 					if (!credentials || !await Database.auth(Utils.decrypt(credentials?.split('=')[1]))) {
 						res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
 						res.end(await Utils.page('login.html', 'login', 'Connexion à la BDD'))
