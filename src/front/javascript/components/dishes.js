@@ -102,9 +102,11 @@ export default class Dishes extends HTMLElement {
 											<li>
 												<button @click="${(pEvent) => this.openModal(pEvent, dish)}">Ajouter</button>
 											</li>
-											<li>
-												<button @click="${(pEvent) => this.clear(pEvent, dish._id)}">Effacer</button>
-											</li>
+											${dish._id && html`
+												<li>
+													<button @click="${(pEvent) => this.clear(pEvent, dish._id)}">Effacer</button>
+												</li>
+											`}
 										</ul>
 									</details>
 								`
