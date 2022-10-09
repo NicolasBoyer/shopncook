@@ -1,9 +1,10 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Utils } from '../utils.js'
+import { Caches, Utils } from '../utils.js'
 
 export default class Ingredients extends HTMLElement {
 	async connectedCallback () {
-		const response = await Utils.request('/db', 'POST', { body: '[{ "getIngredients": "" }, { "getCategories": "" }]' })
+		const response = Caches.get('ingredients', 'categories') || await Utils.request('/db', 'POST', { body: '[{ "getIngredients": "" }, { "getCategories": "" }]' })
+		Caches.set('ingredients', response[0], 'categories', response[1])
 		this.savedIngredients = response[0]
 		this.categories = response[1]
 		this.search()
@@ -11,7 +12,8 @@ export default class Ingredients extends HTMLElement {
 	}
 
 	async editAndSaveIngredient (id, title) {
-		this.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${title}", "id": "${id}" } ] } }` }))
+		this.savedIngredients = await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${title}", "id": "${id}" } ] } }` })
+		Caches.set('ingredients', this.savedIngredients)
 		this.resetMode()
 	}
 
@@ -23,6 +25,7 @@ export default class Ingredients extends HTMLElement {
 	async removeIngredient (id) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
 			this.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${id}" }` }))
+			Caches.set('ingredients', this.savedIngredients)
 			this.search()
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
@@ -37,6 +40,7 @@ export default class Ingredients extends HTMLElement {
 			<fs-categories choiceMode="${selectedCategoryId}"/>
 		`, async () => {
 			this.savedIngredients = await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }` })
+			Caches.set('ingredients', this.savedIngredients)
 			this.search()
 		})
 	}
