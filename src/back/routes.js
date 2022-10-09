@@ -8,19 +8,19 @@ export default class Routes {
 			res.end(await Utils.page('presentation.html', 'presentation', '', 'home.html'))
 		})
 
-		this.request(pServer, '/app', 'lists.html', 'home', '')
+		this.request(pServer, '/app', 'lists.html', 'home', '', true)
 
-		this.request(pServer, '/app/recipe/add', 'recipe.html', 'recipe', 'Les recettes')
+		this.request(pServer, '/app/recipe/add', 'recipe.html', 'recipe', 'Les recettes', true)
 
-		this.request(pServer, '/app/recipe/edit/:id', 'recipe.html', 'recipe', 'Les recettes')
+		this.request(pServer, '/app/recipe/edit/:id', 'recipe.html', 'recipe', 'Les recettes', true)
 
-		this.request(pServer, '/app/recipes', 'recipes.html', 'recipes', 'Les recettes')
+		this.request(pServer, '/app/recipes', 'recipes.html', 'recipes', 'Les recettes', true)
 
-		this.request(pServer, '/app/ingredients', 'ingredients.html', 'ingredients', 'Les ingrédients')
+		this.request(pServer, '/app/ingredients', 'ingredients.html', 'ingredients', 'Les ingrédients', true)
 
-		this.request(pServer, '/app/categories', 'categories.html', 'categories', 'Les catégories')
+		this.request(pServer, '/app/categories', 'categories.html', 'categories', 'Les catégories', true)
 
-		this.request(pServer, '/app/dishes', 'dishes.html', 'dishes', 'Les plats de la semaine')
+		this.request(pServer, '/app/dishes', 'dishes.html', 'dishes', 'Les plats de la semaine', true)
 
 		pServer.get('/app/ingredients.json', async (req, res) => {
 			res.end(JSON.stringify(await Database.request({ getIngredients: {} })))
@@ -69,7 +69,13 @@ export default class Routes {
 	 * GET : retourne une page html
 	 * POST : retourne un JSON contenant un fragment html, une classe et un titre
 	 */
-	request (pServer, pPath, pFile, pClassName, pTitle) {
+	request (pServer, pPath, pFile, pClassName, pTitle, pAddSlashOnUrl) {
+		if (pAddSlashOnUrl) {
+			pServer.get(`${pPath}/`, async (req, res) => {
+				res.end(await Utils.page(pFile, pClassName, pTitle))
+			})
+		}
+
 		pServer.get(pPath, async (req, res) => {
 			res.end(await Utils.page(pFile, pClassName, pTitle))
 		})
