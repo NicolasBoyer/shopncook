@@ -185,7 +185,7 @@ export default class Lists extends HTMLElement {
 			`
 		}
 		const getCategoryTitle = (pCategoryId) => this.categories.map((pCategory) => pCategory._id === pCategoryId && pCategory.title).filter((pCategory) => pCategory)[0]
-		const ingredientsByCategory = this.ingredients.filter((pIngredient) => pIngredient.category).sort((a, b) => getCategoryTitle(a.category).localeCompare(getCategoryTitle(b.category))).reduce((group, ingredient) => {
+		const ingredientsByCategory = this.ingredients.filter((pIngredient) => pIngredient.category || pIngredient.ordered).sort((a, b) => getCategoryTitle(a.category).localeCompare(getCategoryTitle(b.category))).reduce((group, ingredient) => {
 			const categoryId = ingredient.category
 			const category = !ingredient.ordered ? getCategoryTitle(categoryId) : this.strings.ordered
 			group[category] = group[category] ?? []
@@ -236,7 +236,7 @@ export default class Lists extends HTMLElement {
 								? html`
 									<li>Aucun ingrédient ...</li>`
 								: html`
-									${this.ingredients.filter((pIngredient) => !pIngredient.category).map((pIngredient) => listIngredient(pIngredient))}
+									${this.ingredients.filter((pIngredient) => !pIngredient.category && !pIngredient.ordered).map((pIngredient) => listIngredient(pIngredient))}
 									${Object.entries(ingredientsByCategory).sort(([a, av], [b, bv]) => a === this.strings.ordered ? 1 : b === this.strings.ordered ? -1 : a.localeCompare(b)).map(([pCategory, pValue]) => {
 										return html`
 											<li>

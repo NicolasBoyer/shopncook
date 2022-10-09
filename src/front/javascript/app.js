@@ -30,11 +30,9 @@ class App {
 	// TODO si on met un / derrière app ça marche pas
 	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
 	// TODO revoir les erreurs en loc autoanimate
-	// TODO Test ajout recette
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket
 	// TODO Mise en place de test auto ?
-	// TODO si pas de categories la categ non acheté ne se crée pas
 
 	constructor () {
 		this.setBackButton()
