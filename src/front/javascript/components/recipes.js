@@ -1,5 +1,5 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Utils } from '../utils.js'
+import { Caches, Utils } from '../utils.js'
 
 export default class Recipes extends HTMLElement {
 	static get observedAttributes () { return ['choiceMode'] }
@@ -24,12 +24,15 @@ export default class Recipes extends HTMLElement {
 	}
 
 	async getRecipes () {
-		return await Utils.request('/db', 'POST', { body: '{ "getRecipes": "" }' })
+		const recipes = Caches.get('recipes') || await Utils.request('/db', 'POST', { body: '{ "getRecipes": "" }' })
+		Caches.set('recipes', recipes)
+		return recipes
 	}
 
 	async removeRecipe (pRecipe) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
 			this.savedRecipes = await Utils.request('/db', 'POST', { body: `{ "removeRecipe": "${pRecipe._id}" }` })
+			Caches.set('recipes', this.savedRecipes)
 			this.search()
 			Utils.toast('success', 'Recette supprimée')
 		})
@@ -71,12 +74,12 @@ export default class Recipes extends HTMLElement {
 										` : html`
 											<div>
 												<span>${pRecipe.title}</span>
-												<a role="button" class="edit" href="/recipe/edit/${pRecipe.slug}">
+												<fs-link role="button" class="edit" href="/app/recipe/edit/${pRecipe.slug}">
 													<svg class="edit">
 														<use href="#edit"></use>
 													</svg>
 													<span>Éditer</span>
-												</a>
+												</fs-link>
 												<button type="button" class="remove" @click="${() => this.removeRecipe(pRecipe)}">
 													<svg class="remove">
 														<use href="#remove"></use>

@@ -1,5 +1,5 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Utils } from '../utils.js'
+import { Caches, Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 
 export default class Recipe extends HTMLElement {
@@ -10,15 +10,18 @@ export default class Recipe extends HTMLElement {
 		this.title = 'Ajouter une recette'
 		this.isInEditMode = splitUrl.includes('edit')
 		if (this.isInEditMode) {
-			const currentRecipe = await Utils.request('/db', 'POST', { body: `{ "getRecipes": { "slug": "${splitUrl[splitUrl.length - 1]}" } }` })
-			if (Array.isArray(currentRecipe)) location.href = location.origin + '/404.html'
-			this.currentRecipeTitle = currentRecipe.title
-			this.currentRecipeId = currentRecipe._id
+			this.slug = splitUrl[splitUrl.length - 1]
+			this.currentRecipe = Caches.get(`${this.slug}`) || await Utils.request('/db', 'POST', { body: `{ "getRecipes": { "slug": "${this.slug}" } }` })
+			Caches.set(this.slug, this.currentRecipe)
+			if (Array.isArray(this.currentRecipe)) location.href = location.origin + '/404.html'
+			this.currentRecipeTitle = this.currentRecipe.title
+			this.currentRecipeId = this.currentRecipe._id
 			this.submitButtonName = 'Modifier'
 			this.title = 'Modifier une recette'
-			this.newIngredients = currentRecipe.ingredients
+			this.newIngredients = this.currentRecipe.ingredients
 		} else this.newIngredients = []
-		Commons.savedIngredients = await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
+		Commons.savedIngredients = Caches.get('ingredients') || await Utils.request('/db', 'POST', { body: '{ "getIngredients": "" }' })
+		Caches.set('ingredients', Commons.savedIngredients)
 		document.body.style.display = 'flex'
 		this.render()
 		this.setFormListener()
@@ -36,8 +39,14 @@ export default class Recipe extends HTMLElement {
 				const isEdit = splitUrl.includes('edit')
 				const plainFormData = Object.fromEntries(new FormData(form).entries())
 				const id = plainFormData.id
-				const response = await Utils.request('/db', 'POST', { body: `{ "setRecipe": { "title": "${plainFormData.recipe}", ${id ? `"id": "${id}",` : ''} "ingredients": ${JSON.stringify(Object.keys(plainFormData).map((key) => key !== 'recipe' && key !== 'id' && { title: plainFormData[key] }).filter((ingredient) => ingredient))}} }` })
-				if (isEdit) location.href = '/recipes'
+				const ingredients = Object.keys(plainFormData).map((key) => key !== 'recipe' && key !== 'id' && { title: plainFormData[key] }).filter((ingredient) => ingredient)
+				if (this.isInEditMode) {
+					this.currentRecipe.ingredients = ingredients.map((pIngredient) => pIngredient.title)
+					Caches.set(this.slug, this.currentRecipe)
+				}
+				const response = await Utils.request('/db', 'POST', { body: `{ "setRecipe": { "title": "${plainFormData.recipe}", ${id ? `"id": "${id}",` : ''} "ingredients": ${JSON.stringify(ingredients)}} }` })
+				Caches.set('recipes', response[0])
+				if (isEdit) location.href = '/app/recipes'
 				else {
 					this.newIngredients = []
 					document.querySelectorAll('input').forEach((input) => {
@@ -45,6 +54,7 @@ export default class Recipe extends HTMLElement {
 					})
 					Utils.toast('success', 'Recette enregistrée')
 					Commons.savedIngredients = response[1]
+					Caches.set('ingredients', Commons.savedIngredients)
 					this.render()
 				}
 			} catch (error) {

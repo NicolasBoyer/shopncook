@@ -276,6 +276,7 @@ a.ordered {
 
 .recipes ul button,
 .recipes ul a,
+.recipes ul fs-link,
 .ingredients ul button,
 .ingredients ul a,
 .home ul button,
@@ -291,6 +292,7 @@ a.ordered {
 }
 
 .recipes ul button > span,
+.recipes ul fs-link > span,
 .recipes ul a > span,
 .ingredients ul button > span,
 .ingredients ul a > span,

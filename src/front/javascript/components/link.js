@@ -14,7 +14,7 @@ export default class Link extends HTMLElement {
 		const children = Array.from(this.children)
 		this.render()
 		this.querySelector('slot').replaceWith(...children)
-		const fragment = await GETFRAGMENTHTML(this.href)
+		const fragment = await Utils.getFragmentHtml(this.href)
 		this.addEventListener('click', () => {
 			history.pushState({}, '', this.href)
 			REPLACEZONE(fragment)
@@ -28,17 +28,11 @@ export default class Link extends HTMLElement {
 	}
 }
 
+// TODO à voir si ça reste ici !!!
 const REPLACEZONE = (pFragment) => {
 	document.querySelector('[data-replaced-zone]').replaceChildren(document.createRange().createContextualFragment(pFragment.text))
 	document.body.className = pFragment.class
 	document.querySelector('[data-replaced-title]').innerHTML = pFragment.title
 }
-const GETFRAGMENTHTML = async (pUrl) => {
-	const fragment = JSON.parse(sessionStorage.getItem(pUrl)) || await Utils.request(pUrl, 'POST')
-	sessionStorage.setItem(pUrl, JSON.stringify(fragment))
-	return fragment
-}
 
-window.onpopstate = async () => REPLACEZONE(await GETFRAGMENTHTML(location.pathname))
-
-GETFRAGMENTHTML(location.pathname)
+window.onpopstate = async () => REPLACEZONE(await Utils.getFragmentHtml(location.pathname))

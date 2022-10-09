@@ -1,5 +1,5 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Utils } from '../utils.js'
+import { Caches, Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 
 export default class Dishes extends HTMLElement {
@@ -9,7 +9,8 @@ export default class Dishes extends HTMLElement {
 			Midi: this.week,
 			Soir: this.week
 		}
-		const response = await Utils.request('/db', 'POST', { body: '[{ "getDishes": "" }, { "getIngredients": "" }]' })
+		const response = Caches.get('dishes', 'ingredients') || await Utils.request('/db', 'POST', { body: '[{ "getDishes": "" }, { "getIngredients": "" }]' })
+		Caches.set('dishes', response[0], 'ingredients', response[1])
 		this.dishes = response[0]
 		Commons.savedIngredients = response[1]
 		this.refresh()
@@ -29,18 +30,20 @@ export default class Dishes extends HTMLElement {
 			<fs-recipes choiceMode="radio"/>
 		`, async () => {
 			if (this.dishName) {
-				if (!isEdit) {
-					const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes && pIngredient.recipes.length && pIngredient.recipes.some((pRecipeId) => this.dishId === pRecipeId)).map((pIngredient) => ({
-						title: pIngredient.title,
-						category: pIngredient.category
-					}))
-					await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
-				}
 				dish.name = this.dishName
 				this.dishes = await Utils.request('/db', 'POST', { body: `{ "setDish": ${JSON.stringify(dish)} }` })
+				Caches.set('dishes', this.dishes)
+			}
+			this.refresh()
+			if (!isEdit && this.dishName) {
+				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes && pIngredient.recipes.length && pIngredient.recipes.some((pRecipeId) => this.dishId === pRecipeId)).map((pIngredient) => ({
+					title: pIngredient.title,
+					category: pIngredient.category
+				}))
+				const listIngredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
+				Caches.set('listIngredients', listIngredients)
 			}
 			this.dishName = ''
-			this.refresh()
 		})
 	}
 
@@ -57,6 +60,7 @@ export default class Dishes extends HTMLElement {
 	clear () {
 		Utils.confirm(html`<h3>Voulez vous effacer les plats de la semaine ?</h3>`, async () => {
 			this.dishes = await Utils.request('/db', 'POST', { body: '{ "clearDishes": "" }' })
+			Caches.set('dishes', this.dishes)
 			this.refresh()
 		})
 	}

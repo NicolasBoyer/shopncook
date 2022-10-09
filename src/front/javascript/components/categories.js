@@ -1,5 +1,5 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Utils } from '../utils.js'
+import { Caches, Utils } from '../utils.js'
 
 export default class Categories extends HTMLElement {
 	get choiceMode () {
@@ -13,7 +13,8 @@ export default class Categories extends HTMLElement {
 	}
 
 	async connectedCallback () {
-		this.categories = await Utils.request('/db', 'POST', { body: '{ "getCategories": "" }' })
+		this.categories = Caches.get('categories') || await Utils.request('/db', 'POST', { body: '{ "getCategories": "" }' })
+		Caches.set('categories', this.categories)
 		this.render()
 	}
 
@@ -26,6 +27,7 @@ export default class Categories extends HTMLElement {
 		const input = pEvent.target.tagName === 'INPUT' ? pEvent.target : pEvent.target.closest('button').previousElementSibling
 		if (input && input.value) {
 			this.categories = await Utils.request('/db', 'POST', { body: `{ "setCategory": { "title": "${input.value}"${id ? `, "id": "${id}"` : ''} } }` })
+			Caches.set('categories', this.categories)
 			input.value = ''
 			this.resetMode()
 		}
@@ -34,6 +36,7 @@ export default class Categories extends HTMLElement {
 	async removeCategory (id) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
 			this.categories = await Utils.request('/db', 'POST', { body: `{ "removeCategory": "${id}" }` })
+			Caches.set('categories', this.categories)
 			this.render()
 			Utils.toast('success', 'Catégorie supprimée')
 		})

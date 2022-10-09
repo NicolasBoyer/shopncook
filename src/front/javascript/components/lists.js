@@ -1,10 +1,11 @@
 import { html, render } from '../thirdParty/litHtml.js'
 import autoAnimate from '../thirdParty/autoAnimate.js'
-import { Utils } from '../utils.js'
+import { Caches, Utils } from '../utils.js'
 import { Commons } from '../commons.js'
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
+		await Utils.getFragmentHtml(location.pathname)
 		this.strings = {
 			ordered: 'Acheté'
 		}
@@ -17,12 +18,15 @@ export default class Lists extends HTMLElement {
 			},
 			async () => {
 				Commons.clearPropositionsOnBackgroundClick(() => this.render())
-				const response = await Utils.request('/db', 'POST', { body: '[{ "getListIngredients": "" }, { "getCategories": "" }, { "getIngredients": "" }]' })
+				const response = Caches.get('listIngredients', 'categories', 'ingredients') || await Utils.request('/db', 'POST', { body: '[{ "getListIngredients": "" }, { "getCategories": "" }, { "getIngredients": "" }]' })
+				Caches.set('listIngredients', response[0], 'categories', response[1], 'ingredients', response[2])
 				this.ingredients = response[0]
 				this.categories = response[1]
 				Commons.savedIngredients = response[2]
 				this.recipeChoices = []
 				Utils.wsConnection.send(JSON.stringify(this.ingredients))
+				const cacheResponse = Caches.get('recipes', 'dishes') || await Utils.request('/db', 'POST', { body: '[{ "getRecipes": "" }, { "getDishes": "" }]' })
+				Caches.set('recipes', cacheResponse[0], 'dishes', cacheResponse[1])
 			}
 		)
 	}
@@ -38,8 +42,10 @@ export default class Lists extends HTMLElement {
 		const sizeInput = input.nextElementSibling
 		if (input && input.value) {
 			const category = Commons.savedIngredients.map((pIngredient) => pIngredient.title === input.value && pIngredient.category).filter((pIngredient) => pIngredient)[0]
-			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${category ? `, "category": "${category}"` : ''}, "size": "${sizeInput.value}" } ] } }` })
-			if (!id && Commons.savedIngredients && !Commons.savedIngredients.some((pIngredient) => pIngredient.title === input.value)) Commons.savedIngredients.push({ title: input.value })
+			const response = await Utils.request('/db', 'POST', { body: `[{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${category ? `, "category": "${category}"` : ''}, "size": "${sizeInput.value}" } ] } }, { "getIngredients": "" }]` })
+			this.ingredients = response[0]
+			Commons.savedIngredients = response[1]
+			Caches.set('listIngredients', this.ingredients, 'ingredients', Commons.savedIngredients)
 			input.value = ''
 			sizeInput.value = ''
 			this.resetMode()
@@ -48,12 +54,14 @@ export default class Lists extends HTMLElement {
 
 	async editListIngredientOrdered (id, ordered) {
 		this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": [ { "id": "${id}", "ordered": ${ordered} } ] } }` })
+		Caches.set('listIngredients', this.ingredients)
 		this.resetMode()
 	}
 
 	async removeListIngredient (id) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
 			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "removeListIngredient": "${id}" }` })
+			Caches.set('listIngredients', this.ingredients)
 			Utils.wsConnection.send(JSON.stringify(this.ingredients))
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
@@ -72,6 +80,7 @@ export default class Lists extends HTMLElement {
 					category: pIngredient.category
 				}))
 				this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
+				Caches.set('listIngredients', this.ingredients)
 				this.recipeChoices = []
 				Utils.wsConnection.send(JSON.stringify(this.ingredients))
 			}
@@ -89,6 +98,7 @@ export default class Lists extends HTMLElement {
 			const response = await Utils.request('/db', 'POST', { body: `[{ "setListIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }, { "getIngredients": "" }]` })
 			this.ingredients = response[0]
 			Commons.savedIngredients = response[1]
+			Caches.set('listIngredients', this.ingredients, 'ingredients', Commons.savedIngredients)
 			Utils.wsConnection.send(JSON.stringify(this.ingredients))
 		})
 	}
@@ -97,6 +107,7 @@ export default class Lists extends HTMLElement {
 		Utils.confirm(html`<h3>Voulez vous vider la liste ?</h3>`, async () => {
 			this.orderedIngredients = []
 			this.ingredients = await Utils.request('/db', 'POST', { body: '{ "clearListIngredients": "" }' })
+			Caches.set('listIngredients', this.ingredients)
 			Utils.wsConnection.send(JSON.stringify(this.ingredients))
 		})
 	}
