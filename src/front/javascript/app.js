@@ -32,12 +32,13 @@ class App {
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
-	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé avec le .closes sur le client dans server.js
+	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé avec le .closes sur le client dans server.js pas réglé
 
 	constructor () {
 		this.setBackButton()
 		Utils.helpers()
 		this.wakeLock()
+		if (location.href.charAt(location.href.length - 1) === '/') history.replaceState({}, '', location.href.replace(/\/$/, ''))
 	}
 
 	async wakeLock () {
