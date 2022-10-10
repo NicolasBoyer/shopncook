@@ -27,12 +27,11 @@ class App {
 	// TODO Si possible de plus minifier
 	// TODO récupérer les fonts dans les sources
 	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
-	// TODO revoir les erreurs en loc autoanimate
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
-	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé avec le .closes sur le client dans server.js pas réglé
+	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
 
 	constructor () {
 		this.setBackButton()
