@@ -9,7 +9,6 @@ export default class Database {
 		try {
 			const splitCredentials = credentials.split(':')
 			this.client = await MongoClient.connect(`mongodb+srv://${splitCredentials[0]}:${encodeURIComponent(splitCredentials[1])}@cluster0.camsv.mongodb.net/foodshop?retryWrites=true&w=majority`)
-			await this.client.close()
 			return true
 		} catch (e) {
 			return false
