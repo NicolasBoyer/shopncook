@@ -14,7 +14,11 @@ export default class Lists extends HTMLElement {
 				this.ingredients = JSON.parse(await event.data.text())
 				this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
 				this.render()
-				autoAnimate(document.querySelector('ul'))
+				try {
+					autoAnimate(document.querySelector('ul'))
+				} catch (e) {
+					// console.error(e)
+				}
 			},
 			async () => {
 				Commons.clearPropositionsOnBackgroundClick(() => this.render())
