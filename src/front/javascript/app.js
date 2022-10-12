@@ -15,6 +15,7 @@ import LoadingBlock from './components/loadingBlock.js'
 import Dishes from './components/dishes.js'
 import Link from './components/link.js'
 import { Dom } from './classes/dom.js'
+import { Websocket } from './classes/websocket.js'
 
 class App {
 	// TODO images pour la page de home
@@ -40,8 +41,8 @@ class App {
 		this.setBackButton()
 		Utils.helpers()
 		this.wakeLock()
+		Websocket.init()
 		if (location.href.charAt(location.href.length - 1) === '/') history.replaceState({}, '', location.href.replace(/\/$/, ''))
-		Utils.initWsConnection()
 	}
 
 	async wakeLock () {
