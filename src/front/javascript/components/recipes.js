@@ -1,5 +1,6 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Caches, Utils } from '../utils.js'
+import { Utils } from '../classes/utils.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Recipes extends HTMLElement {
 	static get observedAttributes () { return ['choiceMode'] }
@@ -55,20 +56,20 @@ export default class Recipes extends HTMLElement {
 					<ul>
 						${!this.recipes.length ? html`
 							<li>Aucun résultat</li>` : this.recipes.map(
-								(pRecipe) => html`
+			(pRecipe) => html`
 									<li>
 										${this.choiceMode ? html`
 											<label for="${pRecipe.slug}">
 												<input type="${this.choiceMode}" id="${pRecipe.slug}" name="${this.choiceMode === 'checkbox' ? pRecipe.slug : 'recipe'}" value="${pRecipe.title}" @change="${(pEvent) => {
-													const value = pRecipe._id
-													if (pEvent.target.checked) choices.push(value)
-													else choices = choices.filter((pChoice) => pChoice !== value)
-													let detail = { choices }
-													if (this.choiceMode === 'radio') {
-														detail = { ...detail, title: pRecipe.title }
-													}
-													document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail }))
-												}}">
+				const value = pRecipe._id
+				if (pEvent.target.checked) choices.push(value)
+				else choices = choices.filter((pChoice) => pChoice !== value)
+				let detail = { choices }
+				if (this.choiceMode === 'radio') {
+					detail = { ...detail, title: pRecipe.title }
+				}
+				document.body.dispatchEvent(new CustomEvent('modalConfirm', { detail }))
+			}}">
 												${pRecipe.title}
 											</label>
 										` : html`
@@ -93,7 +94,7 @@ export default class Recipes extends HTMLElement {
 										`}
 									</li>
 								`
-						)}
+		)}
 					</ul>
 				</nav>
 			</aside>

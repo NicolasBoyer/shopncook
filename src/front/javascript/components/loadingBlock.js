@@ -1,5 +1,5 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Utils } from '../utils.js'
+import { Utils } from '../classes/utils.js'
 
 export default class LoadingBlock extends HTMLElement {
 	get loadingTimer () {

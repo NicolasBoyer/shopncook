@@ -1,5 +1,6 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Caches, Utils } from '../utils.js'
+import { Utils } from '../classes/utils.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Ingredients extends HTMLElement {
 	async connectedCallback () {
@@ -85,9 +86,9 @@ export default class Ingredients extends HTMLElement {
 													</button>
 												` : html`
 													<button class="edit" @click="${() => {
-														this.editMode = ingredientId
-														this.search(this.querySelector('input').value)
-													}}">
+													this.editMode = ingredientId
+													this.search(this.querySelector('input').value)
+												}}">
 														<svg class="edit">
 															<use href="#edit"></use>
 														</svg>

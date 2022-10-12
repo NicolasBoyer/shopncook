@@ -1,6 +1,6 @@
 import Toast from './components/toast.js'
 import Propose from './components/propose.js'
-import { Dom, Utils } from './utils.js'
+import { Utils } from './classes/utils.js'
 import Confirm from './components/confirm.js'
 import Recipes from './components/recipes.js'
 import Ingredients from './components/ingredients.js'
@@ -14,6 +14,7 @@ import Loader from './components/loader.js'
 import LoadingBlock from './components/loadingBlock.js'
 import Dishes from './components/dishes.js'
 import Link from './components/link.js'
+import { Dom } from './classes/dom.js'
 
 class App {
 	// TODO images pour la page de home
@@ -32,12 +33,15 @@ class App {
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
+	// TODO revoir erreur sur map sur recipe à test
+	// TODO revoir le bouton de retour arrière ... Pour un menu ?
 
 	constructor () {
 		this.setBackButton()
 		Utils.helpers()
 		this.wakeLock()
 		if (location.href.charAt(location.href.length - 1) === '/') history.replaceState({}, '', location.href.replace(/\/$/, ''))
+		Utils.initWsConnection()
 	}
 
 	async wakeLock () {

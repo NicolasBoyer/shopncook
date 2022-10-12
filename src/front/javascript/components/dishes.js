@@ -1,6 +1,7 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Caches, Utils } from '../utils.js'
-import { Commons } from '../commons.js'
+import { Utils } from '../classes/utils.js'
+import { Commons } from '../classes/commons.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Dishes extends HTMLElement {
 	async connectedCallback () {

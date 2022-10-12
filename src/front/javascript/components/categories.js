@@ -1,5 +1,6 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Caches, Utils } from '../utils.js'
+import { Utils } from '../classes/utils.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Categories extends HTMLElement {
 	get choiceMode () {
@@ -54,8 +55,8 @@ export default class Categories extends HTMLElement {
 									? html`
 										<div class="addCategory grid">
 											<input name="newCategory" type="text" @keyup="${(pEvent) => {
-												if (pEvent.key === 'Enter') this.editAndSaveCategory(pEvent)
-											}}"/>
+										if (pEvent.key === 'Enter') this.editAndSaveCategory(pEvent)
+									}}"/>
 											<button type="button" class="add" @click="${(pEvent) => this.editAndSaveCategory(pEvent)}">
 												<svg class="add">
 													<use href="#add"></use>

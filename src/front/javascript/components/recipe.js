@@ -1,6 +1,7 @@
 import { html, render } from '../thirdParty/litHtml.js'
-import { Caches, Utils } from '../utils.js'
-import { Commons } from '../commons.js'
+import { Utils } from '../classes/utils.js'
+import { Commons } from '../classes/commons.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Recipe extends HTMLElement {
 	async connectedCallback () {
@@ -95,7 +96,7 @@ export default class Recipe extends HTMLElement {
 				<fieldset class="ingredients">
 					<legend>Ingrédients</legend>
 					${this.newIngredients.map(
-							(pText, pIndex) => html`
+			(pText, pIndex) => html`
 								<div class="grid ${this.isInEditMode && this.newIngredients.length - 1 === pIndex ? 'threeCol' : ''}">
 									<label>
 										<input name="ingredient_${pIndex + 1}" required type="text" value="${pText}"/>
@@ -108,9 +109,9 @@ export default class Recipe extends HTMLElement {
 									</button>
 									${this.isInEditMode && this.newIngredients.length - 1 === pIndex ? html`
 										<button type="button" class="add" @click="${(pEvent) => {
-											this.isInEditMode = false
-											this.addIngredient(pEvent)
-										}}">
+				this.isInEditMode = false
+				this.addIngredient(pEvent)
+			}}">
 											<svg class="add">
 												<use href="#add"></use>
 											</svg>
@@ -119,7 +120,7 @@ export default class Recipe extends HTMLElement {
 									` : ''}
 								</div>
 							`
-					)}
+		)}
 					${!this.isInEditMode ? html`
 						<div class="grid">
 							<label>
@@ -128,9 +129,9 @@ export default class Recipe extends HTMLElement {
 										required
 										type="text"
 										@keyup="${(pEvent) => {
-											Commons.managePropositions(pEvent, (pEvent) => this.addIngredient(pEvent))
-											this.render()
-										}}"
+			Commons.managePropositions(pEvent, (pEvent) => this.addIngredient(pEvent))
+			this.render()
+		}}"
 								/>
 							</label>
 							<button type="button" class="add" @click="${(pEvent) => this.addIngredient(pEvent)}">
@@ -140,9 +141,9 @@ export default class Recipe extends HTMLElement {
 								<span>Ajouter un ingrédient</span>
 							</button>
 							<fs-propose list="${Commons.propositions}" @listReset="${() => {
-								Commons.setPropositions()
-								this.render()
-							}}"></fs-propose>
+			Commons.setPropositions()
+			this.render()
+		}}"></fs-propose>
 					` : ''}
 					</div>
 				</fieldset>

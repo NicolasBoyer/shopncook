@@ -1,7 +1,8 @@
 import { html, render } from '../thirdParty/litHtml.js'
 import autoAnimate from '../thirdParty/autoAnimate.js'
-import { Caches, Utils } from '../utils.js'
-import { Commons } from '../commons.js'
+import { Utils } from '../classes/utils.js'
+import { Commons } from '../classes/commons.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
@@ -9,9 +10,10 @@ export default class Lists extends HTMLElement {
 		this.strings = {
 			ordered: 'Acheté'
 		}
-		await Utils.initWsConnection(
+		await Utils.listenWs(
 			async (event) => {
 				this.ingredients = JSON.parse(await event.data.text())
+				Caches.set('listIngredients', this.ingredients)
 				this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
 				this.render()
 				try {
@@ -33,6 +35,18 @@ export default class Lists extends HTMLElement {
 				Caches.set('recipes', cacheResponse[0], 'dishes', cacheResponse[1])
 			}
 		)
+		// if (Utils.wsConnection.readyState === 1) {
+		//	Commons.clearPropositionsOnBackgroundClick(() => this.render())
+		//	const response = Caches.get('listIngredients', 'categories', 'ingredients') || await Utils.request('/db', 'POST', { body: '[{ "getListIngredients": "" }, { "getCategories": "" }, { "getIngredients": "" }]' })
+		//	Caches.set('listIngredients', response[0], 'categories', response[1], 'ingredients', response[2])
+		//	this.ingredients = response[0]
+		//	this.categories = response[1]
+		//	Commons.savedIngredients = response[2]
+		//	this.recipeChoices = []
+		//	Utils.wsConnection.send(JSON.stringify(this.ingredients))
+		//	const cacheResponse = Caches.get('recipes', 'dishes') || await Utils.request('/db', 'POST', { body: '[{ "getRecipes": "" }, { "getDishes": "" }]' })
+		//	Caches.set('recipes', cacheResponse[0], 'dishes', cacheResponse[1])
+		// }
 	}
 
 	resetMode () {
