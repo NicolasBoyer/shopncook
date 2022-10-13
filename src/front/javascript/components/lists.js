@@ -14,14 +14,7 @@ export default class Lists extends HTMLElement {
 		await Websocket.listen(
 			async (event) => {
 				this.ingredients = JSON.parse(await event.data.text())
-				Caches.set('listIngredients', this.ingredients)
-				this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
-				this.render()
-				try {
-					autoAnimate(document.querySelector('ul'))
-				} catch (e) {
-					// console.error(e)
-				}
+				this.displayIngredients()
 			},
 			async () => {
 				Commons.clearPropositionsOnBackgroundClick(() => this.render())
@@ -31,16 +24,32 @@ export default class Lists extends HTMLElement {
 				this.categories = response[1]
 				Commons.savedIngredients = response[2]
 				this.recipeChoices = []
-				Websocket.send(this.ingredients)
+				this.sendMessage()
 				const cacheResponse = Caches.get('recipes', 'dishes') || await Utils.request('/db', 'POST', { body: '[{ "getRecipes": "" }, { "getDishes": "" }]' })
 				Caches.set('recipes', cacheResponse[0], 'dishes', cacheResponse[1])
 			}
 		)
 	}
 
+	sendMessage () {
+		Websocket.send(this.ingredients)
+		this.displayIngredients()
+	}
+
+	displayIngredients () {
+		Caches.set('listIngredients', this.ingredients)
+		this.orderedIngredients = this.ingredients.length ? this.ingredients.filter((pIngredient) => pIngredient.ordered).map((pIngredient) => pIngredient._id) : []
+		this.render()
+		try {
+			autoAnimate(document.querySelector('ul'))
+		} catch (e) {
+			// console.error(e)
+		}
+	}
+
 	resetMode () {
 		this.editMode = null
-		Websocket.send(this.ingredients)
+		this.sendMessage()
 	}
 
 	async editAndSaveListIngredient (pEvent, id) {
@@ -69,7 +78,7 @@ export default class Lists extends HTMLElement {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
 			this.ingredients = await Utils.request('/db', 'POST', { body: `{ "removeListIngredient": "${id}" }` })
 			Caches.set('listIngredients', this.ingredients)
-			Websocket.send(this.ingredients)
+			this.sendMessage()
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
 	}
@@ -89,7 +98,7 @@ export default class Lists extends HTMLElement {
 				this.ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
 				Caches.set('listIngredients', this.ingredients)
 				this.recipeChoices = []
-				Websocket.send(this.ingredients)
+				this.sendMessage()
 			}
 		})
 	}
@@ -106,7 +115,7 @@ export default class Lists extends HTMLElement {
 			this.ingredients = response[0]
 			Commons.savedIngredients = response[1]
 			Caches.set('listIngredients', this.ingredients, 'ingredients', Commons.savedIngredients)
-			Websocket.send(this.ingredients)
+			this.sendMessage()
 		})
 	}
 
@@ -115,7 +124,7 @@ export default class Lists extends HTMLElement {
 			this.orderedIngredients = []
 			this.ingredients = await Utils.request('/db', 'POST', { body: '{ "clearListIngredients": "" }' })
 			Caches.set('listIngredients', this.ingredients)
-			Websocket.send(this.ingredients)
+			this.sendMessage()
 		})
 	}
 

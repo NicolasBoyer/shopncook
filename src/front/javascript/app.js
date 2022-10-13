@@ -36,6 +36,7 @@ class App {
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
 	// TODO revoir erreur sur map sur recipe à test
 	// TODO revoir le bouton de retour arrière ... Pour un menu ?
+	// TODO essayer de tester les méthodes privés
 
 	constructor () {
 		this.setBackButton()

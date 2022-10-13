@@ -98,7 +98,10 @@ export class Server {
 		const webSocketServer = new WebSocketServer({ server })
 		webSocketServer.on('connection', (ws) => {
 			ws.on('message', (data) => {
-				webSocketServer.clients.forEach((client) => client.send(data))
+				webSocketServer.clients.forEach((client) => {
+					// Si le client n'est pas le sender, on envoie les datas
+					if (client !== ws) client.send(data)
+				})
 			})
 		})
 		server.listen(pPort)
