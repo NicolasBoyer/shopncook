@@ -79,22 +79,6 @@ fs-header img {
 	width: 100%;
 }
 
-fs-header > div:first-child > a.back {
-	position: absolute;
-	background: transparent;
-	border: none;
-	color: var(--h1-color);
-}
-
-fs-header > div:first-child > a.back > span {
-	display: none;
-}
-
-fs-header > div:first-child > a.back > svg {
-	width: 2rem;
-	height: 2rem;
-}
-
 #main {
 	flex: 1;
 }
@@ -277,7 +261,7 @@ a.ordered {
 
 .recipes ul button,
 .recipes ul a,
-.recipes ul fs-link,
+.recipes aside ul fs-link,
 .ingredients ul button,
 .ingredients ul a,
 .home ul button,
@@ -293,7 +277,7 @@ a.ordered {
 }
 
 .recipes ul button > span,
-.recipes ul fs-link > span,
+.recipes aside ul fs-link > span,
 .recipes ul a > span,
 .ingredients ul button > span,
 .ingredients ul a > span,
@@ -333,7 +317,7 @@ a.ordered {
 	position: relative;
 }
 
-.ingredients button {
+fieldset.ingredients button {
 	width: 2rem;
 	height: 2rem;
 	padding: 0;
@@ -812,3 +796,64 @@ fs-dishes > .content > .grid:first-child > * {
 fs-dishes > .content > .grid > div:first-child {
 	font-size: 1em;
 }
+
+/*** fs-menu ***/
+fs-menu > div > ul {
+	display: flex;
+	justify-content: center;
+	max-width: none !important;
+}
+fs-menu > div > ul > li {
+	list-style: none;
+	margin: 0;
+	padding: var(--nav-element-spacing-vertical) var(--nav-element-spacing-horizontal);
+}
+
+fs-menu > div > ul > li[data-selected='true'] > * {
+	--background-color: var(--primary-hover);
+	--border-color: var(--primary-hover);
+	--box-shadow: var(--button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0));
+	--color: var(--primary-inverse);
+	pointer-events: none;
+}
+
+fs-menu[data-burger] > div {
+	background: var(--primary-inverse);
+	position: absolute;
+	z-index: 2;
+	inset: 0;
+}
+
+fs-menu[data-burger] > div > ul {
+	display: list-item;
+}
+
+fs-menu > div[data-hidden='true'] {
+	display: none;
+}
+
+fs-menu[data-burger] button.back,
+fs-menu[data-burger] button.burger {
+	background: transparent;
+	border: none;
+	color: var(--h1-color);
+	width: auto;
+}
+
+fs-menu[data-burger] button.burger {
+	position: absolute;
+	top: 0;
+	z-index: 2;
+}
+
+fs-menu[data-burger] button.back > span,
+fs-menu[data-burger] button.burger > span {
+	display: none;
+}
+
+fs-menu[data-burger] button.back > svg,
+fs-menu[data-burger] button.burger > svg {
+	width: 2rem;
+	height: 2rem;
+}
+

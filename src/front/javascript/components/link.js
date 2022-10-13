@@ -13,7 +13,7 @@ export default class Link extends HTMLElement {
 	async connectedCallback () {
 		const children = Array.from(this.children)
 		this.render()
-		this.querySelector('slot').replaceWith(...children)
+		this.querySelector('slot')?.replaceWith(...children)
 		const fragment = await Utils.getFragmentHtml(this.href)
 		this.addEventListener('click', () => {
 			history.pushState({}, '', this.href)
@@ -35,4 +35,4 @@ const REPLACEZONE = (pFragment) => {
 	document.querySelector('[data-replaced-title]').innerHTML = pFragment.title
 }
 
-window.onpopstate = async () => REPLACEZONE(await Utils.getFragmentHtml(location.pathname))
+window.addEventListener('popstate', async () => REPLACEZONE(await Utils.getFragmentHtml(location.pathname)))

@@ -14,8 +14,8 @@ import Loader from './components/loader.js'
 import LoadingBlock from './components/loadingBlock.js'
 import Dishes from './components/dishes.js'
 import Link from './components/link.js'
-import { Dom } from './classes/dom.js'
 import { Websocket } from './classes/websocket.js'
+import Menu from './components/menu.js'
 
 class App {
 	// TODO images pour la page de home
@@ -30,16 +30,15 @@ class App {
 	// TODO récupérer les fonts dans les sources
 	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
-	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket
+	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket le mettre partout le websocket
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
 	// TODO revoir erreur sur map sur recipe à test
-	// TODO revoir le bouton de retour arrière ... Pour un menu ?
 	// TODO essayer de tester les méthodes privés
+	// TODO Documenter les fonctions !!!
 
 	constructor () {
-		this.setBackButton()
 		Utils.helpers()
 		this.wakeLock()
 		Websocket.init()
@@ -62,16 +61,6 @@ class App {
 		})
 		await requestWakeLock()
 	}
-
-	setBackButton () {
-		if (location.pathname.split('/').filter((pPart) => pPart).length && history.length > 2) {
-			const bd = Dom.newDom(document.querySelector('fs-header > div:first-child'))
-			bd.elt('a', 'back').att('role', 'button').att('href', '#').listen('click', () => history.back())
-			bd.svg('back').up()
-			bd.elt('span').text('Retour').up()
-			bd.up()
-		}
-	}
 }
 
 new App()
@@ -90,3 +79,4 @@ customElements.define('fs-loading-block', LoadingBlock)
 customElements.define('fs-animated-section', AnimatedSection)
 customElements.define('fs-dishes', Dishes)
 customElements.define('fs-link', Link)
+customElements.define('fs-menu', Menu)

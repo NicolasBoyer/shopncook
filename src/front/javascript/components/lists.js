@@ -7,7 +7,6 @@ import { Websocket } from '../classes/websocket.js'
 
 export default class Lists extends HTMLElement {
 	async connectedCallback () {
-		await Utils.getFragmentHtml(location.pathname)
 		this.strings = {
 			ordered: 'Acheté'
 		}
