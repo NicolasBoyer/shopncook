@@ -27,16 +27,17 @@ class App {
 	// TODO minifier et combiner les fichiers js clients dans app.js
 	// TODO repasser sur les var && et remplacer par var?. si possible
 	// TODO Si possible de plus minifier
-	// TODO récupérer les fonts dans les sources
+	// TODO récupérer les fonts dans les sources -> en cours dans fonts.css
 	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket le mettre partout le websocket
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
-	// TODO revoir erreur sur map sur recipe à test
 	// TODO essayer de tester les méthodes privés
 	// TODO Documenter les fonctions !!!
+	// TODO certainement possible de recup un seul fichier pour la listes des recettes
+	// TODO routes.json à mettre en cache !!!
 
 	constructor () {
 		Utils.helpers()
