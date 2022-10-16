@@ -10,6 +10,7 @@ export default class Recipe extends HTMLElement {
 		this.submitButtonName = 'Ajouter'
 		this.title = 'Ajouter une recette'
 		this.isInEditMode = splitUrl.includes('edit')
+		this.isEditAndAddIngredient = this.isInEditMode
 		if (this.isInEditMode) {
 			this.slug = splitUrl[splitUrl.length - 1]
 			this.currentRecipe = Caches.get(`${this.slug}`) || await Utils.request('/db', 'POST', { body: `{ "getRecipes": { "slug": "${this.slug}" } }` })
@@ -36,8 +37,6 @@ export default class Recipe extends HTMLElement {
 		form.addEventListener('submit', async (pEvent) => {
 			pEvent.preventDefault()
 			try {
-				const splitUrl = location.pathname.split('/')
-				const isEdit = splitUrl.includes('edit')
 				const plainFormData = Object.fromEntries(new FormData(form).entries())
 				const id = plainFormData.id
 				const ingredients = Object.keys(plainFormData).map((key) => key !== 'recipe' && key !== 'id' && { title: plainFormData[key] }).filter((ingredient) => ingredient)
@@ -49,7 +48,7 @@ export default class Recipe extends HTMLElement {
 				const response = await Utils.request('/db', 'POST', { body: `{ "setRecipe": { "title": "${plainFormData.recipe}", ${id ? `"id": "${id}",` : ''} "ingredients": ${JSON.stringify(ingredients)}} }` })
 				Caches.set('recipes', response[0])
 				Utils.loader(false)
-				if (isEdit) location.href = '/app/recipes'
+				if (this.isInEditMode) location.href = '/app/recipes'
 				else {
 					this.newIngredients = []
 					document.querySelectorAll('input').forEach((input) => {
@@ -95,9 +94,9 @@ export default class Recipe extends HTMLElement {
 				</label>
 				<fieldset class="ingredients">
 					<legend>Ingrédients</legend>
-					${this.newIngredients.map(
-			(pText, pIndex) => html`
-								<div class="grid ${this.isInEditMode && this.newIngredients.length - 1 === pIndex ? 'threeCol' : ''}">
+					${this.newIngredients?.map(
+							(pText, pIndex) => html`
+								<div class="grid ${this.isEditAndAddIngredient && this.newIngredients.length - 1 === pIndex ? 'threeCol' : ''}">
 									<label>
 										<input name="ingredient_${pIndex + 1}" required type="text" value="${pText}"/>
 									</label>
@@ -107,11 +106,11 @@ export default class Recipe extends HTMLElement {
 										</svg>
 										<span>Supprimer un ingrédient</span>
 									</button>
-									${this.isInEditMode && this.newIngredients.length - 1 === pIndex ? html`
+									${this.isEditAndAddIngredient && this.newIngredients.length - 1 === pIndex ? html`
 										<button type="button" class="add" @click="${(pEvent) => {
-				this.isInEditMode = false
-				this.addIngredient(pEvent)
-			}}">
+											this.isEditAndAddIngredient = false
+											this.addIngredient(pEvent)
+										}}">
 											<svg class="add">
 												<use href="#add"></use>
 											</svg>
@@ -120,8 +119,8 @@ export default class Recipe extends HTMLElement {
 									` : ''}
 								</div>
 							`
-		)}
-					${!this.isInEditMode ? html`
+					)}
+					${!this.isEditAndAddIngredient ? html`
 						<div class="grid">
 							<label>
 								<input
@@ -129,9 +128,9 @@ export default class Recipe extends HTMLElement {
 										required
 										type="text"
 										@keyup="${(pEvent) => {
-			Commons.managePropositions(pEvent, (pEvent) => this.addIngredient(pEvent))
-			this.render()
-		}}"
+											Commons.managePropositions(pEvent, (pEvent) => this.addIngredient(pEvent))
+											this.render()
+										}}"
 								/>
 							</label>
 							<button type="button" class="add" @click="${(pEvent) => this.addIngredient(pEvent)}">
@@ -141,9 +140,9 @@ export default class Recipe extends HTMLElement {
 								<span>Ajouter un ingrédient</span>
 							</button>
 							<fs-propose list="${Commons.propositions}" @listReset="${() => {
-			Commons.setPropositions()
-			this.render()
-		}}"></fs-propose>
+								Commons.setPropositions()
+								this.render()
+							}}"></fs-propose>
 					` : ''}
 					</div>
 				</fieldset>
