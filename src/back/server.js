@@ -20,6 +20,10 @@ const includeFiles = [
 		regexp: '.jpg$',
 		mimetype: { 'Content-Type': 'image/jpg' }
 	},
+	{
+		regexp: '.woff2',
+		mimetype: { 'Content-Type': 'font/woff2' }
+	},
 	// {
 	//	regexp: '.svg$',
 	//	mimetype: { 'Content-Type': 'image/svg+xml' }

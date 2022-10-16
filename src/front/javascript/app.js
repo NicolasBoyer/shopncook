@@ -27,7 +27,6 @@ class App {
 	// TODO minifier et combiner les fichiers js clients dans app.js
 	// TODO repasser sur les var && et remplacer par var?. si possible
 	// TODO Si possible de plus minifier
-	// TODO récupérer les fonts dans les sources -> en cours dans fonts.css
 	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
 	// TODO bug dishes lors ajourt recette -> fait mais peut potentiellement etre lent voir si améliorable avec websocket le mettre partout le websocket

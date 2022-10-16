@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;800&family=Rubik+Glitch&family=Press+Start+2P&display=swap');
+@import url('fonts.css');
 
 :root:not([data-theme=dark]), [data-theme=light] {
 	--color: #625941;
