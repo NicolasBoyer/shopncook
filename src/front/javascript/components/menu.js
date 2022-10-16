@@ -1,5 +1,6 @@
 import { html, render } from '../thirdParty/litHtml.js'
 import { Utils } from '../classes/utils.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Menu extends HTMLElement {
 	constructor () {
@@ -8,7 +9,8 @@ export default class Menu extends HTMLElement {
 	}
 
 	async connectedCallback () {
-		this.links = await Utils.request('/app/routes.json')
+		this.links = Caches.get('routes') || await Utils.request('/app/routes.json')
+		Caches.set('routes', this.links)
 		this.removeAttribute('style')
 		this.displayMenu()
 		window.addEventListener('resize', (pEvent) => this.displayMenu())

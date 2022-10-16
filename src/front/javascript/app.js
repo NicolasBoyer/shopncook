@@ -36,7 +36,6 @@ class App {
 	// TODO essayer de tester les méthodes privés
 	// TODO Documenter les fonctions !!!
 	// TODO certainement possible de recup un seul fichier pour la listes des recettes
-	// TODO routes.json à mettre en cache !!!
 
 	constructor () {
 		Utils.helpers()
