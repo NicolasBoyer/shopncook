@@ -3,36 +3,41 @@ import { Utils } from '../classes/utils.js'
 import { Caches } from '../classes/caches.js'
 
 export default class Ingredients extends HTMLElement {
+	#savedIngredients
+	#editMode
+	#ingredients
+	#categories
+
 	async connectedCallback () {
 		const response = Caches.get('ingredients', 'categories') || await Utils.request('/db', 'POST', { body: '[{ "getIngredients": "" }, { "getCategories": "" }]' })
 		Caches.set('ingredients', response[0], 'categories', response[1])
-		this.savedIngredients = response[0]
-		this.categories = response[1]
-		this.search()
-		this.querySelector('input').addEventListener('keyup', (pEvent) => this.search(pEvent.target.value))
+		this.#savedIngredients = response[0]
+		this.#categories = response[1]
+		this.#search()
+		this.querySelector('input').addEventListener('keyup', (pEvent) => this.#search(pEvent.target.value))
 	}
 
-	async editAndSaveIngredient (id, title) {
-		this.savedIngredients = await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${title}", "id": "${id}" } ] } }` })
-		Caches.set('ingredients', this.savedIngredients)
-		this.resetMode()
+	async #editAndSaveIngredient (id, title) {
+		this.#savedIngredients = await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${title}", "id": "${id}" } ] } }` })
+		Caches.set('ingredients', this.#savedIngredients)
+		this.#resetMode()
 	}
 
-	resetMode () {
-		this.editMode = null
-		this.search(this.querySelector('input').value)
+	#resetMode () {
+		this.#editMode = null
+		this.#search(this.querySelector('input').value)
 	}
 
-	async removeIngredient (id) {
+	async #removeIngredient (id) {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
-			this.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${id}" }` }))
-			Caches.set('ingredients', this.savedIngredients)
-			this.search()
+			this.#savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${id}" }` }))
+			Caches.set('ingredients', this.#savedIngredients)
+			this.#search()
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
 	}
 
-	setCategory (pEvent, ingredientId, ingredientTitle, selectedCategoryId) {
+	#setCategory (pEvent, ingredientId, ingredientTitle, selectedCategoryId) {
 		let categoryId
 		document.body.addEventListener('modalConfirm', (pEvent) => {
 			categoryId = pEvent.detail.id
@@ -40,18 +45,18 @@ export default class Ingredients extends HTMLElement {
 		Utils.confirm(html`
 			<fs-categories choiceMode="${selectedCategoryId}"/>
 		`, async () => {
-			this.savedIngredients = await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }` })
-			Caches.set('ingredients', this.savedIngredients)
-			this.search()
+			this.#savedIngredients = await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }` })
+			Caches.set('ingredients', this.#savedIngredients)
+			this.#search()
 		})
 	}
 
-	search (pValue) {
-		this.ingredients = (pValue ? this.savedIngredients.filter((pIngredient) => pIngredient.title.toLowerCase().includes(pValue.toLowerCase())) : this.savedIngredients).sort((a, b) => a.title.localeCompare(b.title))
-		this.render()
+	#search (pValue) {
+		this.#ingredients = (pValue ? this.#savedIngredients.filter((pIngredient) => pIngredient.title.toLowerCase().includes(pValue.toLowerCase())) : this.#savedIngredients).sort((a, b) => a.title.localeCompare(b.title))
+		this.#render()
 	}
 
-	render () {
+	#render () {
 		render(html`
 			<h2>Liste des ingrédients</h2>
 			<label>
@@ -60,25 +65,25 @@ export default class Ingredients extends HTMLElement {
 			<aside>
 				<nav>
 					<ul>
-						${!this.ingredients.length ? html`
-							<li>Aucun résultat</li>` : this.ingredients.map(
+						${!this.#ingredients.length ? html`
+							<li>Aucun résultat</li>` : this.#ingredients.map(
 								(pIngredient) => {
 									const ingredientTitle = pIngredient.title
-									const category = this.categories.map((pCategory) => pCategory._id === pIngredient.category && pCategory.title).filter((pCategory) => pCategory)[0]
+									const category = this.#categories.map((pCategory) => pCategory._id === pIngredient.category && pCategory.title).filter((pCategory) => pCategory)[0]
 									const ingredientId = pIngredient._id
 									return html`
 										<li>
 											<div>
-												${this.editMode === ingredientId ? html`
+												${this.#editMode === ingredientId ? html`
 													<input name="${ingredientId}" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
-														if (pEvent.key === 'Enter') this.editAndSaveIngredient(ingredientId, pEvent.target.value)
-														if (pEvent.key === 'Escape') this.resetMode()
+														if (pEvent.key === 'Enter') this.#editAndSaveIngredient(ingredientId, pEvent.target.value)
+														if (pEvent.key === 'Escape') this.#resetMode()
 													}}"/>
 												` : html`
 													<span>${ingredientTitle}${category ? html` (${category})` : ''}</span>
 												`}
-												${this.editMode === ingredientId ? html`
-													<button class="valid" @click="${(pEvent) => this.editAndSaveIngredient(ingredientId, pEvent.target.closest('button').previousElementSibling.value)}">
+												${this.#editMode === ingredientId ? html`
+													<button class="valid" @click="${(pEvent) => this.#editAndSaveIngredient(ingredientId, pEvent.target.closest('button').previousElementSibling.value)}">
 														<svg class="valid">
 															<use href="#valid"></use>
 														</svg>
@@ -86,30 +91,30 @@ export default class Ingredients extends HTMLElement {
 													</button>
 												` : html`
 													<button class="edit" @click="${() => {
-													this.editMode = ingredientId
-													this.search(this.querySelector('input').value)
-												}}">
+														this.#editMode = ingredientId
+														this.#search(this.querySelector('input').value)
+													}}">
 														<svg class="edit">
 															<use href="#edit"></use>
 														</svg>
 														<span>Modifier</span>
 													</button>
 												`}
-												${this.editMode === ingredientId ? html`
-													<button type="button" class="undo" @click="${() => this.resetMode()}">
+												${this.#editMode === ingredientId ? html`
+													<button type="button" class="undo" @click="${() => this.#resetMode()}">
 														<svg class="undo">
 															<use href="#undo"></use>
 														</svg>
 														<span>Annuler</span>
 													</button>
 												` : html`
-													<button type="button" class="remove" @click="${() => this.removeIngredient(ingredientId)}">
+													<button type="button" class="remove" @click="${() => this.#removeIngredient(ingredientId)}">
 														<svg class="remove">
 															<use href="#remove"></use>
 														</svg>
 														<span>Supprimer</span>
 													</button>
-													<button type="button" class="setCategory" @click="${(pEvent) => this.setCategory(pEvent, ingredientId, ingredientTitle, pIngredient.category)}">
+													<button type="button" class="setCategory" @click="${(pEvent) => this.#setCategory(pEvent, ingredientId, ingredientTitle, pIngredient.category)}">
 														<svg class="setCategory">
 															<use href="#setCategory"></use>
 														</svg>

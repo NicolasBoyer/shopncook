@@ -25,7 +25,6 @@ class App {
 	// TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
 	// TODO permettre de rendre payant
 	// TODO minifier et combiner les fichiers js clients dans app.js
-	// TODO repasser sur les var && et remplacer par var?. si possible
 	// TODO Si possible de plus minifier
 	// TODO revoir la conf qua pour faire en sorte de modifier aussi l'appel vers le min.js dans page.html
 	// TODO bug car quand recherche un ingredient alors que recherche si suppr rest de la liste
@@ -33,7 +32,6 @@ class App {
 	// TODO Mise en place de test auto ?
 	// TODO home à passer sur mobile
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
-	// TODO essayer de tester les méthodes privés
 	// TODO Documenter les fonctions !!!
 	// TODO certainement possible de recup un seul fichier pour la listes des recettes
 

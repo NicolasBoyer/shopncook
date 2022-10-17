@@ -1,6 +1,8 @@
 import { html, render } from '../thirdParty/litHtml.js'
 
 export default class Toast extends HTMLElement {
+	#messageProperty
+
 	static get observedAttributes () { return ['visible'] }
 
 	get type () {
@@ -20,9 +22,9 @@ export default class Toast extends HTMLElement {
 	}
 
 	connectedCallback () {
-		this.render()
+		this.#render()
 		setTimeout(() => {
-			this.messageProperty = this.message
+			this.#messageProperty = this.message
 			this.removeAttribute('message')
 			this.visible = 'visible'
 		}, 50)
@@ -33,13 +35,13 @@ export default class Toast extends HTMLElement {
 	}
 
 	attributeChangedCallback (name, oldValue, newValue) {
-		if ((name === 'visible') && oldValue !== newValue) this.render()
+		if ((name === 'visible') && oldValue !== newValue) this.#render()
 	}
 
-	render () {
+	#render () {
 		render(html`
 			<div class='toast ${this.type} ${this.visible}' role='alert'>
-				${this.messageProperty}
+				${this.#messageProperty}
 			</div>
 		`, this)
 	}

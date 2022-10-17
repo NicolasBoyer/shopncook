@@ -3,11 +3,11 @@ import { Utils } from '../classes/utils.js'
 
 export default class Login extends HTMLElement {
 	connectedCallback () {
-		this.render()
-		this.setFormListener()
+		this.#render()
+		this.#setFormListener()
 	}
 
-	setFormListener () {
+	#setFormListener () {
 		const form = this.querySelector('form')
 		form.addEventListener('submit', async (pEvent) => {
 			pEvent.preventDefault()
@@ -16,7 +16,7 @@ export default class Login extends HTMLElement {
 		})
 	}
 
-	render () {
+	#render () {
 		render(html`
 			<form>
 				<label>

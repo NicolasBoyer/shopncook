@@ -12,7 +12,7 @@ export default class Link extends HTMLElement {
 
 	async connectedCallback () {
 		const children = Array.from(this.children)
-		this.render()
+		this.#render()
 		this.querySelector('slot')?.replaceWith(...children)
 		const fragment = await Utils.getFragmentHtml(this.href)
 		this.addEventListener('click', () => {
@@ -21,7 +21,7 @@ export default class Link extends HTMLElement {
 		})
 	}
 
-	render () {
+	#render () {
 		render(html`
 			<slot></slot>
 		`, this)

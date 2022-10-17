@@ -13,7 +13,7 @@ export default class Loader extends HTMLElement {
 	}
 
 	connectedCallback () {
-		this.render()
+		this.#render()
 		this.style.display = 'none'
 	}
 
@@ -21,16 +21,16 @@ export default class Loader extends HTMLElement {
 		if (name === 'visible' && oldValue !== newValue) {
 			if (newValue === '') {
 				this.style.display = ''
-				setTimeout(() => this.render(), 20)
+				setTimeout(() => this.#render(), 20)
 			}
 			if (newValue === null) {
 				this.style.display = 'none'
-				setTimeout(() => this.render(), 20)
+				setTimeout(() => this.#render(), 20)
 			}
 		}
 	}
 
-	render () {
+	#render () {
 		render(html`
 			<div class="spinner"></div>`, this)
 	}

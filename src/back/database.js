@@ -39,9 +39,9 @@ export default class Database {
 		const resolvers = {
 			async getRecipes (args) {
 				let recipes = []
-				if (args && args.slug) recipes.push(await Database.recipes.findOne({ slug: args.slug }))
+				if (args?.slug) recipes.push(await Database.recipes.findOne({ slug: args.slug }))
 				else recipes = await Database.recipes.find().toArray()
-				if (args && args.map) recipes = recipes.map((ingredient) => ingredient[args.map])
+				if (args?.map) recipes = recipes.map((ingredient) => ingredient[args.map])
 				else {
 					for (const recipe of recipes) {
 						recipe.ingredients = (await Database.ingredients.find({ recipes: { $in: [recipe._id.toString()] } }).toArray()).map((ingredient) => ingredient.title)
@@ -66,7 +66,7 @@ export default class Database {
 
 			async getIngredients (args) {
 				let ingredients = await Database.ingredients.find().toArray()
-				if (args && args.map) ingredients = ingredients.map((ingredient) => ingredient[args.map])
+				if (args?.map) ingredients = ingredients.map((ingredient) => ingredient[args.map])
 				return ingredients
 			},
 

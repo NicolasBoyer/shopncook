@@ -13,27 +13,27 @@ export default class Confirm extends HTMLElement {
 	}
 
 	connectedCallback () {
-		this.render()
+		this.#render()
 		this.style.display = 'none'
 	}
 
 	attributeChangedCallback (name, oldValue, newValue) {
 		if ((name === 'open') && oldValue !== newValue) {
 			this.style.display = ''
-			setTimeout(() => this.render(), 50)
+			setTimeout(() => this.#render(), 50)
 		}
 	}
 
-	closeDialog () {
+	#closeDialog () {
 		this.open = false
 		setTimeout(() => {
 			this.style.display = 'none'
 			this.message = ''
-			this.render()
+			this.#render()
 		}, 225)
 	}
 
-	render () {
+	#render () {
 		render(html`
 			<dialog ?open="${this.open}">
 				<article>
@@ -41,12 +41,12 @@ export default class Confirm extends HTMLElement {
 					<footer>
 						<a role="button" class="secondary" @click="${(pEvent) => {
 							pEvent.preventDefault()
-							this.closeDialog()
+							this.#closeDialog()
 						}}">Cancel</a>
 						<a role="button" @click="${(pEvent) => {
 							pEvent.preventDefault()
 							this.dispatchEvent(new CustomEvent('modalConfirm'))
-							this.closeDialog()
+							this.#closeDialog()
 						}}">Confirm</a>
 					</footer>
 				</article>

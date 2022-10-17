@@ -11,7 +11,7 @@ export default class Header extends HTMLElement {
 
 	constructor () {
 		super()
-		this.render()
+		this.#render()
 	}
 
 	connectedCallback () {
@@ -24,7 +24,7 @@ export default class Header extends HTMLElement {
 		})
 	}
 
-	render () {
+	#render () {
 		render(html`
 			<div class="image">
 				<img alt="${this.alt}" src="${this.src}"/>
