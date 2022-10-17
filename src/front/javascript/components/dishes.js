@@ -2,6 +2,7 @@ import { html, render } from '../thirdParty/litHtml.js'
 import { Utils } from '../classes/utils.js'
 import { Commons } from '../classes/commons.js'
 import { Caches } from '../classes/caches.js'
+import { Websocket } from '../classes/websocket.js'
 
 export default class Dishes extends HTMLElement {
 	#week
@@ -50,7 +51,7 @@ export default class Dishes extends HTMLElement {
 				}))
 				const listIngredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
 				Caches.set('listIngredients', listIngredients)
-				// Websocket.send(listIngredients)
+				Websocket.send(listIngredients)
 			}
 			this.#dishName = ''
 		})
