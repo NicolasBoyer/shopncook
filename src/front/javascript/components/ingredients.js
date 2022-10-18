@@ -32,7 +32,7 @@ export default class Ingredients extends HTMLElement {
 		Utils.confirm(html`<h3>Voulez-vous vraiment supprimer ?</h3>`, async () => {
 			this.#savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "removeIngredient": "${id}" }` }))
 			Caches.set('ingredients', this.#savedIngredients)
-			this.#search()
+			this.#search(this.querySelector('input').value)
 			Utils.toast('success', 'Ingrédient supprimé')
 		})
 	}
