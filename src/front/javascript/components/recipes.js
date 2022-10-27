@@ -92,7 +92,7 @@ export default class Recipes extends HTMLElement {
 												</button>
 											</div>
 											<div class="ingredients">
-												${pRecipe.ingredients?.map((pIngredient, pIndex) => pIngredient + (pRecipe.ingredients.length - 1 === pIndex ? '' : ', '))}
+												${pRecipe.ingredients?.map((pIngredient, pIndex) => pIngredient.title + (pRecipe.ingredients.length - 1 === pIndex ? '' : ', '))}
 											</div>
 										`}
 									</li>

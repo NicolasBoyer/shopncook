@@ -6,7 +6,6 @@ import { Caches } from '../classes/caches.js'
 import { Websocket } from '../classes/websocket.js'
 
 export default class Lists extends HTMLElement {
-	#strings
 	#ingredients
 	#categories
 	#recipeChoices
@@ -14,9 +13,6 @@ export default class Lists extends HTMLElement {
 	#editMode
 
 	async connectedCallback () {
-		this.#strings = {
-			ordered: 'Acheté'
-		}
 		await Websocket.listen(
 			async (event) => {
 				this.#ingredients = JSON.parse(await event.data.text())
@@ -60,11 +56,12 @@ export default class Lists extends HTMLElement {
 
 	async #editAndSaveListIngredient (pEvent, id) {
 		Commons.setPropositions()
-		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling
+		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.tagName === 'SELECT' ? pEvent.target.previousElementSibling.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling.previousElementSibling
 		const sizeInput = input.nextElementSibling
+		const unitSelect = input.nextElementSibling.nextElementSibling
 		if (input?.value) {
 			const category = Commons.savedIngredients.map((pIngredient) => pIngredient.title === input.value && pIngredient.category).filter((pIngredient) => pIngredient)[0]
-			const response = await Utils.request('/db', 'POST', { body: `[{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${category ? `, "category": "${category}"` : ''}, "size": "${sizeInput.value}" } ] } }, { "getIngredients": "" }]` })
+			const response = await Utils.request('/db', 'POST', { body: `[{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${category ? `, "category": "${category}"` : ''}, "size": "${sizeInput.value}", "unit": "${unitSelect.value}" } ] } }, { "getIngredients": "" }]` })
 			this.#ingredients = response[0]
 			Commons.savedIngredients = response[1]
 			Caches.set('listIngredients', this.#ingredients, 'ingredients', Commons.savedIngredients)
@@ -139,6 +136,7 @@ export default class Lists extends HTMLElement {
 			const ingredientId = pIngredient._id
 			const ingredientTitle = pIngredient.title
 			const ingredientSize = pIngredient.size
+			const ingredientUnit = pIngredient.unit
 			const isIngredientOrdered = this.#orderedIngredients?.includes(ingredientId)
 			return html`
 				<li>
@@ -148,17 +146,18 @@ export default class Lists extends HTMLElement {
 								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
 								if (pEvent.key === 'Escape') this.#resetMode()
 							}}"/>
-							<input name="size" type="text" value="${ingredientSize}" @keyup="${(pEvent) => {
+							<input name="size" type="number" value="${ingredientSize}" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
 								if (pEvent.key === 'Escape') this.#resetMode()
 							}}"/>
+							${Commons.getUnitSelect()}
 						` : html`
 							<a class="${isIngredientOrdered ? 'ordered' : ''}" @click="${() => {
 								this.#editListIngredientOrdered(ingredientId, !isIngredientOrdered)
 								if (!isIngredientOrdered) this.#orderedIngredients.push(ingredientId)
 								else this.#orderedIngredients = this.#orderedIngredients.filter((pOrderedIngredient) => ingredientId !== pOrderedIngredient)
 								if (this.#orderedIngredients.length === this.#ingredients.length) this.#clear()
-							}}"><span>${ingredientTitle}${ingredientSize && html` (${ingredientSize})`}</span></a>
+							}}"><span>${ingredientTitle}${ingredientSize && html` (${ingredientSize}${ingredientUnit !== 'nb' ? ` ${ingredientUnit}` : ''})`}</span></a>
 						`}
 						${this.#editMode === ingredientId ? html`
 							<button class="valid" @click="${(pEvent) => this.#editAndSaveListIngredient(pEvent, ingredientId)}">
@@ -209,7 +208,7 @@ export default class Lists extends HTMLElement {
 		const getCategoryTitle = (pCategoryId) => this.#categories.map((pCategory) => pCategory._id === pCategoryId && pCategory.title).filter((pCategory) => pCategory)[0]
 		const ingredientsByCategory = this.#ingredients?.filter((pIngredient) => pIngredient.category || pIngredient.ordered).sort((a, b) => getCategoryTitle(a.category)?.localeCompare(getCategoryTitle(b.category))).reduce((group, ingredient) => {
 			const categoryId = ingredient.category
-			const category = !ingredient.ordered ? getCategoryTitle(categoryId) : this.#strings.ordered
+			const category = !ingredient.ordered ? getCategoryTitle(categoryId) : Commons.strings.ordered
 			group[category] = group[category] ?? []
 			group[category].push(ingredient)
 			return group
@@ -229,13 +228,14 @@ export default class Lists extends HTMLElement {
 					<ul>
 						<li>
 							<div class="addListIngredient grid">
-								<input name="ingredient" type="text" @keyup="${(pEvent) => {
-									Commons.managePropositions(pEvent, () => this.#editAndSaveListIngredient(pEvent))
+								<input name="ingredient" type="text" @keyup="${async (pEvent) => {
+									await Commons.managePropositions(pEvent, () => this.#editAndSaveListIngredient(pEvent))
 									this.#render()
 								}}"/>
-								<input name="size" type="text" @keyup="${(pEvent) => {
+								<input name="size" type="number" @keyup="${(pEvent) => {
 									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)
 								}}"/>
+								${Commons.getUnitSelect()}
 								<button type="button" class="add" @click="${(pEvent) => this.#editAndSaveListIngredient(pEvent)}">
 									<svg class="add">
 										<use href="#add"></use>
@@ -259,7 +259,7 @@ export default class Lists extends HTMLElement {
 									<li>Aucun ingrédient ...</li>`
 								: html`
 									${this.#ingredients.filter((pIngredient) => !pIngredient.category && !pIngredient.ordered).map((pIngredient) => listIngredient(pIngredient))}
-									${Object.entries(ingredientsByCategory).sort(([a, av], [b, bv]) => a === this.#strings.ordered ? 1 : b === this.#strings.ordered ? -1 : a.localeCompare(b)).map(([pCategory, pValue]) => {
+									${Object.entries(ingredientsByCategory).sort(([a, av], [b, bv]) => a === Commons.strings.ordered ? 1 : b === Commons.strings.ordered ? -1 : a.localeCompare(b)).map(([pCategory, pValue]) => {
 										return html`
 											<li>
 												<div class="category">${pCategory}</div>

@@ -44,7 +44,10 @@ export default class Database {
 				if (args?.map) recipes = recipes.map((ingredient) => ingredient[args.map])
 				else {
 					for (const recipe of recipes) {
-						recipe.ingredients = (await Database.ingredients.find({ recipes: { $in: [recipe._id.toString()] } }).toArray()).map((ingredient) => ingredient.title)
+						recipe.ingredients = (await Database.ingredients.find({ recipes: { $elemMatch: { recipeId: recipe._id.toString() } } }).toArray()).map((ingredient) => {
+							const recipe = ingredient.recipes.find((pRecipe) => typeof pRecipe === 'object')
+							return recipe ? { title: ingredient.title, size: recipe.size, unit: recipe.unit } : ingredient.title
+						})
 					}
 				}
 				return recipes.length === 1 ? recipes[0] : recipes
@@ -60,7 +63,7 @@ export default class Database {
 
 			async removeRecipe (id) {
 				await Database.recipes.deleteOne({ _id: new ObjectId(id) })
-				await Database.ingredients.updateMany({}, { $pull: { recipes: { $in: [id] } } })
+				await Database.ingredients.updateMany({}, { $pull: { recipes: { recipeId: id } } })
 				return await resolvers.getRecipes()
 			},
 
@@ -81,12 +84,26 @@ export default class Database {
 					currentIngredient.title = ingredient.title
 					currentIngredient.category = ingredient.category || currentIngredient.category || ''
 					if (!currentIngredient.recipes) currentIngredient.recipes = []
-					if (args.ingredients.some((pIngredient) => pIngredient._id === ingredient.id) && args.recipeId && !currentIngredient.recipes.includes(args.recipeId)) currentIngredient.recipes.push(args.recipeId)
+					if (args.ingredients.some((pIngredient) => pIngredient._id === ingredient.id) && args.recipeId) {
+						if (!currentIngredient.recipes.some((pRecipe) => pRecipe.recipeId === args.recipeId)) {
+							// Ajout de recette dans ingredient
+							currentIngredient.recipes.push({
+								recipeId: args.recipeId,
+								size: ingredient.size,
+								unit: ingredient.unit
+							})
+						} else {
+							// Edit recette dans ingredient
+							const recipe = currentIngredient.recipes.find((pRecipe) => pRecipe.recipeId === args.recipeId)
+							recipe.size = ingredient.size
+							recipe.unit = ingredient.unit
+						}
+					}
 					newIngredients.push(currentIngredient)
 				}
 				let ingredients = []
 				if (args.recipeId) {
-					ingredients = (await Database.ingredients.find({ recipes: Utils.slugify(args.recipeId) }).toArray()).filter((pIngredient) => !args.ingredients.some((pArgIngredient) => pArgIngredient.title === pIngredient.title)).map((pIngredient) => pIngredient.recipes.splice(pIngredient.recipes.indexOf(args.recipeId), 1) && pIngredient)
+					ingredients = (await Database.ingredients.find({ recipes: { $elemMatch: { recipeId: args.recipeId.toString() } } }).toArray()).filter((pIngredient) => !args.ingredients.some((pArgIngredient) => pArgIngredient.title === pIngredient.title)).map((pIngredient) => pIngredient.recipes.splice(pIngredient.recipes.indexOf(args.recipeId), 1) && pIngredient)
 				}
 				await Database.ingredients.bulkWrite([...newIngredients, ...ingredients].map((ingredient, index) =>
 					({
@@ -116,10 +133,11 @@ export default class Database {
 				for (const ingredient of args.ingredients) {
 					const { id, ...currentIngredient } = ingredient
 					if (ingredient.title) currentIngredient.title = ingredient.title
-					ingredient.filter = ingredient.id ? { _id: new ObjectId(ingredient.id) } : { title: ingredient.title }
+					ingredient.filter = ingredient.id ? { _id: new ObjectId(ingredient.id) } : { title: ingredient.title, unit: ingredient.unit }
 					if (!ingredient.id) {
 						const listIngredient = await Database.lists.findOne(ingredient.filter)
-						currentIngredient.size = listIngredient?.size || ingredient.size
+						currentIngredient.size = listIngredient?.unit === ingredient.unit ? Number(listIngredient?.size) + Number(ingredient.size) : ingredient.size
+						currentIngredient.unit = listIngredient?.unit || ingredient.unit
 						currentIngredient.category = listIngredient?.category || ingredient.category || ''
 					}
 					isNewCategory = !!ingredient.category

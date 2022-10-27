@@ -70,7 +70,7 @@ export default class Dishes extends HTMLElement {
 	#clear (pEvent, id) {
 		if (pEvent) pEvent.target.closest('details').removeAttribute('open')
 		Utils.confirm(html`<h3>Voulez vous effacer ${id ? 'ce plat' : 'les plats de la semaine'} ?</h3>`, async () => {
-			this.#dishes = await Utils.request('/db', 'POST', { body: `{ "clearDishes": "${id}" }` })
+			this.#dishes = await Utils.request('/db', 'POST', { body: `{ "clearDishes": "${id || ''}" }` })
 			Caches.set('dishes', this.#dishes)
 			this.#refresh()
 		})

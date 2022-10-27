@@ -49,9 +49,20 @@ export default class Recipe extends HTMLElement {
 			try {
 				const plainFormData = Object.fromEntries(new FormData(form).entries())
 				const id = plainFormData.id
-				const ingredients = Object.keys(plainFormData).map((key) => key !== 'recipe' && key !== 'id' && { title: plainFormData[key] }).filter((ingredient) => ingredient)
+				const formKeys = Object.keys(plainFormData)
+				const ingredients = formKeys.reduce((pIngredients, pKey) => {
+					if (pKey !== 'recipe' && pKey !== 'id') {
+						if (!pIngredients.some((pIngredient) => pIngredient.title === plainFormData[pKey]) && pKey.includes('ingredient')) pIngredients.push({ title: plainFormData[pKey] })
+						if (!pKey.includes('ingredient')) {
+							const splitKey = pKey.split('_')
+							const key = Number(splitKey[1]) === 0 ? pIngredients.length - 1 : Number(splitKey[1]) - 1
+							pIngredients[key][splitKey[0]] = plainFormData[pKey]
+						}
+					}
+					return pIngredients
+				}, [])
 				if (this.#isInEditMode) {
-					this.#currentRecipe.ingredients = ingredients.map((pIngredient) => pIngredient.title)
+					this.#currentRecipe.ingredients = ingredients
 					Caches.set(this.#slug, this.#currentRecipe)
 				}
 				Utils.loader(true)
@@ -80,6 +91,10 @@ export default class Recipe extends HTMLElement {
 		const button = pEvent.target.closest('button')
 		const previousSibling = button?.previousElementSibling
 		const input = pEvent.target.tagName === 'INPUT' ? pEvent.target : previousSibling?.querySelector('input')
+		// const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.tagName === 'SELECT' ? pEvent.target.previousElementSibling.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling.previousElementSibling
+		// const sizeInput = input.nextElementSibling
+		// const unitSelect = input.nextElementSibling.nextElementSibling
+
 		if (input?.value) {
 			this.#newIngredients.push(input.value)
 			input.value = ''
@@ -105,11 +120,16 @@ export default class Recipe extends HTMLElement {
 				<fieldset class="ingredients">
 					<legend>Ingrédients</legend>
 					${this.#newIngredients?.map(
-							(pText, pIndex) => html`
-								<div class="grid ${this.#isEditAndAddIngredient && this.#newIngredients.length - 1 === pIndex ? 'threeCol' : ''}">
+							(pIngredient, pIndex) => html`
+								<div class="grid ${this.#isEditAndAddIngredient && this.#newIngredients.length - 1 === pIndex ? 'fiveCol' : ''}">
 									<label>
-										<input name="ingredient_${pIndex + 1}" required type="text" value="${pText}"/>
+										<input name="ingredient_${pIndex + 1}" required type="text" value="${pIngredient?.title || pIngredient}"/>
 									</label>
+									<input name="size_${pIndex + 1}" type="number" value="${pIngredient?.size || ''}" @keyup="${(pEvent) => {
+										// if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
+										// if (pEvent.key === 'Escape') this.#resetMode()
+									}}"/>
+									${Commons.getUnitSelect(`unit_${pIndex + 1}`, pIngredient?.unit || '')}
 									<button type="button" class="remove" @click="${() => this.#removeIngredient(pIndex)}">
 										<svg class="minus">
 											<use href="#minus"></use>
@@ -143,6 +163,11 @@ export default class Recipe extends HTMLElement {
 										}}"
 								/>
 							</label>
+							<input name="size_0" type="number" @keyup="${(pEvent) => {
+								// if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
+								// if (pEvent.key === 'Escape') this.#resetMode()
+							}}"/>
+							${Commons.getUnitSelect('unit_0')}
 							<button type="button" class="add" @click="${(pEvent) => this.#addIngredient(pEvent)}">
 								<svg class="add">
 									<use href="#add"></use>

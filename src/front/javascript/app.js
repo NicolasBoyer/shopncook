@@ -31,6 +31,9 @@ class App {
 	// TODO home à passer sur mobile
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
 	// TODO Documenter les fonctions !!!
+	// TODO possible erreur si suppr ingredient cache recipes pas mis à jour ...
+	// TODO ajouter ingrédient pas le + ne marche pas quand ajout recette
+	// TODO si ajout ingredient le nouvel ingredient recupère size et unit
 
 	constructor () {
 		Utils.helpers()
