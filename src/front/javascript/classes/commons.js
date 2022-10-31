@@ -10,7 +10,7 @@ export class Commons {
 
 	static getUnitSelect (pName, pValue) {
 		return html`
-			<select name="${pName || 'unit'}">
+			<select class="unit" name="${pName || 'unit'}">
 				<option ?selected="${pValue === 'nb'}" value="nb">${this.strings.number}</option>
 				<option ?selected="${pValue === 'g'}" value="g">${this.strings.gram}</option>
 				<option ?selected="${pValue === 'cl'}" value="cl">${this.strings.centiliter}</option>
@@ -32,19 +32,20 @@ export class Commons {
 		})
 	}
 
-	static async managePropositions (pEvent, pEnterFunction) {
+	static managePropositions (pEvent, pEnterFunction) {
 		const input = pEvent.target
 		this.setPropositions(input.value)
+		this.isProposeOpen = true
 		if (pEvent.key === 'Enter') {
-			// TODO rendu ici essai de supprimer le bug de choix avec un entrée
-			console.log(pEvent.target)
 			pEnterFunction(pEvent)
+			this.isProposeOpen = false
 			pEvent.preventDefault()
 		} else if (pEvent.key === 'ArrowDown' && this.propositions) input.closest('.grid').querySelector('fs-propose a:first-child').focus()
 		else if (this.propositions.length) {
 			if (input.value.length === 0 || this.propositions.length === 1 && this.propositions[0].toLowerCase() === input.value) {
 				if (this.propositions[0].toLowerCase() === input.value) input.value = this.propositions[0]
 				this.setPropositions()
+				this.isProposeOpen = false
 			}
 		}
 	}

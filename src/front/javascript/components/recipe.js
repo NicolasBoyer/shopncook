@@ -88,16 +88,16 @@ export default class Recipe extends HTMLElement {
 
 	#addIngredient (pEvent) {
 		Commons.setPropositions()
-		const button = pEvent.target.closest('button')
-		const previousSibling = button?.previousElementSibling
-		const input = pEvent.target.tagName === 'INPUT' ? pEvent.target : previousSibling?.querySelector('input')
-		// const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.tagName === 'SELECT' ? pEvent.target.previousElementSibling.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling.previousElementSibling
-		// const sizeInput = input.nextElementSibling
-		// const unitSelect = input.nextElementSibling.nextElementSibling
+		const parent = pEvent.target.closest('.grid')
+		const input = parent.querySelector('.ingredient')
+		const sizeInput = parent.querySelector('.size')
+		const unitSelect = parent.querySelector('.unit')
 
 		if (input?.value) {
-			this.#newIngredients.push(input.value)
+			this.#newIngredients.push({ title: input.value, size: sizeInput.value, unit: unitSelect.value })
 			input.value = ''
+			sizeInput.value = ''
+			unitSelect.value = 'nb'
 			this.#render()
 		}
 	}
@@ -125,10 +125,7 @@ export default class Recipe extends HTMLElement {
 									<label>
 										<input name="ingredient_${pIndex + 1}" required type="text" value="${pIngredient?.title || pIngredient}"/>
 									</label>
-									<input name="size_${pIndex + 1}" type="number" value="${pIngredient?.size || ''}" @keyup="${(pEvent) => {
-										// if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
-										// if (pEvent.key === 'Escape') this.#resetMode()
-									}}"/>
+									<input name="size_${pIndex + 1}" type="number" value="${pIngredient?.size || ''}"/>
 									${Commons.getUnitSelect(`unit_${pIndex + 1}`, pIngredient?.unit || '')}
 									<button type="button" class="remove" @click="${() => this.#removeIngredient(pIndex)}">
 										<svg class="minus">
@@ -154,18 +151,29 @@ export default class Recipe extends HTMLElement {
 						<div class="grid">
 							<label>
 								<input
+										class="ingredient"
 										name="ingredient_0"
 										required
 										type="text"
 										@keyup="${(pEvent) => {
-											Commons.managePropositions(pEvent, (pEvent) => this.#addIngredient(pEvent))
+											Commons.managePropositions(pEvent, () => {
+												Commons.setPropositions()
+												console.log(Commons.isProposeOpen)
+
+												// this.#render()
+											})
 											this.#render()
+											if (Commons.isProposeOpen) {
+												return
+											}
+											if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
+											// this.#render()
+											// TODO ici et aussi sur l'ajout de ingredient dans list
 										}}"
 								/>
 							</label>
-							<input name="size_0" type="number" @keyup="${(pEvent) => {
-								// if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
-								// if (pEvent.key === 'Escape') this.#resetMode()
+							<input class="size" name="size_0" type="number" @keyup="${(pEvent) => {
+								if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
 							}}"/>
 							${Commons.getUnitSelect('unit_0')}
 							<button type="button" class="add" @click="${(pEvent) => this.#addIngredient(pEvent)}">

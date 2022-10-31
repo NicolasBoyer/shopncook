@@ -94,10 +94,18 @@ export default class Lists extends HTMLElement {
 			<fs-recipes choiceMode="checkbox"/>
 		`, async () => {
 			if (this.#recipeChoices.length) {
-				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes && pIngredient.recipes.length && pIngredient.recipes.some((pRecipeId) => this.#recipeChoices.includes(pRecipeId))).map((pIngredient) => ({
-					title: pIngredient.title,
-					category: pIngredient.category
-				}))
+				const newIngredients = []
+				Commons.savedIngredients.forEach((pIngredient) => {
+					const recipe = pIngredient.recipes.find((pRecipe) => this.#recipeChoices.some((pRecipeId) => pRecipe.recipeId === pRecipeId))
+					if (recipe) {
+						newIngredients.push({
+							title: pIngredient.title,
+							size: recipe.size,
+							unit: recipe.unit,
+							category: pIngredient.category
+						})
+					}
+				})
 				this.#ingredients = await Utils.request('/db', 'POST', { body: `{ "setListIngredients": { "ingredients": ${JSON.stringify(newIngredients)} } }` })
 				Caches.set('listIngredients', this.#ingredients)
 				this.#recipeChoices = []
@@ -142,11 +150,11 @@ export default class Lists extends HTMLElement {
 				<li>
 					<div class="editListIngredient ${this.#editMode === ingredientId ? 'grid' : ''}">
 						${this.#editMode === ingredientId ? html`
-							<input name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
+							<input class="ingredient" name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
 								if (pEvent.key === 'Escape') this.#resetMode()
 							}}"/>
-							<input name="size" type="number" value="${ingredientSize}" @keyup="${(pEvent) => {
+							<input class="size" name="size" type="number" value="${ingredientSize}" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
 								if (pEvent.key === 'Escape') this.#resetMode()
 							}}"/>
@@ -228,11 +236,11 @@ export default class Lists extends HTMLElement {
 					<ul>
 						<li>
 							<div class="addListIngredient grid">
-								<input name="ingredient" type="text" @keyup="${async (pEvent) => {
+								<input class="ingredient" name="ingredient" type="text" @keyup="${async (pEvent) => {
 									await Commons.managePropositions(pEvent, () => this.#editAndSaveListIngredient(pEvent))
 									this.#render()
 								}}"/>
-								<input name="size" type="number" @keyup="${(pEvent) => {
+								<input class="size" name="size" type="number" @keyup="${(pEvent) => {
 									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)
 								}}"/>
 								${Commons.getUnitSelect()}

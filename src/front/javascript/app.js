@@ -19,7 +19,6 @@ import Menu from './components/menu.js'
 
 class App {
 	// TODO images pour la page de home
-	// TODO size dans recette (transformer size avec une unité)
 	// TODO Liste de ce qui est présent dans le congelé
 	// TODO Choix pour activer les fonctionnalités
 	// TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
@@ -32,8 +31,6 @@ class App {
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
 	// TODO Documenter les fonctions !!!
 	// TODO possible erreur si suppr ingredient cache recipes pas mis à jour ...
-	// TODO ajouter ingrédient pas le + ne marche pas quand ajout recette
-	// TODO si ajout ingredient le nouvel ingredient recupère size et unit
 
 	constructor () {
 		Utils.helpers()
