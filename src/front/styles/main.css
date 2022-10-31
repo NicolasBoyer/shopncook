@@ -255,7 +255,7 @@ a.ordered {
 
 .home li > div.grid.addListIngredient,
 .home li > div.grid.editListIngredient {
-	grid-template-columns: 1fr 6rem 8rem 2rem 2rem;
+	grid-template-columns: 2fr 2fr 1fr 2rem 2rem;
 }
 
 .home li > div.grid.addListIngredient > select,

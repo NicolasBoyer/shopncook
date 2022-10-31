@@ -3,9 +3,9 @@ import { html } from '../thirdParty/litHtml.js'
 export class Commons {
 	static strings = {
 		ordered: 'Acheté',
-		gram: 'Gramme',
-		centiliter: 'Centilitre',
-		number: 'Nombre'
+		gram: 'Gr',
+		centiliter: 'Cl',
+		number: 'Nb'
 	}
 
 	static getUnitSelect (pName, pValue) {
