@@ -166,11 +166,11 @@ export default class Lists extends HTMLElement {
 				<li>
 					<div class="editListIngredient ${this.#editMode === ingredientId ? 'grid' : ''} ${this.#editIngredientFocusedClass}">
 						${this.#editMode === ingredientId ? html`
-							<input placeholder="${this.#editIngredientPlaceholder}" class="ingredient" name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
+							<input autocomplete="off" placeholder="${this.#editIngredientPlaceholder}" class="ingredient" name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
 								if (pEvent.key === 'Escape') this.#resetMode()
 							}}" @focus="${() => this.#focusEditIngredient('ingredientFocused', 'Ingrédient')}" @blur="${() => this.#focusEditIngredient()}"/>
-							<input placeholder="${this.#editIngredientPlaceholder}" class="size" name="size" type="number" value="${ingredientSize}" @keyup="${(pEvent) => {
+							<input autocomplete="off" placeholder="${this.#editIngredientPlaceholder}" class="size" name="size" type="number" value="${ingredientSize}" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
 								if (pEvent.key === 'Escape') this.#resetMode()
 							}}" @focus="${() => this.#focusEditIngredient('sizeFocused', 'Unité')}" @blur="${() => this.#focusEditIngredient()}"/>
@@ -252,7 +252,7 @@ export default class Lists extends HTMLElement {
 					<ul>
 						<li>
 							<div class="addListIngredient grid ${this.#addIngredientFocusedClass}">
-								<input placeholder="${this.#addIngredientPlaceholder}" class="ingredient" name="ingredient" type="text" @focus="${() => this.#focusAddIngredient('ingredientFocused', 'Ingrédient')}"
+								<input autocomplete="off" placeholder="${this.#addIngredientPlaceholder}" class="ingredient" name="ingredient" type="text" @focus="${() => this.#focusAddIngredient('ingredientFocused', 'Ingrédient')}"
 									   @blur="${() => this.#focusAddIngredient()}" @keydown="${(pEvent) => {
 									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)
 								}}" @keyup="${(pEvent) => {
@@ -261,7 +261,7 @@ export default class Lists extends HTMLElement {
 										this.#render()
 									}
 								}}"/>
-								<input placeholder="${this.#addIngredientPlaceholder}" class="size" name="size" type="number" @keyup="${(pEvent) => {
+								<input autocomplete="off" placeholder="${this.#addIngredientPlaceholder}" class="size" name="size" type="number" @keyup="${(pEvent) => {
 									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)
 								}}" @focus="${() => this.#focusAddIngredient('sizeFocused', 'Unité')}" @blur="${() => this.#focusAddIngredient()}"/>
 								${Commons.getUnitSelect()}
