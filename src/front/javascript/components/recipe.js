@@ -155,20 +155,14 @@ export default class Recipe extends HTMLElement {
 										name="ingredient_0"
 										required
 										type="text"
-										@keyup="${(pEvent) => {
-											Commons.managePropositions(pEvent, () => {
-												Commons.setPropositions()
-												console.log(Commons.isProposeOpen)
-
-												// this.#render()
-											})
-											this.#render()
-											if (Commons.isProposeOpen) {
-												return
-											}
+										@keydown="${(pEvent) => {
 											if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
-											// this.#render()
-											// TODO ici et aussi sur l'ajout de ingredient dans list
+										}}"
+										@keyup="${(pEvent) => {
+											if (pEvent.key !== 'Enter') {
+												Commons.managePropositions(pEvent)
+												this.#render()
+											}
 										}}"
 								/>
 							</label>

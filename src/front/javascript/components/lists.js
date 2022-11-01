@@ -236,9 +236,13 @@ export default class Lists extends HTMLElement {
 					<ul>
 						<li>
 							<div class="addListIngredient grid">
-								<input class="ingredient" name="ingredient" type="text" @keyup="${async (pEvent) => {
-									await Commons.managePropositions(pEvent, () => this.#editAndSaveListIngredient(pEvent))
-									this.#render()
+								<input class="ingredient" name="ingredient" type="text" @keydown="${(pEvent) => {
+									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)
+								}}" @keyup="${(pEvent) => {
+									if (pEvent.key !== 'Enter') {
+										Commons.managePropositions(pEvent)
+										this.#render()
+									}
 								}}"/>
 								<input class="size" name="size" type="number" @keyup="${(pEvent) => {
 									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)

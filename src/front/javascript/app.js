@@ -31,6 +31,8 @@ class App {
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
 	// TODO Documenter les fonctions !!!
 	// TODO possible erreur si suppr ingredient cache recipes pas mis à jour ...
+	// TODO agrandir les input quand on rentre dedans et y mettre un placeholder + suppr propose defaut
+	// TODO repasser sur les recettes
 
 	constructor () {
 		Utils.helpers()
