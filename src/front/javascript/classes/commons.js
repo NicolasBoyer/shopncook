@@ -5,15 +5,29 @@ export class Commons {
 		ordered: 'Acheté',
 		gram: 'Gr',
 		centiliter: 'Cl',
-		number: 'Nb'
+		number: 'Nb',
+		gramComplete: 'Gramme',
+		centiliterComplete: 'Centilitre',
+		numberComplete: 'Nombre'
+	}
+
+	static focusIngredient (pEvent, pClass, pPlaceholder = '', pIsUnit = false) {
+		if (pPlaceholder) pEvent.target.closest('.grid').classList.add(pClass)
+		else pEvent.target.closest('.grid').classList.remove(pClass)
+		pEvent.target.placeholder = pPlaceholder
+		if (pIsUnit) {
+			pEvent.target.querySelector('.nb').innerHTML = pPlaceholder ? this.strings.numberComplete : this.strings.number
+			pEvent.target.querySelector('.g').innerHTML = pPlaceholder ? this.strings.gramComplete : this.strings.gram
+			pEvent.target.querySelector('.cl').innerHTML = pPlaceholder ? this.strings.centiliterComplete : this.strings.centiliter
+		}
 	}
 
 	static getUnitSelect (pName, pValue) {
 		return html`
-			<select class="unit" name="${pName || 'unit'}" @focus="${(pEvent) => pEvent.target.parentElement.classList.add('unitFocused')}" @blur="${(pEvent) => pEvent.target.parentElement.classList.remove('unitFocused')}">
-				<option ?selected="${pValue === 'nb'}" value="nb">${this.strings.number}</option>
-				<option ?selected="${pValue === 'g'}" value="g">${this.strings.gram}</option>
-				<option ?selected="${pValue === 'cl'}" value="cl">${this.strings.centiliter}</option>
+			<select class="unit" name="${pName || 'unit'}" @focus="${(pEvent) => this.focusIngredient(pEvent, 'unitFocused', 'Unité', true)}" @blur="${(pEvent) => this.focusIngredient(pEvent, 'unitFocused', '', true)}">
+				<option class="nb" ?selected="${pValue === 'nb'}" value="nb">${this.strings.number}</option>
+				<option class="g" ?selected="${pValue === 'g'}" value="g">${this.strings.gram}</option>
+				<option class="cl" ?selected="${pValue === 'cl'}" value="cl">${this.strings.centiliter}</option>
 			</select>
 		`
 	}

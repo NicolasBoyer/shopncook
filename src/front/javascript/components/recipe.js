@@ -108,12 +108,6 @@ export default class Recipe extends HTMLElement {
 		this.#render()
 	}
 
-	#focusIngredient (pEvent, pClass, pPlaceholder = '') {
-		if (pPlaceholder) pEvent.target.closest('.grid').classList.add(pClass)
-		else pEvent.target.closest('.grid').classList.remove(pClass)
-		pEvent.target.placeholder = pPlaceholder
-	}
-
 	#render () {
 		render(html`
 			<h2>${this.#title}</h2>
@@ -130,10 +124,10 @@ export default class Recipe extends HTMLElement {
 								<div class="grid ${this.#isEditAndAddIngredient && this.#newIngredients.length - 1 === pIndex ? 'fiveCol' : ''}">
 									<label>
 										<input class="ingredient" autocomplete="off" name="ingredient_${pIndex + 1}" required type="text" value="${pIngredient?.title || pIngredient}"
-											   @focus="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}" @blur="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused')}"/>
+											   @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused')}"/>
 									</label>
 									<input class="size" autocomplete="off" name="size_${pIndex + 1}" type="number" value="${pIngredient?.size || ''}"
-										   @focus="${(pEvent) => this.#focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => this.#focusIngredient(pEvent, 'sizeFocused')}"/>
+										   @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused')}"/>
 									${Commons.getUnitSelect(`unit_${pIndex + 1}`, pIngredient?.unit || '')}
 									<button type=" button" class="remove" @click="${() => this.#removeIngredient(pIndex)}">
 										<svg class="minus">
@@ -173,13 +167,13 @@ export default class Recipe extends HTMLElement {
 												this.#render()
 											}
 										}}"
-										@focus="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}"
-										@blur="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused')}"
+										@focus="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}"
+										@blur="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused')}"
 								/>
 							</label>
 							<input autocomplete="off" class="size" name="size_0" type="number" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
-							}}" @focus="${(pEvent) => this.#focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => this.#focusIngredient(pEvent)}"/>
+							}}" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent)}"/>
 							${Commons.getUnitSelect('unit_0')}
 							<button type="button" class="add" @click="${(pEvent) => this.#addIngredient(pEvent, 'sizeFocused')}">
 								<svg class="add">
