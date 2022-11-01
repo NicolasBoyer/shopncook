@@ -10,7 +10,7 @@ export class Commons {
 
 	static getUnitSelect (pName, pValue) {
 		return html`
-			<select class="unit" name="${pName || 'unit'}">
+			<select class="unit" name="${pName || 'unit'}" @focus="${(pEvent) => pEvent.target.parentElement.classList.add('unitFocused')}" @blur="${(pEvent) => pEvent.target.parentElement.classList.remove('unitFocused')}">
 				<option ?selected="${pValue === 'nb'}" value="nb">${this.strings.number}</option>
 				<option ?selected="${pValue === 'g'}" value="g">${this.strings.gram}</option>
 				<option ?selected="${pValue === 'cl'}" value="cl">${this.strings.centiliter}</option>
