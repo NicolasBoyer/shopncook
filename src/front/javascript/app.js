@@ -31,7 +31,7 @@ class App {
 	// TODO ne pas tester l'auth à chaque connection !!! -> Possible que le problème soit réglé
 	// TODO Documenter les fonctions !!!
 	// TODO repasser sur les recettes
-	// TODO améliorer les focus sur les input et mieux partager le code voir si possible de trouver mieux pour le mobile
+	// TODO améliorer les focus sur les input et voir si possible de trouver mieux pour le mobile après utilisation
 
 	constructor () {
 		Utils.helpers()
