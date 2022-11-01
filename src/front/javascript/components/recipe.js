@@ -108,13 +108,19 @@ export default class Recipe extends HTMLElement {
 		this.#render()
 	}
 
+	#focusIngredient (pEvent, pClass, pPlaceholder = '') {
+		if (pPlaceholder) pEvent.target.closest('.grid').classList.add(pClass)
+		else pEvent.target.closest('.grid').classList.remove(pClass)
+		pEvent.target.placeholder = pPlaceholder
+	}
+
 	#render () {
 		render(html`
 			<h2>${this.#title}</h2>
 			<form>
 				<label>
 					<span>Nom</span>
-					<input name="recipe" required type="text" value="${this.#currentRecipeTitle || ''}">
+					<input autocomplete="off" name="recipe" required type="text" value="${this.#currentRecipeTitle || ''}">
 					<input name="id" type="hidden" value="${this.#currentRecipeId || ''}">
 				</label>
 				<fieldset class="ingredients">
@@ -123,11 +129,13 @@ export default class Recipe extends HTMLElement {
 							(pIngredient, pIndex) => html`
 								<div class="grid ${this.#isEditAndAddIngredient && this.#newIngredients.length - 1 === pIndex ? 'fiveCol' : ''}">
 									<label>
-										<input name="ingredient_${pIndex + 1}" required type="text" value="${pIngredient?.title || pIngredient}"/>
+										<input class="ingredient" autocomplete="off" name="ingredient_${pIndex + 1}" required type="text" value="${pIngredient?.title || pIngredient}"
+											   @focus="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}" @blur="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused')}"/>
 									</label>
-									<input name="size_${pIndex + 1}" type="number" value="${pIngredient?.size || ''}"/>
+									<input class="size" autocomplete="off" name="size_${pIndex + 1}" type="number" value="${pIngredient?.size || ''}"
+										   @focus="${(pEvent) => this.#focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => this.#focusIngredient(pEvent, 'sizeFocused')}"/>
 									${Commons.getUnitSelect(`unit_${pIndex + 1}`, pIngredient?.unit || '')}
-									<button type="button" class="remove" @click="${() => this.#removeIngredient(pIndex)}">
+									<button type=" button" class="remove" @click="${() => this.#removeIngredient(pIndex)}">
 										<svg class="minus">
 											<use href="#minus"></use>
 										</svg>
@@ -152,6 +160,7 @@ export default class Recipe extends HTMLElement {
 							<label>
 								<input
 										class="ingredient"
+										autocomplete="off"
 										name="ingredient_0"
 										required
 										type="text"
@@ -164,13 +173,15 @@ export default class Recipe extends HTMLElement {
 												this.#render()
 											}
 										}}"
+										@focus="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}"
+										@blur="${(pEvent) => this.#focusIngredient(pEvent, 'ingredientFocused')}"
 								/>
 							</label>
-							<input class="size" name="size_0" type="number" @keyup="${(pEvent) => {
+							<input autocomplete="off" class="size" name="size_0" type="number" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
-							}}"/>
+							}}" @focus="${(pEvent) => this.#focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => this.#focusIngredient(pEvent)}"/>
 							${Commons.getUnitSelect('unit_0')}
-							<button type="button" class="add" @click="${(pEvent) => this.#addIngredient(pEvent)}">
+							<button type="button" class="add" @click="${(pEvent) => this.#addIngredient(pEvent, 'sizeFocused')}">
 								<svg class="add">
 									<use href="#add"></use>
 								</svg>

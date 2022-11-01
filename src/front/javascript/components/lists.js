@@ -143,13 +143,13 @@ export default class Lists extends HTMLElement {
 		})
 	}
 
-	#focusAddIngredient (pClass, pPlaceholder = '') {
+	#focusAddIngredient (pClass = '', pPlaceholder = '') {
 		this.#addIngredientFocusedClass = pClass
 		this.#addIngredientPlaceholder = pPlaceholder
 		this.#render()
 	}
 
-	#focusEditIngredient (pClass, pPlaceholder = '') {
+	#focusEditIngredient (pClass = '', pPlaceholder = '') {
 		this.#editIngredientFocusedClass = pClass
 		this.#editIngredientPlaceholder = pPlaceholder
 		this.#render()

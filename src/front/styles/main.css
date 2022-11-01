@@ -342,12 +342,33 @@ a.ordered {
 }
 
 .ingredients > div {
-	grid-template-columns: 1fr 6rem 8rem 2rem;
+	grid-template-columns: 4fr 1fr 1fr 2rem;
 	align-items: center;
 }
 
+.ingredients > div.ingredientFocused,
+.ingredients > div.sizeFocused,
+.ingredients > div.unitFocused {
+ grid-template-columns: 1fr 2rem;
+}
+
+.ingredients > div.ingredientFocused input.size,
+.ingredients > div.ingredientFocused select.unit,
+.ingredients > div.sizeFocused label,
+.ingredients > div.sizeFocused select.unit,
+.ingredients > div.unitFocused input.size,
+.ingredients > div.unitFocused label {
+	display: none;
+}
+
 .ingredients > div.fiveCol {
-	grid-template-columns: 1fr 6rem 8rem 2rem 2rem;
+	grid-template-columns: 4fr 1fr 1fr 2rem 2rem;
+}
+
+.ingredients > div.fiveCol.ingredientFocused,
+.ingredients > div.fiveCol.sizeFocused,
+.ingredients > div.fiveCol.unitFocused {
+ grid-template-columns: 1fr 2rem 2rem;
 }
 
 .ingredients > .grid {
