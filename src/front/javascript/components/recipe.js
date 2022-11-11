@@ -173,7 +173,7 @@ export default class Recipe extends HTMLElement {
 							</label>
 							<input autocomplete="off" class="size" name="size_0" type="number" @keyup="${(pEvent) => {
 								if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
-							}}" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent)}"/>
+							}}" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused')}"/>
 							${Commons.getUnitSelect('unit_0')}
 							<button type="button" class="add" @click="${(pEvent) => this.#addIngredient(pEvent, 'sizeFocused')}">
 								<svg class="add">

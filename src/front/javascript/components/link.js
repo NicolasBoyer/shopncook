@@ -28,7 +28,6 @@ export default class Link extends HTMLElement {
 	}
 }
 
-// TODO à voir si ça reste ici !!!
 const REPLACEZONE = (pFragment) => {
 	document.querySelector('[data-replaced-zone]').replaceChildren(document.createRange().createContextualFragment(pFragment.text))
 	document.body.className = pFragment.class
