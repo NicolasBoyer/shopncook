@@ -14,7 +14,7 @@ export default class Propose extends HTMLElement {
 	}
 
 	connectedCallback () {
-		this.#input = this.closest('div').querySelector('input')
+		this.#input = this.closest('div, article').querySelector('input')
 		this.#render()
 	}
 

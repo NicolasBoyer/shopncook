@@ -41,6 +41,7 @@ export default class Confirm extends HTMLElement {
 					<footer>
 						<a role="button" class="secondary" @click="${(pEvent) => {
 							pEvent.preventDefault()
+							this.dispatchEvent(new CustomEvent('modalCancel'))
 							this.#closeDialog()
 						}}">Cancel</a>
 						<a role="button" @click="${(pEvent) => {

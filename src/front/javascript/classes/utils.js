@@ -3,10 +3,10 @@ import { Dom } from './dom.js'
 import { Caches } from './caches.js'
 
 export class Utils {
-	static helpers ({ confirmMessage = '', cbConfirm = null, isConfirmInit = true, loaderVisible = false } = {}) {
+	static helpers ({ confirmMessage = '', cbConfirm = null, cbCancel = null, isConfirmInit = true, loaderVisible = false } = {}) {
 		render(html`
 			<fs-loader ?visible="${loaderVisible}"></fs-loader>
-			<fs-confirm .message="${confirmMessage}" ?open="${isConfirmInit ? !isConfirmInit : Math.random()}" @modalConfirm="${() => cbConfirm()}"></fs-confirm>
+			<fs-confirm .message="${confirmMessage}" ?open="${isConfirmInit ? !isConfirmInit : Math.random()}" @modalConfirm="${() => cbConfirm()}" @modalCancel="${() => cbCancel()}"></fs-confirm>
 		`, document.body)
 	}
 
@@ -14,8 +14,8 @@ export class Utils {
 		this.helpers({ loaderVisible: visible })
 	}
 
-	static confirm (message, cbConfirm, isInit) {
-		this.helpers({ confirmMessage: message, cbConfirm, isConfirmInit: false })
+	static confirm (message, cbConfirm, cbCancel) {
+		this.helpers({ confirmMessage: message, cbConfirm, isConfirmInit: false, cbCancel })
 	}
 
 	static toast (type, message) {

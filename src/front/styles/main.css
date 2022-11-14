@@ -241,7 +241,6 @@ a.ordered {
 	font-size: 1.7rem;
 }
 
-.home li > div.grid.addListIngredient,
 .home li > div.grid.editListIngredient,
 .categories li > div.grid.addCategory {
 	align-items: center;
@@ -253,36 +252,25 @@ a.ordered {
 	grid-template-columns: 1fr 6rem 2rem 2rem;
 }
 
-.home li > div.grid.addListIngredient,
 .home li > div.grid.editListIngredient {
 	grid-template-columns: 2fr 2fr 1fr 2rem 2rem;
 }
 
-.home li > div.grid.addListIngredient.ingredientFocused,
 .home li > div.grid.editListIngredient.ingredientFocused,
-.home li > div.grid.addListIngredient.sizeFocused,
 .home li > div.grid.editListIngredient.sizeFocused,
-.home li > div.grid.addListIngredient.unitFocused,
 .home li > div.grid.editListIngredient.unitFocused {
 	grid-template-columns: 1fr 2rem 2rem;
 }
 
-.home li > div.grid.addListIngredient.ingredientFocused input.size,
-.home li > div.grid.addListIngredient.ingredientFocused select.unit,
 .home li > div.grid.editListIngredient.ingredientFocused input.size,
 .home li > div.grid.editListIngredient.ingredientFocused select.unit,
-.home li > div.grid.addListIngredient.sizeFocused input.ingredient,
-.home li > div.grid.addListIngredient.sizeFocused select.unit,
 .home li > div.grid.editListIngredient.sizeFocused input.ingredient,
 .home li > div.grid.editListIngredient.sizeFocused select.unit,
-.home li > div.grid.addListIngredient.unitFocused input.ingredient,
-.home li > div.grid.addListIngredient.unitFocused input.size,
 .home li > div.grid.editListIngredient.unitFocused input.ingredient,
 .home li > div.grid.editListIngredient.unitFocused input.size {
 	display: none;
 }
 
-.home li > div.grid.addListIngredient > select,
 .home li > div.grid.editListIngredient > select {
 	min-width: max-content;
 }
@@ -313,6 +301,10 @@ a.ordered {
 	align-items: center;
 }
 
+.home .title button {
+	margin: 0 0.5rem;
+}
+
 .recipes ul button > span,
 .recipes aside ul fs-link > span,
 .recipes ul a > span,
@@ -334,6 +326,10 @@ a.ordered {
 	height: 1rem;
 	stroke: currentColor;
 	fill: currentColor;
+}
+
+fs-confirm .addIngredient {
+	position: relative;
 }
 
 /*** RECIPE ***/

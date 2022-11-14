@@ -56,9 +56,9 @@ export default class Lists extends HTMLElement {
 
 	async #editAndSaveListIngredient (pEvent, id) {
 		Commons.setPropositions()
-		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling : pEvent.target.tagName === 'SELECT' ? pEvent.target.previousElementSibling.previousElementSibling : pEvent.target.closest('button').previousElementSibling.previousElementSibling.previousElementSibling
-		const sizeInput = input.nextElementSibling
-		const unitSelect = input.nextElementSibling.nextElementSibling
+		const input = pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'ingredient' ? pEvent.target : pEvent.target.tagName === 'INPUT' && pEvent.target.name === 'size' ? pEvent.target.previousElementSibling.querySelector('input') : pEvent.target.previousElementSibling.previousElementSibling.querySelector('input')
+		const sizeInput = input.closest('div').nextElementSibling
+		const unitSelect = input.closest('div').nextElementSibling.nextElementSibling
 		if (input?.value) {
 			const category = Commons.savedIngredients.map((pIngredient) => pIngredient.title === input.value && pIngredient.category).filter((pIngredient) => pIngredient)[0]
 			const response = await Utils.request('/db', 'POST', { body: `[{ "setListIngredients": { "ingredients": [ { "title": "${input.value}"${id ? `, "id": "${id}"` : ''}${category ? `, "category": "${category}"` : ''}, "size": "${sizeInput.value}", "unit": "${unitSelect.value}" } ] } }, { "getIngredients": "" }]` })
@@ -139,6 +139,18 @@ export default class Lists extends HTMLElement {
 		})
 	}
 
+	#openEditListIngredient (ingredient) {
+		let event
+		document.body.addEventListener('modalConfirm', (pEvent) => {
+			event = pEvent.detail.event
+		})
+		Utils.confirm(html``, async () => {
+			await this.#editAndSaveListIngredient(event, ingredient?._id)
+			Commons.renderAddIngredientInDialog(ingredient, true)
+		}, () => Commons.renderAddIngredientInDialog(ingredient, true))
+		Commons.renderAddIngredientInDialog(ingredient)
+	}
+
 	#render () {
 		const listIngredient = (pIngredient) => {
 			const ingredientId = pIngredient._id
@@ -149,50 +161,19 @@ export default class Lists extends HTMLElement {
 			return html`
 				<li>
 					<div class="editListIngredient ${this.#editMode === ingredientId ? 'grid' : ''}">
-						${this.#editMode === ingredientId ? html`
-							<input autocomplete="off" class="ingredient" name="ingredient" required type="text" value="${ingredientTitle}" @keyup="${(pEvent) => {
-								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
-								if (pEvent.key === 'Escape') this.#resetMode()
-							}}" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused')}"/>
-							<input autocomplete="off" class="size" name="size" type="number" value="${ingredientSize}" @keyup="${(pEvent) => {
-								if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent, ingredientId)
-								if (pEvent.key === 'Escape') this.#resetMode()
-							}}" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused')}"/>
-							${Commons.getUnitSelect()}
-						` : html`
+						${html`
 							<a class="${isIngredientOrdered ? 'ordered' : ''}" @click="${() => {
 								this.#editListIngredientOrdered(ingredientId, !isIngredientOrdered)
 								if (!isIngredientOrdered) this.#orderedIngredients.push(ingredientId)
 								else this.#orderedIngredients = this.#orderedIngredients.filter((pOrderedIngredient) => ingredientId !== pOrderedIngredient)
 								if (this.#orderedIngredients.length === this.#ingredients.length) this.#clear()
 							}}"><span>${ingredientTitle}${ingredientSize && html` (${ingredientSize}${ingredientUnit !== 'nb' ? ` ${ingredientUnit}` : ''})`}</span></a>
-						`}
-						${this.#editMode === ingredientId ? html`
-							<button class="valid" @click="${(pEvent) => this.#editAndSaveListIngredient(pEvent, ingredientId)}">
-								<svg class="valid">
-									<use href="#valid"></use>
-								</svg>
-								<span>Valider</span>
-							</button>
-						` : html`
-							<button class="edit" @click="${() => {
-								this.#editMode = ingredientId
-								this.#render()
-							}}" .disabled="${isIngredientOrdered}">
+							<button class="edit" @click="${() => this.#openEditListIngredient(pIngredient)}" .disabled="${isIngredientOrdered}">
 								<svg class="edit">
 									<use href="#edit"></use>
 								</svg>
 								<span>Modifier</span>
 							</button>
-						`}
-						${this.#editMode === ingredientId ? html`
-							<button type="button" class="undo" @click="${() => this.#resetMode()}">
-								<svg class="undo">
-									<use href="#undo"></use>
-								</svg>
-								<span>Annuler</span>
-							</button>
-						` : html`
 							<button type="button" class="remove" @click="${() => this.#removeListIngredient(ingredientId)}" .disabled="${isIngredientOrdered}">
 								<svg class="remove">
 									<use href="#remove"></use>
@@ -224,6 +205,18 @@ export default class Lists extends HTMLElement {
 		render(html`
 			<div class="title">
 				<h2>Votre liste</h2>
+				<button type="button" class="add" @click="${() => this.#openEditListIngredient()}">
+					<svg class="add">
+						<use href="#add"></use>
+					</svg>
+					<span>Ajouter un ingrédient</span>
+				</button>
+				<button type="button" class="addList" @click="${() => this.#addListIngredientByRecipe()}">
+					<svg class="addList">
+						<use href="#addList"></use>
+					</svg>
+					<span>Ajouter des ingrédients</span>
+				</button>
 				<button type="button" class="trash" @click="${() => this.#clear()}">
 					<svg class="trash">
 						<use href="#trash"></use>
@@ -234,39 +227,6 @@ export default class Lists extends HTMLElement {
 			<aside>
 				<nav>
 					<ul>
-						<li>
-							<div class="addListIngredient grid">
-								<input autocomplete="off" class="ingredient" name="ingredient" type="text" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}"
-									   @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused')}" @keydown="${(pEvent) => {
-									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)
-								}}" @keyup="${(pEvent) => {
-									if (pEvent.key !== 'Enter') {
-										Commons.managePropositions(pEvent)
-										this.#render()
-									}
-								}}"/>
-								<input autocomplete="off" class="size" name="size" type="number" @keyup="${(pEvent) => {
-									if (pEvent.key === 'Enter') this.#editAndSaveListIngredient(pEvent)
-								}}" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused')}"/>
-								${Commons.getUnitSelect()}
-								<button type="button" class="add" @click="${(pEvent) => this.#editAndSaveListIngredient(pEvent)}">
-									<svg class="add">
-										<use href="#add"></use>
-									</svg>
-									<span>Ajouter un ingrédient</span>
-								</button>
-								<button type="button" class="addList" @click="${() => this.#addListIngredientByRecipe()}">
-									<svg class="addList">
-										<use href="#addList"></use>
-									</svg>
-									<span>Ajouter des ingrédients</span>
-								</button>
-								<fs-propose list="${Commons.propositions}" @listReset="${() => {
-									Commons.setPropositions()
-									this.#render()
-								}}"></fs-propose>
-							</div>
-						</li>
 						${!this.#ingredients.length
 								? html`
 									<li>Aucun ingrédient ...</li>`
