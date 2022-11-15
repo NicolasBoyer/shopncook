@@ -86,18 +86,15 @@ export default class Recipe extends HTMLElement {
 		})
 	}
 
-	#addIngredient (pEvent) {
-		Commons.setPropositions()
-		const parent = pEvent.target.closest('.grid')
+	#addOrEditIngredient (pEvent, pIndex) {
+		const parent = pEvent.target.closest('article')
 		const input = parent.querySelector('.ingredient')
 		const sizeInput = parent.querySelector('.size')
 		const unitSelect = parent.querySelector('.unit')
-
 		if (input?.value) {
-			this.#newIngredients.push({ title: input.value, size: sizeInput.value, unit: unitSelect.value })
-			input.value = ''
-			sizeInput.value = ''
-			unitSelect.value = 'nb'
+			const ingredient = { title: input.value, size: sizeInput.value, unit: unitSelect.value }
+			if (pIndex !== undefined) this.#newIngredients[pIndex] = ingredient
+			else this.#newIngredients.push(ingredient)
 			this.#render()
 		}
 	}
@@ -106,6 +103,19 @@ export default class Recipe extends HTMLElement {
 		Commons.setPropositions()
 		this.#newIngredients.splice(pIndex, 1)
 		this.#render()
+	}
+
+	#openEditListIngredient (pIngredient, pIndex) {
+		let event
+		document.body.addEventListener('modalConfirm', (pEvent) => {
+			event = pEvent.detail.event
+		})
+		Utils.confirm(html``, async () => {
+			if (pIndex !== undefined) this.#addOrEditIngredient(event, pIndex)
+			else this.#addOrEditIngredient(event)
+			Commons.renderAddIngredientInDialog(pIngredient, true)
+		}, () => Commons.renderAddIngredientInDialog(pIngredient, true))
+		Commons.renderAddIngredientInDialog(pIngredient)
 	}
 
 	#render () {
@@ -118,74 +128,37 @@ export default class Recipe extends HTMLElement {
 					<input name="id" type="hidden" value="${this.#currentRecipeId || ''}">
 				</label>
 				<fieldset class="ingredients">
-					<legend>Ingrédients</legend>
+					<div class="title">
+						<legend>Ingrédients</legend>
+						<button type="button" class="add" @click="${() => this.#openEditListIngredient()}">
+							<svg class="add">
+								<use href="#add"></use>
+							</svg>
+							<span>Ajouter un ingrédient</span>
+						</button>
+					</div>
 					${this.#newIngredients?.map(
 							(pIngredient, pIndex) => html`
-								<div class="grid ${this.#isEditAndAddIngredient && this.#newIngredients.length - 1 === pIndex ? 'fiveCol' : ''}">
-									<label>
-										<input class="ingredient" autocomplete="off" name="ingredient_${pIndex + 1}" required type="text" value="${pIngredient?.title || pIngredient}"
-											   @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused')}"/>
-									</label>
-									<input class="size" autocomplete="off" name="size_${pIndex + 1}" type="number" value="${pIngredient?.size || ''}"
-										   @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused')}"/>
-									${Commons.getUnitSelect(`unit_${pIndex + 1}`, pIngredient?.unit || '')}
-									<button type=" button" class="remove" @click="${() => this.#removeIngredient(pIndex)}">
+								<div class="grid">
+									<span>${pIngredient?.title || pIngredient}${pIngredient?.size ? ` (${pIngredient?.size}${pIngredient?.unit && pIngredient?.unit !== 'nb' ? ` ${pIngredient?.unit}` : ''})` : ''}</span>
+									<input name="ingredient_${pIndex + 1}" type="hidden" value="${pIngredient?.title || pIngredient}"/>
+									<input name="size_${pIndex + 1}" type="hidden" value="${pIngredient?.size || ''}"/>
+									<input name="unit_${pIndex + 1}" type="hidden" value="${pIngredient?.unit || ''}"/>
+									<button type="button" class="edit" @click="${() => this.#openEditListIngredient(pIngredient, pIndex)}">
+										<svg class="edit">
+											<use href="#edit"></use>
+										</svg>
+										<span>Supprimer un ingrédient</span>
+									</button>
+									<button type="button" class="remove" @click="${() => this.#removeIngredient(pIndex)}">
 										<svg class="minus">
 											<use href="#minus"></use>
 										</svg>
 										<span>Supprimer un ingrédient</span>
 									</button>
-									${this.#isEditAndAddIngredient && this.#newIngredients.length - 1 === pIndex ? html`
-										<button type="button" class="add" @click="${(pEvent) => {
-											this.#isEditAndAddIngredient = false
-											this.#addIngredient(pEvent)
-										}}">
-											<svg class="add">
-												<use href="#add"></use>
-											</svg>
-											<span>Ajouter un ingrédient</span>
-										</button>
-									` : ''}
 								</div>
 							`
 					)}
-					${!this.#isEditAndAddIngredient ? html`
-						<div class="grid">
-							<label>
-								<input
-										class="ingredient"
-										autocomplete="off"
-										name="ingredient_0"
-										required
-										type="text"
-										@keydown="${(pEvent) => {
-											if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
-										}}"
-										@keyup="${(pEvent) => {
-											if (pEvent.key !== 'Enter') {
-												Commons.managePropositions(pEvent)
-												this.#render()
-											}
-										}}"
-										@focus="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused', 'Ingrédient')}"
-										@blur="${(pEvent) => Commons.focusIngredient(pEvent, 'ingredientFocused')}"
-								/>
-							</label>
-							<input autocomplete="off" class="size" name="size_0" type="number" @keyup="${(pEvent) => {
-								if (pEvent.key === 'Enter') this.#addIngredient(pEvent)
-							}}" @focus="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused', 'Unité')}" @blur="${(pEvent) => Commons.focusIngredient(pEvent, 'sizeFocused')}"/>
-							${Commons.getUnitSelect('unit_0')}
-							<button type="button" class="add" @click="${(pEvent) => this.#addIngredient(pEvent, 'sizeFocused')}">
-								<svg class="add">
-									<use href="#add"></use>
-								</svg>
-								<span>Ajouter un ingrédient</span>
-							</button>
-							<fs-propose list="${Commons.propositions}" @listReset="${() => {
-								Commons.setPropositions()
-								this.#render()
-							}}"></fs-propose>
-					` : ''}
 					</div>
 				</fieldset>
 				<button type="submit">

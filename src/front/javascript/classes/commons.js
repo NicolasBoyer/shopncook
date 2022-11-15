@@ -11,27 +11,6 @@ export class Commons {
 		numberComplete: 'Nombre'
 	}
 
-	static focusIngredient (pEvent, pClass, pPlaceholder = '', pIsUnit = false) {
-		if (pPlaceholder) pEvent.target.closest('.grid').classList.add(pClass)
-		else pEvent.target.closest('.grid').classList.remove(pClass)
-		pEvent.target.placeholder = pPlaceholder
-		if (pIsUnit) {
-			pEvent.target.querySelector('.nb').innerHTML = pPlaceholder ? this.strings.numberComplete : this.strings.number
-			pEvent.target.querySelector('.g').innerHTML = pPlaceholder ? this.strings.gramComplete : this.strings.gram
-			pEvent.target.querySelector('.cl').innerHTML = pPlaceholder ? this.strings.centiliterComplete : this.strings.centiliter
-		}
-	}
-
-	static getUnitSelect (pName, pValue) {
-		return html`
-			<select class="unit" name="${pName || 'unit'}">
-				<option class="nb" ?selected="${pValue === 'nb'}" value="nb">${this.strings.numberComplete}</option>
-				<option class="g" ?selected="${pValue === 'g'}" value="g">${this.strings.gramComplete}</option>
-				<option class="cl" ?selected="${pValue === 'cl'}" value="cl">${this.strings.centiliterComplete}</option>
-			</select>
-		`
-	}
-
 	static renderAddIngredientInDialog (ingredient, isReset) {
 		const element = document.querySelector('fs-confirm > dialog > article')
 		render(isReset ? '' : html`

@@ -215,7 +215,8 @@ a.ordered {
 .recipes ul,
 .ingredients ul,
 .home ul,
-.categories ul {
+.categories ul,
+fs-recipe form{
 	max-width: 35rem;
 	margin: auto !important;
 }
@@ -254,21 +255,6 @@ a.ordered {
 
 .home li > div.grid.editListIngredient {
 	grid-template-columns: 2fr 2fr 1fr 2rem 2rem;
-}
-
-.home li > div.grid.editListIngredient.ingredientFocused,
-.home li > div.grid.editListIngredient.sizeFocused,
-.home li > div.grid.editListIngredient.unitFocused {
-	grid-template-columns: 1fr 2rem 2rem;
-}
-
-.home li > div.grid.editListIngredient.ingredientFocused input.size,
-.home li > div.grid.editListIngredient.ingredientFocused select.unit,
-.home li > div.grid.editListIngredient.sizeFocused input.ingredient,
-.home li > div.grid.editListIngredient.sizeFocused select.unit,
-.home li > div.grid.editListIngredient.unitFocused input.ingredient,
-.home li > div.grid.editListIngredient.unitFocused input.size {
-	display: none;
 }
 
 .home li > div.grid.editListIngredient > select {
@@ -313,7 +299,9 @@ a.ordered {
 .home ul button > span,
 .home .title button > span,
 .categories ul button > span,
-.dishes button > span {
+.dishes button > span,
+.recipe label > span,
+.recipe .title > legend {
 	display: none;
 }
 
@@ -338,43 +326,31 @@ fs-confirm .addIngredient {
 }
 
 .ingredients > div {
-	grid-template-columns: 4fr 1fr 1fr 2rem;
+	grid-template-columns: 1fr 2rem 2rem;
 	align-items: center;
 }
 
-.ingredients > div.ingredientFocused,
-.ingredients > div.sizeFocused,
-.ingredients > div.unitFocused {
- grid-template-columns: 1fr 2rem;
+.ingredients > div.title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	justify-content: right;
 }
 
-.ingredients > div.ingredientFocused input.size,
-.ingredients > div.ingredientFocused select.unit,
-.ingredients > div.sizeFocused label,
-.ingredients > div.sizeFocused select.unit,
-.ingredients > div.unitFocused input.size,
-.ingredients > div.unitFocused label {
-	display: none;
-}
-
-.ingredients > div.fiveCol {
-	grid-template-columns: 4fr 1fr 1fr 2rem 2rem;
-}
-
-.ingredients > div.fiveCol.ingredientFocused,
-.ingredients > div.fiveCol.sizeFocused,
-.ingredients > div.fiveCol.unitFocused {
- grid-template-columns: 1fr 2rem 2rem;
-}
-
-.ingredients > .grid {
-	position: relative;
+.ingredients > div.grid {
+	padding: 0.5rem 0;
+	font-size: 1.5rem;
 }
 
 fieldset.ingredients button {
 	width: 2rem;
 	height: 2rem;
 	padding: 0;
+	margin: 0;
+}
+
+fieldset.ingredients legend {
+	margin: 0;
 }
 
 .ingredients button > span {

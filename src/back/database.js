@@ -45,8 +45,8 @@ export default class Database {
 				else {
 					for (const recipe of recipes) {
 						recipe.ingredients = (await Database.ingredients.find({ recipes: { $elemMatch: { recipeId: recipe._id.toString() } } }).toArray()).map((ingredient) => {
-							const recipe = ingredient.recipes.find((pRecipe) => typeof pRecipe === 'object')
-							return recipe ? { title: ingredient.title, size: recipe.size, unit: recipe.unit } : ingredient.title
+							const currentRecipe = ingredient.recipes.find((pRecipe) => pRecipe.recipeId === recipe._id.toString())
+							return currentRecipe ? { title: ingredient.title, size: currentRecipe.size, unit: currentRecipe.unit } : ingredient.title
 						})
 					}
 				}

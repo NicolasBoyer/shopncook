@@ -227,11 +227,11 @@ export default class Lists extends HTMLElement {
 			<aside>
 				<nav>
 					<ul>
-						${!this.#ingredients.length
+						${!this.#ingredients?.length
 								? html`
 									<li>Aucun ingrédient ...</li>`
 								: html`
-									${this.#ingredients.filter((pIngredient) => !pIngredient.category && !pIngredient.ordered).map((pIngredient) => listIngredient(pIngredient))}
+									${this.#ingredients?.filter((pIngredient) => !pIngredient.category && !pIngredient.ordered).map((pIngredient) => listIngredient(pIngredient))}
 									${Object.entries(ingredientsByCategory).sort(([a, av], [b, bv]) => a === Commons.strings.ordered ? 1 : b === Commons.strings.ordered ? -1 : a.localeCompare(b)).map(([pCategory, pValue]) => {
 										return html`
 											<li>
