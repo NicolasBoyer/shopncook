@@ -45,7 +45,7 @@ export default class Dishes extends HTMLElement {
 			}
 			this.#refresh()
 			if (!isEdit && this.#dishName) {
-				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes?.length && pIngredient.recipes.some((pRecipeId) => this.#dishId === pRecipeId)).map((pIngredient) => ({
+				const newIngredients = Commons.savedIngredients.filter((pIngredient) => pIngredient.recipes.length && pIngredient.recipes.some((pRecipe) => pRecipe.recipeId === this.#dishId)).map((pIngredient) => ({
 					title: pIngredient.title,
 					category: pIngredient.category
 				}))
