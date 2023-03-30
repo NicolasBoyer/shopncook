@@ -1,4 +1,5 @@
-import { terser } from 'rollup-plugin-terser'
+import terser from '@rollup/plugin-terser'
+import babel from '@rollup/plugin-babel'
 
 export default {
 	input: 'src/front/javascript/app.js',
@@ -6,5 +7,8 @@ export default {
 		file: 'src/front/dist/app.min.js',
 		plugins: [terser()],
 		format: 'es'
-	}
+	},
+	plugins: [babel({
+		babelHelpers: 'bundled'
+	})]
 }
