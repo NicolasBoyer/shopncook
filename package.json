@@ -5,20 +5,33 @@
   "main": "src/back/dev.js",
   "type": "module",
   "scripts": {
-	"dev": "nodemon src/back/dev.js --ignore src/front/dist",
-	"qua": "nodemon --exec \"npx rollup -c & node src/back/dev.js\" --ignore src/front/dist",
-	"start": "rollup -c & node src/back/prod.js"
+    "dev": "nodemon src/back/dev.js --ignore src/front/dist",
+    "qua": "nodemon --exec \"npx rollup -c & node src/back/dev.js\" --ignore src/front/dist",
+    "start": "rollup -c & node src/back/prod.js"
   },
   "author": "Nicolas Boyer",
   "license": "ISC",
   "devDependencies": {
-	"eslint": "^8.12.0",
-	"nodemon": "^2.0.15",
-	"rollup": "^2.79.1",
-	"rollup-plugin-terser": "^7.0.2"
-  },
-  "dependencies": {
-	"mongodb": "^4.6.0",
-	"ws": "^8.7.0"
-  }
+      "@babel/preset-env": "^7.20.2",
+      "@rollup/plugin-babel": "^6.0.3",
+      "@rollup/plugin-terser": "^0.4.0",
+      "eslint": "^8.37.0",
+      "mongodb": "^5.1.0",
+      "nodemon": "^2.0.22",
+      "rollup": "^3.20.2"
+    },
+    "babel": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "useBuiltIns": "entry",
+            "corejs": "3.22"
+          }
+        ]
+      ]
+    },
+    "dependencies": {
+      "ws": "^8.13.0"
+    }
 }
