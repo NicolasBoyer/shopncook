@@ -16,13 +16,13 @@
   "author": "Nicolas Boyer",
   "license": "ISC",
   "devDependencies": {
-      "@babel/preset-env": "7.22.20",
+      "@babel/preset-env": "7.24.4",
       "@rollup/plugin-babel": "6.0.4",
       "@rollup/plugin-terser": "0.4.4",
-      "eslint": "8.51.0",
-      "mongodb": "6.1.0",
-      "nodemon": "3.0.1",
-      "rollup": "4.0.2"
+      "eslint": "9.0.0",
+      "mongodb": "6.5.0",
+      "nodemon": "3.1.0",
+      "rollup": "4.14.3"
     },
     "babel": {
       "presets": [
@@ -36,6 +36,6 @@
       ]
     },
     "dependencies": {
-      "ws": "8.14.2"
+      "ws": "8.16.0"
     }
 }
