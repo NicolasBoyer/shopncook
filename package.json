@@ -1,6 +1,6 @@
 {
   "engines": {
-  	"node": "18.17.0"
+  	"node": "21.6.2"
   },
   "name": "foodshop",
   "version": "1.0.0",

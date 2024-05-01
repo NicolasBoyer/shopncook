@@ -1,7 +1,7 @@
 import http from 'http'
 import fs from 'fs'
-import { Utils } from './utils.js'
-import { WebSocketServer } from 'ws'
+import {Utils} from './utils.js'
+import {WebSocketServer} from 'ws'
 import Database from './database.js'
 
 const GET = []
@@ -10,19 +10,19 @@ const POST = []
 const includeFiles = [
 	{
 		regexp: '.css$',
-		mimetype: { 'Content-Type': 'text/css' }
+		mimetype: {'Content-Type': 'text/css'}
 	},
 	{
 		regexp: '.png$',
-		mimetype: { 'Content-Type': 'image/png' }
+		mimetype: {'Content-Type': 'image/png'}
 	},
 	{
 		regexp: '.jpg$',
-		mimetype: { 'Content-Type': 'image/jpg' }
+		mimetype: {'Content-Type': 'image/jpg'}
 	},
 	{
 		regexp: '.woff2',
-		mimetype: { 'Content-Type': 'font/woff2' }
+		mimetype: {'Content-Type': 'font/woff2'}
 	},
 	// {
 	//	regexp: '.svg$',
@@ -30,7 +30,7 @@ const includeFiles = [
 	// },
 	{
 		regexp: '.js$',
-		mimetype: { 'Content-Type': 'text/javascript' }
+		mimetype: {'Content-Type': 'text/javascript'}
 	}
 	// {
 	//	regexp: '.ico$',
@@ -44,7 +44,7 @@ export const mimetype = Object.freeze({
 })
 
 export class Server {
-	constructor (pPort = 8000) {
+	constructor(pPort = 8000) {
 		const server = http.createServer(async (req, res) => {
 			const response = async (pMethod) => {
 				for (const pRoute of pMethod) {
@@ -62,10 +62,10 @@ export class Server {
 						}
 						switch (pRoute.type) {
 							case mimetype.HTML:
-								res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+								res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
 								break
 							case mimetype.JSON:
-								res.writeHead(200, { 'Content-Type': 'application/json' })
+								res.writeHead(200, {'Content-Type': 'application/json'})
 								break
 						}
 						// webSocketServer.emit('connection', 'blop')
@@ -73,7 +73,7 @@ export class Server {
 						return
 					}
 				}
-				res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
+				res.writeHead(404, {'Content-Type': 'text/html; charset=utf-8'})
 				res.end(await Utils.page('404.html', 'notFound', '404 : Page non trouvée'))
 			}
 			if (req.method === 'GET') {
@@ -86,20 +86,20 @@ export class Server {
 					}
 				}
 				if (req.url.includes('/app')) {
-					const credentials = req.headers?.cookie?.split('; ').filter((cookie) => cookie.includes('_ma'))[0]
-					if (!credentials || !await Database.auth(Utils.decrypt(credentials?.split('=')[1]))) {
-						res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
-						res.end(await Utils.page('login.html', 'login', 'Connexion à la BDD'))
-						return
-					}
-					Database.init()
+					//const credentials = req.headers?.cookie?.split('; ').filter((cookie) => cookie.includes('_ma'))[0]
+					//if (!credentials || !await Database.auth(Utils.decrypt(credentials?.split('=')[1]))) {
+					//	res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
+					//	res.end(await Utils.page('login.html', 'login', 'Connexion à la BDD'))
+					//	return
+					//}
+					await Database.init()
 				}
 
 				response(GET)
 			}
 			if (req.method === 'POST') response(POST)
 		})
-		const webSocketServer = new WebSocketServer({ server })
+		const webSocketServer = new WebSocketServer({server})
 		webSocketServer.on('connection', (ws) => {
 			ws.on('message', (data) => {
 				webSocketServer.clients.forEach((client) => {
@@ -111,11 +111,11 @@ export class Server {
 		server.listen(pPort)
 	}
 
-	get (pPath, pCallback, pType = mimetype.HTML) {
-		GET.push({ path: pPath, callback: pCallback, type: pType })
+	get(pPath, pCallback, pType = mimetype.HTML) {
+		GET.push({path: pPath, callback: pCallback, type: pType})
 	}
 
-	post (pPath, pCallback, pType = mimetype.JSON) {
-		POST.push({ path: pPath, callback: pCallback, type: pType })
+	post(pPath, pCallback, pType = mimetype.JSON) {
+		POST.push({path: pPath, callback: pCallback, type: pType})
 	}
 }
