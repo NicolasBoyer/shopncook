@@ -32,5 +32,5 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             docker pull nicolasboyer252/foodshop:latest
-            cd foodshop
+            cd /opt/docker/foodshop
             docker-compose up -d --build
