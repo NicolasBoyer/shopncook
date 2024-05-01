@@ -3,8 +3,14 @@ services:
     build: .
     ports:
       - "8000:8000"
+    depends_on:
+      - mongo
 #    develop:
 #      watch:
 #        - action: sync
 #          path: .
 #          target: /code
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
