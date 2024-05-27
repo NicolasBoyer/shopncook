@@ -1,4 +1,4 @@
-@import url('fonts.css');
+/*@import url('./fonts.css');*/
 
 :root:not([data-theme=dark]), [data-theme=light] {
 	--color: #625941;

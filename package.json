@@ -1,41 +1,39 @@
 {
-  "engines": {
-  	"node": "21.6.2"
-  },
   "name": "foodshop",
   "version": "1.0.0",
   "description": "",
-  "main": "src/back/dev.js",
   "type": "module",
   "scripts": {
-  	"update": "npx npm-check-updates -u & npm i",
-    "dev": "nodemon src/back/dev.js --ignore src/front/dist",
-    "qua": "nodemon --exec \"npx rollup -c & node src/back/dev.js\" --ignore src/front/dist",
-    "start": "rollup -c & node src/back/prod.js"
+    "update": "npx npm-check-updates -u & npm i",
+    "dev:frontend": "vite",
+    "dev:backend": "nodemon -w src/back -e ts -x \"ts-node --esm src/back/dev.ts\"",
+    "dev": "cross-env NODE_ENV=dev concurrently 'npm:dev:frontend' 'npm:dev:backend'",
+    "start": "vite build & ts-node --esm --transpile-only src/back/prod.ts"
   },
   "author": "Nicolas Boyer",
   "license": "ISC",
   "devDependencies": {
-      "@babel/preset-env": "7.24.4",
-      "@rollup/plugin-babel": "6.0.4",
-      "@rollup/plugin-terser": "0.4.4",
-      "eslint": "9.0.0",
-      "mongodb": "6.5.0",
-      "nodemon": "3.1.0",
-      "rollup": "4.14.3"
-    },
-    "babel": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "useBuiltIns": "entry",
-            "corejs": "3.22"
-          }
-        ]
-      ]
-    },
-    "dependencies": {
-      "ws": "8.16.0"
-    }
+    "@types/livereload": "0.9.5",
+    "@types/node": "20.12.11",
+    "@typescript-eslint/eslint-plugin": "7.8.0",
+    "@typescript-eslint/parser": "7.8.0",
+    "concurrently": "8.2.2",
+    "cross-env": "7.0.3",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-import": "2.29.1",
+    "livereload": "0.9.3",
+    "mongodb": "6.6.1",
+    "nodemon": "3.1.0",
+    "prettier": "3.2.5",
+    "vite": "5.2.11"
+  },
+  "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
+    "html2canvas": "1.4.1",
+    "idb": "8.0.0",
+    "lit": "3.1.3",
+    "ts-node": "10.9.2",
+    "ws": "8.17.0"
+  }
 }
