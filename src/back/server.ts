@@ -105,7 +105,7 @@ export class Server {
                 }
                 if (req.url?.split('/')[1]) {
                     const credentials = req.headers?.cookie?.split('; ').filter((cookie): boolean => cookie.includes('_ma'))[0]
-                    if (!credentials || !(await Database.auth(<string>Utils.decrypt(credentials?.split('=')[1])))) {
+                    if (!credentials || !(await Database.connectDB(<string>Utils.decrypt(credentials?.split('=')[1])))) {
                         res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
                         res.end(await Utils.page('login.html', 'login', 'Connexion à la BDD'))
                         return

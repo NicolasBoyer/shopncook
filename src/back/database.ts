@@ -1,11 +1,13 @@
-import { Collection, MongoClient, ObjectId } from 'mongodb'
+import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
 import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient } from '../front/javascript/types.js'
+import { DB_NAME, DB_URL } from './config.js'
 
-let client: MongoClient
+export const client = new MongoClient(DB_URL)
+let db: Db
 
 /**
- * Permet la déclaration de la db (ici un fichier json) et de résoudre les requêtes passées dans la fonction request
+ * Permet la déclaration de la db et de résoudre les requêtes passées dans la fonction request
  */
 export default class Database {
     private static ingredients: Collection
@@ -14,22 +16,21 @@ export default class Database {
     private static categories: Collection
     private static dishes: Collection
 
-    static async auth(credentials: string): Promise<boolean> {
-        try {
-            const splitCredentials = credentials.split(':')
+    static async connectDB(): Promise<Db> {
+        if (!db) {
             try {
-                client = await MongoClient.connect(`mongodb://${splitCredentials[0]}:${encodeURIComponent(splitCredentials[1])}@217.182.71.88:27017/admin?authMechanism=DEFAULT`)
-            } catch (e) {
-                client = await MongoClient.connect(`mongodb://${splitCredentials[0]}:${encodeURIComponent(splitCredentials[1])}@217.182.71.88:27017/foodshop?authMechanism=DEFAULT`)
+                await client.connect()
+                db = client.db(DB_NAME)
+                console.log('Connected to database')
+            } catch (err) {
+                console.error('Failed to connect to the database', err)
+                throw err
             }
-            return true
-        } catch (e) {
-            return false
         }
+        return db
     }
 
     static init(): void {
-        const db = client.db('foodshop')
         this.ingredients = db.collection('ingredients')
         this.recipes = db.collection('recipes')
         this.lists = db.collection('lists')

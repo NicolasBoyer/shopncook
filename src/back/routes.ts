@@ -93,7 +93,7 @@ export default class Routes {
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
                 const json = JSON.parse(body)
                 const credentials = `${json.id}:${json.password}`
-                if (await Database.auth(credentials)) res!.writeHead(200, { 'Set-Cookie': `_ma=${Utils.crypt(credentials)}; expires=Tue, 19 Jan 2038 03:14:07 GMT` })
+                if (await Database.connectDB(credentials)) res!.writeHead(200, { 'Set-Cookie': `_ma=${Utils.crypt(credentials)}; expires=Tue, 19 Jan 2038 03:14:07 GMT` })
                 return res!.end(JSON.stringify('{}'))
             })
         })
