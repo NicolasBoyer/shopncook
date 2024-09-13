@@ -30,7 +30,10 @@ export default class Database {
         return db
     }
 
-    static init(): void {
+    static async init(): Promise<void> {
+        // TODO DELETE
+        db = await Database.connectDB()
+        //
         this.ingredients = db.collection('ingredients')
         this.recipes = db.collection('recipes')
         this.lists = db.collection('lists')
@@ -38,9 +41,9 @@ export default class Database {
         this.dishes = db.collection('dishes')
     }
 
-    static createUser(user: string): void {
-        console.log(user)
-    }
+    // static createUser(user: string): void {
+    //     console.log(user)
+    // }
 
     /**
      * Retourne ou enregistre des informations dans la db (des fichiers json) en fonction des requêtes reçues dans le resolver

@@ -16,7 +16,7 @@ import Dishes from './components/dishes.js'
 import Link from './components/link.js'
 import { Websocket } from './classes/websocket.js'
 import Menu from './components/menu.js'
-import Signup from './components/signup.js'
+import Register from './components/register.js'
 
 class App {
     // TODO images pour la page de home
@@ -75,7 +75,7 @@ customElements.define('fs-lists', Lists)
 customElements.define('fs-ingredients', Ingredients)
 customElements.define('fs-categories', Categories)
 customElements.define('fs-login', Login)
-customElements.define('fs-signup', Signup)
+customElements.define('fs-signup', Register)
 customElements.define('fs-loading-block', LoadingBlock)
 customElements.define('fs-animated-section', AnimatedSection)
 customElements.define('fs-dishes', Dishes)

@@ -15,11 +15,11 @@ export class Utils {
         return fromSrc(`front${pFile}`)
     }
 
-    static async page(pFile: string, pClassName: string, pTitle = '', pTemplateHtml = 'page.html'): Promise<string> {
-        const fragment = await fs.readFile(fromFragments(pFile), 'utf8')
-        let template = await fs.readFile(fromTemplate(pTemplateHtml), 'utf8')
-        template = replaceTagAndGetHtml(template, '§§title§§', `<div class='subtitle' data-replaced-title>${pTitle}</div>`)
-        template = replaceTagAndGetHtml(template, '§§className§§', pClassName)
+    static async page(options: { file?: string; className: string; title?: string; templateHtml?: string }): Promise<string> {
+        const fragment = options.file && (await fs.readFile(fromFragments(options.file), 'utf8'))
+        let template = await fs.readFile(fromTemplate(options.templateHtml || 'page.html'), 'utf8')
+        if (options.title) template = replaceTagAndGetHtml(template, '§§title§§', `<div class='subtitle' data-replaced-title>${options.title}</div>`)
+        if (options.className) template = replaceTagAndGetHtml(template, '§§className§§', options.className)
         if (process.env.NODE_ENV === 'dev') {
             template = replaceTagAndGetHtml(
                 template,
@@ -32,7 +32,7 @@ export class Utils {
 `
             )
         } else template = replaceTagAndGetHtml(template, '§§scripts§§', '<script crossorigin="anonymous" defer="defer" src="/dist/app.min.js" type="module"></script>')
-        return replaceTagAndGetHtml(template, '§§content§§', fragment)
+        return fragment ? replaceTagAndGetHtml(template, '§§content§§', fragment) : template
     }
 
     static async fragment(pFile: string): Promise<string> {

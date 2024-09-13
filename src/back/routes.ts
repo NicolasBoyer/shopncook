@@ -2,17 +2,23 @@ import { Utils } from './utils.js'
 import { mimetype, Server } from './server.js'
 import Database from './database.js'
 import http from 'http'
+import Auth from './auth.js'
+import { TIncomingMessage } from '../front/javascript/types.js'
 
 export default class Routes {
     routes: Record<string, string>[] = []
 
     constructor(pServer: Server) {
-        pServer.get('/', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            res?.end(await Utils.page('presentation.html', 'presentation', '', 'home.html'))
+        pServer.get('/', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            res?.end(await Utils.page({ file: 'presentation.html', className: 'presentation', templateHtml: 'home.html' }))
         })
 
-        pServer.get('/signup', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            res?.end(await Utils.page('signup.html', 'signup', 'Inscription', 'page.html'))
+        pServer.get('/register', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            res?.end(await Utils.page({ file: 'register.html', className: 'register', title: 'Inscription' }))
+        })
+
+        pServer.get('/login', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            res?.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
         })
 
         this.request(pServer, '/app', 'lists.html', 'home', '', true, 'Gérer votre liste')
@@ -31,48 +37,48 @@ export default class Routes {
 
         pServer.get(
             '/app/routes.json',
-            async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                res?.end(JSON.stringify(this.routes))
+            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(this.routes))
             },
             mimetype.JSON
         )
 
         pServer.get(
             '/app/ingredients.json',
-            async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                res?.end(JSON.stringify(await Database.request({ getIngredients: '{}' })))
+            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getIngredients: '{}' })))
             },
             mimetype.JSON
         )
 
         pServer.get(
             '/app/lists.json',
-            async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                res?.end(JSON.stringify(await Database.request({ getListIngredients: '{}' })))
+            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getListIngredients: '{}' })))
             },
             mimetype.JSON
         )
 
         pServer.get(
             '/app/recipes.json',
-            async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                res?.end(JSON.stringify(await Database.request({ getRecipes: '{}' })))
+            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getRecipes: '{}' })))
             },
             mimetype.JSON
         )
 
         pServer.get(
             '/app/categories.json',
-            async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                res?.end(JSON.stringify(await Database.request({ getCategories: '{}' })))
+            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getCategories: '{}' })))
             },
             mimetype.JSON
         )
 
         pServer.get(
             '/app/dishes.json',
-            async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                res?.end(JSON.stringify(await Database.request({ getDishes: '{}' })))
+            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getDishes: '{}' })))
             },
             mimetype.JSON
         )
@@ -85,18 +91,18 @@ export default class Routes {
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => res!.end(JSON.stringify(await Database.request(JSON.parse(body)))))
         })
 
-        pServer.post('/auth', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            let body = ''
-            _req?.on('data', (pChunk): void => {
-                body += pChunk
-            })
-            _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
-                const json = JSON.parse(body)
-                const credentials = `${json.id}:${json.password}`
-                if (await Database.connectDB(credentials)) res!.writeHead(200, { 'Set-Cookie': `_ma=${Utils.crypt(credentials)}; expires=Tue, 19 Jan 2038 03:14:07 GMT` })
-                return res!.end(JSON.stringify('{}'))
-            })
-        })
+        // pServer.post('/auth', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        //     let body = ''
+        //     _req?.on('data', (pChunk): void => {
+        //         body += pChunk
+        //     })
+        //     _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
+        //         const json = JSON.parse(body)
+        //         const credentials = `${json.id}:${json.password}`
+        //         if (await Database.connectDB(credentials)) res!.writeHead(200, { 'Set-Cookie': `_ma=${Utils.crypt(credentials)}; expires=Tue, 19 Jan 2038 03:14:07 GMT` })
+        //         return res!.end(JSON.stringify('{}'))
+        //     })
+        // })
 
         // pServer.post('/signup', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
         //     let body = ''
@@ -115,28 +121,28 @@ export default class Routes {
      * GET : retourne une page html
      * POST : retourne un JSON contenant un fragment html, une classe et un titre
      */
-    private request(pServer: Server, pPath: string, pFile: string, pClassName: string, pTitle: string, pAddSlashOnUrl: boolean, pLabel = ''): void {
-        if (pLabel) {
+    private request(pServer: Server, path: string, file: string, className: string, title: string, addSlashOnUrl: boolean, label = ''): void {
+        if (label) {
             this.routes.push({
-                path: pPath,
-                className: pClassName,
-                title: pTitle,
-                label: pLabel,
+                path,
+                className,
+                title,
+                label,
             })
         }
 
-        if (pAddSlashOnUrl) {
-            pServer.get(`${pPath}/`, async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                res?.end(await Utils.page(pFile, pClassName, pTitle))
+        if (addSlashOnUrl) {
+            pServer.get(`${path}/`, async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+                if (await Auth.authenticateToken(_req!, res!)) res?.end(await Utils.page({ file, className, title }))
             })
         }
 
-        pServer.get(pPath, async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            res?.end(await Utils.page(pFile, pClassName, pTitle))
+        pServer.get(path, async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(await Utils.page({ file, className, title }))
         })
 
-        pServer.post(pPath, async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            res?.end(JSON.stringify({ text: await Utils.fragment(pFile), class: pClassName, title: pTitle }))
+        pServer.post(path, async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify({ text: await Utils.fragment(file), class: className, title }))
         })
     }
 }

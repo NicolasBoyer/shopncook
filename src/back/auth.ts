@@ -1,13 +1,17 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { SECRET_KEY } from './config.js'
-import Database from './database.js'
+import Database, { client } from './database.js'
 import http from 'http'
+import { ObjectId } from 'mongodb'
+import { TIncomingMessage } from '../front/javascript/types.js'
 
 type TUser = {
     username: string
     email: string
     password: string
+    role: string
+    userDbName: string
 }
 
 type TValidateReturn = {
@@ -41,14 +45,17 @@ export default class Auth {
 
             const salt = await bcrypt.genSalt(10)
             const hashedPassword = await bcrypt.hash(password, salt)
+            const userDbName = `foodshop_${new ObjectId()}`
 
-            // await db.addUser(username, password, {
-            //     roles: [{ role, db: db.databaseName }],
-            // })
+            await db.collection('users').insertOne({ username, email, password: hashedPassword, role, userDbName })
 
-            await db.collection('users').insertOne({ username, email, password: hashedPassword, role })
+            const userDb = client.db(userDbName)
+            await userDb.createCollection('dishes')
+            await userDb.createCollection('categories')
+            await userDb.createCollection('ingredients')
+            await userDb.createCollection('lists')
 
-            return { success: true, message: 'User created successfully with role' }
+            return { success: true, message: 'L\'utilisateur a été créé avec succès' }
         } catch (err) {
             console.error(err)
             return { success: false, message: 'Erreur serveur' }
@@ -61,41 +68,45 @@ export default class Auth {
         try {
             const user = await db.collection<TUser>('users').findOne({ email })
             if (!user) {
-                return { success: false, message: 'User not found' }
+                return { success: false, message: 'Utilisateur non trouvé' }
             }
 
             const isMatch = await bcrypt.compare(password, user.password)
             if (!isMatch) {
-                return { success: false, message: 'Invalid credentials' }
+                return { success: false, message: 'Credentials invalides' }
             }
 
             const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '1h' })
 
             return { success: true, token }
         } catch (err) {
-            return { success: false, message: 'Server error' }
+            return { success: false, message: 'Erreur serveur' }
         }
     }
 
-    static authenticateToken(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, next: () => void): void {
+    static async authenticateToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<boolean> {
         const authHeader = req.headers['authorization']
         const token = authHeader && authHeader.split(' ')[1]
 
         if (!token) {
-            res.writeHead(401, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ message: 'No token provided' }))
-            return
+            // res.writeHead(401, { 'Content-Type': 'application/json' })
+            // res.end(JSON.stringify({ message: 'Aucun token créé' }))
+            res.writeHead(302, { Location: '/login' })
+            res.end()
+            return false
         }
 
-        jwt.verify(token, SECRET_KEY, (err, user) => {
+        jwt.verify(token, SECRET_KEY, async (err, user): Promise<boolean> => {
             if (err) {
-                res.writeHead(403, { 'Content-Type': 'application/json' })
-                res.end(JSON.stringify({ message: 'Invalid token' }))
-                return
+                // res.writeHead(403, { 'Content-Type': 'application/json' })
+                // res.end(JSON.stringify({ message: 'Token invalide' }))
+                res.writeHead(302, { Location: '/login' })
+                res.end()
+                return false
             }
-
             req.user = user
-            next()
+            return true
         })
+        return false
     }
 }

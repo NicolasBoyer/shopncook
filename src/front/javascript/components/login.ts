@@ -31,6 +31,9 @@ export default class Login extends HTMLElement {
                     <button type="submit">
                         <span>Envoyer</span>
                     </button>
+                    <a href="/register" role="button">
+                        <span>Inscrivez-vous</span>
+                    </a>
                 </form>
             `,
             this

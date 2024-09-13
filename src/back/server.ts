@@ -2,16 +2,12 @@ import http from 'http'
 import fs from 'fs'
 import { Utils } from './utils.js'
 import { WebSocketServer } from 'ws'
-import Database from './database.js'
+import { TIncomingMessage } from '../front/javascript/types.js'
 
 type TMethod = {
     path: string
     callback: (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }) => void
     type: symbol
-}
-
-type TIncomingMessage = http.IncomingMessage & {
-    params: Record<string, string>
 }
 
 const GET: TMethod[] = []
@@ -92,7 +88,7 @@ export class Server {
                     }
                 }
                 res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
-                res.end(await Utils.page('404.html', 'notFound', '404 : Page non trouvée'))
+                res.end(await Utils.page({ className: 'notFound', templateHtml: '404.html' }))
             }
             if (req.method === 'GET') {
                 const url = Utils.fromFront(<string>req.url)
@@ -103,19 +99,14 @@ export class Server {
                         return
                     }
                 }
-                if (req.url?.split('/')[1]) {
-                    const credentials = req.headers?.cookie?.split('; ').filter((cookie): boolean => cookie.includes('_ma'))[0]
-                    if (!credentials || !(await Database.connectDB(<string>Utils.decrypt(credentials?.split('=')[1])))) {
-                        res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
-                        res.end(await Utils.page('login.html', 'login', 'Connexion à la BDD'))
-                        return
-                    }
-                    Database.init()
-                }
-
-                response(GET)
+                // if (req.url?.split('/')[1] && (await Auth.authenticateToken(req as TIncomingMessage, res))) Database.init()
+                // Database.init()
+                await response(GET)
             }
-            if (req.method === 'POST') response(POST)
+            if (req.method === 'POST') {
+                // if (req.url?.split('/')[1] && (await Auth.authenticateToken(req as TIncomingMessage, res))) Database.init()
+                await response(POST)
+            }
         })
         const webSocketServer = new WebSocketServer({ server })
         webSocketServer.on('connection', (ws): void => {

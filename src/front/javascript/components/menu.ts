@@ -1,6 +1,4 @@
 import { html, render, TemplateResult } from 'lit'
-import { Utils } from '../classes/utils.js'
-import { Caches } from '../classes/caches.js'
 import { TRoute } from '../types.js'
 
 export default class Menu extends HTMLElement {
@@ -14,13 +12,13 @@ export default class Menu extends HTMLElement {
     }
 
     async connectedCallback(): Promise<void> {
-        this.links = ((await Caches.get('routes')) || (await Utils.request('/app/routes.json'))) as TRoute[]
-        if (!this.links) return
-        await Caches.set(false, 'routes', this.links)
-        this.removeAttribute('style')
-        this.displayMenu()
-        window.addEventListener('resize', (): void => this.displayMenu())
-        window.addEventListener('popstate', (): void => this.render())
+        // this.links = ((await Caches.get('routes')) || (await Utils.request('/app/routes.json'))) as TRoute[]
+        // if (!this.links) return
+        // await Caches.set(false, 'routes', this.links)
+        // this.removeAttribute('style')
+        // this.displayMenu()
+        // window.addEventListener('resize', (): void => this.displayMenu())
+        // window.addEventListener('popstate', (): void => this.render())
     }
 
     private displayMenu(): void {

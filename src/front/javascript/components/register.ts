@@ -1,7 +1,7 @@
 import { html, render } from 'lit'
 import { Utils } from '../classes/utils.js'
 
-export default class Signup extends HTMLElement {
+export default class Register extends HTMLElement {
     connectedCallback(): void {
         this.render()
         this.setFormListener()
@@ -11,7 +11,7 @@ export default class Signup extends HTMLElement {
         const form = this.querySelector('form')
         form?.addEventListener('submit', async (pEvent): Promise<void> => {
             pEvent.preventDefault()
-            await Utils.request('/signup', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })
+            await Utils.request('/register', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })
             //location.href = '/auth'
         })
     }

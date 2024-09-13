@@ -1,4 +1,6 @@
 import { ObjectId } from 'mongodb'
+import http from 'http'
+import { JwtPayload } from 'jsonwebtoken'
 
 export type HTMLElementEvent<T extends HTMLElement> = Event &
     KeyboardEvent & {
@@ -51,3 +53,8 @@ export type TRoute = {
 }
 
 export type TDatabaseIngredient = Record<string, (TIngredient & TListIngredient & { id?: string; filter: { _id?: ObjectId } | { title?: string; unit?: string } })[] & string>
+
+export type TIncomingMessage = http.IncomingMessage & {
+    params: Record<string, string>
+    user?: string | JwtPayload
+}
