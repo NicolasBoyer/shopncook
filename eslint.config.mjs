@@ -1,10 +1,12 @@
 import tsParser from '@typescript-eslint/parser'
 import eslint from '@eslint/js'
 import tsEslint from 'typescript-eslint'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
     eslint.configs.recommended,
     ...tsEslint.configs.recommended,
+    eslintConfigPrettier,
     {
         languageOptions: {
             parser: tsParser,
