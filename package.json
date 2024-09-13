@@ -6,9 +6,9 @@
   "scripts": {
     "update": "npx npm-check-updates -u & npm i",
     "dev:frontend": "vite",
-    "dev:backend": "nodemon -w src/back -e ts -x \"ts-node --esm src/back/dev.ts\"",
+    "dev:backend": "nodemon -w src/back -e ts -x \"node --import=tsimp/import src/back/dev.ts TSIMP_DIAG=error\"",
     "dev": "cross-env NODE_ENV=dev concurrently 'npm:dev:frontend' 'npm:dev:backend'",
-    "start": "vite build & ts-node --esm --transpile-only src/back/prod.ts"
+    "start": "vite build & node --import=tsimp/import src/back/prod.ts TSIMP_DIAG=ignore"
   },
   "author": "Nicolas Boyer",
   "license": "ISC",
@@ -38,6 +38,7 @@
     "jsonwebtoken": "9.0.2",
     "lit": "3.2.0",
     "ts-node": "10.9.2",
+    "tsimp": "2.0.11",
     "ws": "8.18.0"
   }
 }
