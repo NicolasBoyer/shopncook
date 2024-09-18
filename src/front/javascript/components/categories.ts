@@ -80,7 +80,7 @@ export default class Categories extends HTMLElement {
                                 ? html` <li>Aucune catégorie ...</li>`
                                 : this.categories.map((pCategory): TemplateResult => {
                                       const categoryTitle = pCategory.title
-                                      const categoryId = pCategory._id
+                                      const categoryId = pCategory._id.toString()
                                       return this.choiceMode !== null
                                           ? html`
                                                 <label for="${categoryId}">

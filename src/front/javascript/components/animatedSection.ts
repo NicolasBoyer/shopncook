@@ -44,7 +44,7 @@ export default class AnimatedSection extends HTMLElement {
         Object.values(this.animations).forEach((pAnimations): void => {
             for (const animation of pAnimations) {
                 if ((proportion >= animation.lowValue && proportion < animation.highValue) || (animation.lowValue === 0 && proportion < animation.lowValue)) {
-                    animation.element.style = animation.animations.replaceAll('§§proportion§§', `${proportion}`)
+                    animation.element.setAttribute('style', animation.animations.replaceAll('§§proportion§§', `${proportion}`))
                 }
             }
         })
