@@ -104,16 +104,25 @@ export default class Routes {
         //     })
         // })
 
-        // pServer.post('/signup', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-        //     let body = ''
-        // 	_req?.on('data', (pChunk): void => {
-        //         body += pChunk
-        //     })
-        // 	_req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }>  => {
-        //         //Database.createUser(JSON.parse(body))
-        //         return res!.end(JSON.stringify('{}'))
-        //     })
-        // })
+        pServer.post('/register', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            let body = ''
+            _req?.on('data', (pChunk): void => {
+                body += pChunk
+            })
+            _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
+                try {
+                    const { firstName, lastName, mail, password, passwordBis } = JSON.parse(body)
+                    const result = await Auth.createUserWithRole(mail, firstName, lastName, password, passwordBis, 'userRole')
+
+                    res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify({ message: result.message }))
+                } catch (err) {
+                    console.error(err)
+                    res!.writeHead(400, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify({ message: 'Invalid request format' }))
+                }
+            })
+        })
     }
 
     /**

@@ -21,8 +21,8 @@ type TValidateReturn = {
 }
 
 export default class Auth {
-    static async createUserWithRole(username: string, email: string, password: string, role: string): Promise<TValidateReturn> {
-        if (!username || !email || !password) {
+    static async createUserWithRole(email: string, firstName: string, lastName: string, password: string, passwordBis: string, role: string): Promise<TValidateReturn> {
+        if (!firstName || !lastName || !email || !password || !passwordBis) {
             return { success: false, message: 'Tous les champs sont recquis' }
         }
 
@@ -31,8 +31,12 @@ export default class Auth {
             return { success: false, message: 'Format d\'email invalide' }
         }
 
+        if (password !== passwordBis) {
+            return { success: false, message: 'Les mots de passe ne sont pas identiques' }
+        }
+
         if (password.length < 6) {
-            return { success: false, message: 'Le password doit avoir au moins 6 caractères' }
+            return { success: false, message: 'Le mot de passe doit avoir au moins 6 caractères' }
         }
 
         const db = await Database.connectDB()
@@ -47,7 +51,7 @@ export default class Auth {
             const hashedPassword = await bcrypt.hash(password, salt)
             const userDbName = `foodshop_${new ObjectId()}`
 
-            await db.collection('users').insertOne({ username, email, password: hashedPassword, role, userDbName })
+            await db.collection('users').insertOne({ firstName, lastName, email, password: hashedPassword, role, userDbName })
 
             const userDb = client.db(userDbName)
             await userDb.createCollection('dishes')
