@@ -56,7 +56,7 @@ export const mimetype = Object.freeze({
 export class Server {
     constructor(pPort = 8000) {
         const server = http.createServer(async (req, res): Promise<void> => {
-            const response = async (pMethod: TMethod[]): Promise<void> => {
+            const response = async (pMethod: TMethod[]): Promise<boolean> => {
                 for (const pRoute of pMethod) {
                     const pathArr = pRoute.path.split('/')
                     const urlArr = req.url?.split('/')
@@ -84,11 +84,10 @@ export class Server {
                         }
                         // webSocketServer.emit('connection', 'blop')
                         pRoute.callback(req, res)
-                        return
+                        return true
                     }
                 }
-                res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
-                res.end(await Utils.page({ className: 'notFound', templateHtml: '404.html' }))
+                return false
             }
             if (req.method === 'GET') {
                 const url = Utils.fromFront(<string>req.url)
@@ -101,11 +100,17 @@ export class Server {
                 }
                 // if (req.url?.split('/')[1] && (await Auth.authenticateToken(req as TIncomingMessage, res))) Database.init()
                 // Database.init()
-                await response(GET)
+                if (!(await response(GET))) {
+                    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
+                    res.end(await Utils.page({ className: 'notFound', templateHtml: '404.html' }))
+                }
             }
             if (req.method === 'POST') {
                 // if (req.url?.split('/')[1] && (await Auth.authenticateToken(req as TIncomingMessage, res))) Database.init()
-                await response(POST)
+                if (!(await response(POST))) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' })
+                    res.end(JSON.stringify({ url: '404' }))
+                }
             }
         })
         const webSocketServer = new WebSocketServer({ server })

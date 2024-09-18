@@ -32,10 +32,9 @@ export class Utils {
         const response = await fetch(pUrl, { ...{ method: pMethod }, ...pOptions })
         if (pReturnType === 'status' && pMethod === 'HEAD') return response.status
         if (response.status !== 200 && response.status !== 204) {
-            // eslint-disable-next-line no-console
             console.error('Request failed : ' + response.status)
-            // eslint-disable-next-line no-console
             console.log(response)
+            location.href = (await response.json()).url
         } else {
             switch (pReturnType) {
                 case 'blob':
@@ -87,7 +86,6 @@ export class Utils {
                 .replace(/&/g, '_and_') // Replace & with 'and'
                 // eslint-disable-next-line no-useless-escape
                 .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-                // eslint-disable-next-line no-useless-escape
                 .replace(/--+/g, '_') // Replace multiple - with single _
                 .replace(/^-+/, '') // Trim - from start of text
                 .replace(/-+$/, '')

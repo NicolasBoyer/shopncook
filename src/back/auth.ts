@@ -80,6 +80,7 @@ export default class Auth {
 
             return { success: true, token }
         } catch (err) {
+            console.error(err)
             return { success: false, message: 'Erreur serveur' }
         }
     }
