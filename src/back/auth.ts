@@ -21,7 +21,7 @@ type TValidateReturn = {
 }
 
 export default class Auth {
-    static async createUserWithRole(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
+    static async createUser(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
         if (!firstName || !lastName || !email || !password || !passwordBis) {
             return { success: false, message: 'Tous les champs sont recquis' }
         }
@@ -100,6 +100,7 @@ export default class Auth {
     }
 
     static authorizeRole(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>, requiredRole: string): boolean {
+        // TODO - A finir
         const user = req.user
 
         if (typeof user === 'string' || !user) {
@@ -118,29 +119,32 @@ export default class Auth {
         return true
     }
 
-    static async authenticateToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<boolean> {
-        const authHeader = req.headers['authorization']
-        const token = authHeader && authHeader.split(' ')[1]
-
-        if (!token) {
-            // res.writeHead(401, { 'Content-Type': 'application/json' })
-            // res.end(JSON.stringify({ message: 'Aucun token créé' }))
-            // res.writeHead(302, { Location: '/login' })
-            res.end(JSON.stringify({ message: 'Aucun token créé' }))
+    static async authenticateToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<TIncomingMessage | boolean> {
+        const cookies = req.headers.cookie
+        if (!cookies) {
+            res.writeHead(401, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ message: 'Token non fourni dans les cookies' }))
             return false
         }
 
-        jwt.verify(token, SECRET_KEY, async (err, user): Promise<boolean> => {
+        const token = cookies.split(';').find((c): boolean => c.trim().startsWith('token='))
+        if (!token) {
+            res.writeHead(401, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ message: 'Token introuvable dans les cookies' }))
+            return false
+        }
+
+        const jwtToken = token.split('=')[1]
+        let isTokenValid: TIncomingMessage | boolean = false
+        jwt.verify(jwtToken, SECRET_KEY, (err, user): void => {
             if (err) {
-                // res.writeHead(403, { 'Content-Type': 'application/json' })
-                // res.end(JSON.stringify({ message: 'Token invalide' }))
-                // res.writeHead(302, { Location: '/login' })
+                res.writeHead(403, { 'Content-Type': 'application/json' })
                 res.end(JSON.stringify({ message: 'Token invalide' }))
-                return false
             }
             req.user = user
-            return true
+            isTokenValid = err ? false : req
         })
-        return false
+        // Retourne false ou req si valide
+        return isTokenValid
     }
 }

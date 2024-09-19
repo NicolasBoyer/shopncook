@@ -4,6 +4,7 @@ import Database from './database.js'
 import http from 'http'
 import Auth from './auth.js'
 import { TIncomingMessage } from '../front/javascript/types.js'
+import { JwtPayload } from 'jsonwebtoken'
 
 export default class Routes {
     routes: Record<string, string>[] = []
@@ -40,6 +41,7 @@ export default class Routes {
             async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
                 if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(this.routes))
             },
+            // TODO A supprimer
             mimetype.JSON
         )
 
@@ -83,15 +85,27 @@ export default class Routes {
             mimetype.JSON
         )
 
-        pServer.post('/db', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.post('/db', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             let body = ''
             _req?.on('data', (pChunk): void => {
                 body += pChunk
             })
-            _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => res!.end(JSON.stringify(await Database.request(JSON.parse(body)))))
+            _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
+                // TODO il faut authenticate
+                try {
+                    const req = (await Auth.authenticateToken(_req, res!)) as TIncomingMessage
+                    Database.init(req.user as JwtPayload)
+                    res!.writeHead(200, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify(await Database.request(JSON.parse(body))))
+                } catch (err) {
+                    console.error(err)
+                    res!.writeHead(500, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify({ message: 'Server error' }))
+                }
+            })
         })
 
-        pServer.post('/login', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.post('/login', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             let body = ''
             _req?.on('data', (pChunk): void => {
                 body += pChunk
@@ -100,8 +114,10 @@ export default class Routes {
                 try {
                     const { email, password } = JSON.parse(body)
                     const result = await Auth.authenticateUser(email, password)
-                    // res!.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' })
-                    return res!.end(JSON.stringify({ message: result.success ? 'Login successful' : result.message, token: result.token }))
+                    // TODO renommer le token ? A mettre ailleur ?
+                    res!.setHeader('Set-Cookie', `token=${result.token}; HttpOnly; Path=/; Secure; SameSite=Strict`)
+                    res!.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify({ message: result.success ? 'Login successful' : result.message }))
                 } catch (err) {
                     console.error(err)
                     res!.writeHead(400, { 'Content-Type': 'application/json' })
@@ -110,7 +126,7 @@ export default class Routes {
             })
         })
 
-        pServer.post('/register', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.post('/register', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             let body = ''
             _req?.on('data', (pChunk): void => {
                 body += pChunk
@@ -118,9 +134,8 @@ export default class Routes {
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
                 try {
                     const { firstName, lastName, mail, password, passwordBis } = JSON.parse(body)
-                    const result = await Auth.createUserWithRole(mail, firstName, lastName, password, passwordBis)
-
-                    // res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
+                    const result = await Auth.createUser(mail, firstName, lastName, password, passwordBis)
+                    res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
                     return res!.end(JSON.stringify({ message: result.message }))
                 } catch (err) {
                     console.error(err)

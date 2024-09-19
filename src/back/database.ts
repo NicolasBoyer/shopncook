@@ -2,9 +2,9 @@ import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
 import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
+import { JwtPayload } from 'jsonwebtoken'
 
 export const client = new MongoClient(DB_URL)
-let db: Db
 
 /**
  * Permet la déclaration de la db et de résoudre les requêtes passées dans la fonction request
@@ -17,6 +17,7 @@ export default class Database {
     private static dishes: Collection
 
     static async connectDB(): Promise<Db> {
+        let db: Db
         try {
             await client.connect()
             db = client.db(DB_NAME)
@@ -28,20 +29,15 @@ export default class Database {
         return db
     }
 
-    static async init(): Promise<void> {
-        // TODO DELETE
-        db = await Database.connectDB()
-        //
-        this.ingredients = db.collection('ingredients')
-        this.recipes = db.collection('recipes')
-        this.lists = db.collection('lists')
-        this.categories = db.collection('categories')
-        this.dishes = db.collection('dishes')
+    static init(user: JwtPayload): void {
+        const userDb = client.db(`foodshop_${user.userId}`)
+        this.ingredients = userDb.collection('ingredients')
+        this.lists = userDb.collection('lists')
+        this.categories = userDb.collection('categories')
+        this.dishes = userDb.collection('dishes')
+        const foodshopDb = client.db('foodshop')
+        this.recipes = foodshopDb.collection('recipes')
     }
-
-    // static createUser(user: string): void {
-    //     console.log(user)
-    // }
 
     /**
      * Retourne ou enregistre des informations dans la db (des fichiers json) en fonction des requêtes reçues dans le resolver

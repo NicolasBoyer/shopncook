@@ -74,14 +74,14 @@ export class Server {
                             ;(req as TIncomingMessage).params = {}
                             ;(req as TIncomingMessage).params.id = id
                         }
-                        switch (pRoute.type) {
-                            case mimetype.HTML:
-                                res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
-                                break
-                            case mimetype.JSON:
-                                res.writeHead(200, { 'Content-Type': 'application/json' })
-                                break
-                        }
+                        // switch (pRoute.type) {
+                        //     case mimetype.HTML:
+                        //         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+                        //         break
+                        //     case mimetype.JSON:
+                        //         res.writeHead(200, { 'Content-Type': 'application/json' })
+                        //         break
+                        // }
                         // webSocketServer.emit('connection', 'blop')
                         pRoute.callback(req, res)
                         return true
