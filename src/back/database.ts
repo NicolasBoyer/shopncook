@@ -17,15 +17,13 @@ export default class Database {
     private static dishes: Collection
 
     static async connectDB(): Promise<Db> {
-        if (!db) {
-            try {
-                await client.connect()
-                db = client.db(DB_NAME)
-                console.log('Connected to database')
-            } catch (err) {
-                console.error('Failed to connect to the database', err)
-                throw err
-            }
+        try {
+            await client.connect()
+            db = client.db(DB_NAME)
+            console.log('Connected to database')
+        } catch (err) {
+            console.error('Failed to connect to the database', err)
+            throw err
         }
         return db
     }

@@ -91,18 +91,24 @@ export default class Routes {
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => res!.end(JSON.stringify(await Database.request(JSON.parse(body)))))
         })
 
-        // pServer.post('/auth', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-        //     let body = ''
-        //     _req?.on('data', (pChunk): void => {
-        //         body += pChunk
-        //     })
-        //     _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
-        //         const json = JSON.parse(body)
-        //         const credentials = `${json.id}:${json.password}`
-        //         if (await Database.connectDB(credentials)) res!.writeHead(200, { 'Set-Cookie': `_ma=${Utils.crypt(credentials)}; expires=Tue, 19 Jan 2038 03:14:07 GMT` })
-        //         return res!.end(JSON.stringify('{}'))
-        //     })
-        // })
+        pServer.post('/login', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            let body = ''
+            _req?.on('data', (pChunk): void => {
+                body += pChunk
+            })
+            _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
+                try {
+                    const { email, password } = JSON.parse(body)
+                    const result = await Auth.authenticateUser(email, password)
+                    // res!.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify({ message: result.success ? 'Login successful' : result.message, token: result.token }))
+                } catch (err) {
+                    console.error(err)
+                    res!.writeHead(400, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify({ message: 'Invalid request format' }))
+                }
+            })
+        })
 
         pServer.post('/register', async (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             let body = ''
@@ -112,9 +118,9 @@ export default class Routes {
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
                 try {
                     const { firstName, lastName, mail, password, passwordBis } = JSON.parse(body)
-                    const result = await Auth.createUserWithRole(mail, firstName, lastName, password, passwordBis, 'userRole')
+                    const result = await Auth.createUserWithRole(mail, firstName, lastName, password, passwordBis)
 
-                    res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
+                    // res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
                     return res!.end(JSON.stringify({ message: result.message }))
                 } catch (err) {
                     console.error(err)

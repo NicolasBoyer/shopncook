@@ -11,7 +11,7 @@ export default class Login extends HTMLElement {
         const form = this.querySelector('form')
         form?.addEventListener('submit', async (pEvent): Promise<void> => {
             pEvent.preventDefault()
-            await Utils.request('/auth', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })
+            await Utils.request('/login', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })
             location.href = '/'
         })
     }
@@ -22,7 +22,7 @@ export default class Login extends HTMLElement {
                 <form>
                     <label>
                         <span>Identifiant</span>
-                        <input name="id" required type="text" />
+                        <input name="email" required type="email" />
                     </label>
                     <label>
                         <span>Mot de passe</span>

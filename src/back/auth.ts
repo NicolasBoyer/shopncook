@@ -21,7 +21,7 @@ type TValidateReturn = {
 }
 
 export default class Auth {
-    static async createUserWithRole(email: string, firstName: string, lastName: string, password: string, passwordBis: string, role: string): Promise<TValidateReturn> {
+    static async createUserWithRole(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
         if (!firstName || !lastName || !email || !password || !passwordBis) {
             return { success: false, message: 'Tous les champs sont recquis' }
         }
@@ -51,6 +51,16 @@ export default class Auth {
             const hashedPassword = await bcrypt.hash(password, salt)
             const userDbName = `foodshop_${new ObjectId()}`
 
+            const role = [
+                {
+                    db: 'foodshop',
+                    permissions: ['author'],
+                },
+                {
+                    db: userDbName,
+                    permissions: ['admin'],
+                },
+            ]
             await db.collection('users').insertOne({ firstName, lastName, email, password: hashedPassword, role, userDbName })
 
             const userDb = client.db(userDbName)
@@ -89,6 +99,25 @@ export default class Auth {
         }
     }
 
+    static authorizeRole(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>, requiredRole: string): boolean {
+        const user = req.user
+
+        if (typeof user === 'string' || !user) {
+            res.writeHead(403, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ message: 'Access denied' }))
+            return false
+        }
+
+        // Vérification du rôle utilisateur
+        if (user.role !== requiredRole) {
+            res.writeHead(403, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ message: 'Insufficient permissions' }))
+            return false
+        }
+
+        return true
+    }
+
     static async authenticateToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<boolean> {
         const authHeader = req.headers['authorization']
         const token = authHeader && authHeader.split(' ')[1]
@@ -96,8 +125,8 @@ export default class Auth {
         if (!token) {
             // res.writeHead(401, { 'Content-Type': 'application/json' })
             // res.end(JSON.stringify({ message: 'Aucun token créé' }))
-            res.writeHead(302, { Location: '/login' })
-            res.end()
+            // res.writeHead(302, { Location: '/login' })
+            res.end(JSON.stringify({ message: 'Aucun token créé' }))
             return false
         }
 
@@ -105,8 +134,8 @@ export default class Auth {
             if (err) {
                 // res.writeHead(403, { 'Content-Type': 'application/json' })
                 // res.end(JSON.stringify({ message: 'Token invalide' }))
-                res.writeHead(302, { Location: '/login' })
-                res.end()
+                // res.writeHead(302, { Location: '/login' })
+                res.end(JSON.stringify({ message: 'Token invalide' }))
                 return false
             }
             req.user = user
