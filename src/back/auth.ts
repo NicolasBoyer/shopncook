@@ -16,6 +16,7 @@ type TUser = {
 }
 
 export default class Auth {
+    // TODO compte et possibilité de logout
     static async createUser(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
         if (!firstName || !lastName || !email || !password || !passwordBis) {
             return { success: false, message: 'Tous les champs sont recquis' }
