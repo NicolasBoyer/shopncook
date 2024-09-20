@@ -91,7 +91,6 @@ export default class Routes {
                 body += pChunk
             })
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
-                // TODO il faut authenticate
                 try {
                     const req = (await Auth.authenticateToken(_req, res!)) as TIncomingMessage
                     Database.init(req.user as JwtPayload)
@@ -111,18 +110,11 @@ export default class Routes {
                 body += pChunk
             })
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
-                try {
-                    const { email, password } = JSON.parse(body)
-                    const result = await Auth.authenticateUser(email, password)
-                    // TODO renommer le token ? A mettre ailleur ?
-                    res!.setHeader('Set-Cookie', `token=${result.token}; HttpOnly; Path=/; Secure; SameSite=Strict`)
-                    res!.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' })
-                    return res!.end(JSON.stringify({ message: result.success ? 'Login successful' : result.message }))
-                } catch (err) {
-                    console.error(err)
-                    res!.writeHead(400, { 'Content-Type': 'application/json' })
-                    return res!.end(JSON.stringify({ message: 'Invalid request format' }))
-                }
+                const { email, password } = JSON.parse(body)
+                const result = await Auth.authenticateUser(email, password)
+                res!.setHeader('Set-Cookie', `token=${result.token}; HttpOnly; Path=/; Secure; SameSite=Strict`)
+                res!.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' })
+                return res!.end(JSON.stringify({ message: result.success ? 'Connexion réussie' : result.message, success: result.success }))
             })
         })
 

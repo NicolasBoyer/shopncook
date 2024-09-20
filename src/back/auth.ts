@@ -4,7 +4,8 @@ import { SECRET_KEY } from './config.js'
 import Database, { client } from './database.js'
 import http from 'http'
 import { ObjectId } from 'mongodb'
-import { TIncomingMessage } from '../front/javascript/types.js'
+import { TIncomingMessage, TValidateReturn } from '../front/javascript/types.js'
+import { Utils } from './utils.js'
 
 type TUser = {
     username: string
@@ -12,12 +13,6 @@ type TUser = {
     password: string
     role: string
     userDbName: string
-}
-
-type TValidateReturn = {
-    success: boolean
-    message?: string
-    token?: string
 }
 
 export default class Auth {
@@ -49,7 +44,8 @@ export default class Auth {
 
             const salt = await bcrypt.genSalt(10)
             const hashedPassword = await bcrypt.hash(password, salt)
-            const userDbName = `foodshop_${new ObjectId()}`
+            const _id = new ObjectId()
+            const userDbName = `foodshop_${_id}`
 
             const role = [
                 {
@@ -61,7 +57,7 @@ export default class Auth {
                     permissions: ['admin'],
                 },
             ]
-            await db.collection('users').insertOne({ firstName, lastName, email, password: hashedPassword, role, userDbName })
+            await db.collection('users').insertOne({ _id, firstName, lastName, email, password: hashedPassword, role })
 
             const userDb = client.db(userDbName)
             await userDb.createCollection('dishes')
@@ -87,7 +83,7 @@ export default class Auth {
 
             const isMatch = await bcrypt.compare(password, user.password)
             if (!isMatch) {
-                return { success: false, message: 'Credentials invalides' }
+                return { success: false, message: 'Identifiants invalides' }
             }
 
             const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '1h' })
@@ -122,24 +118,24 @@ export default class Auth {
     static async authenticateToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<TIncomingMessage | boolean> {
         const cookies = req.headers.cookie
         if (!cookies) {
-            res.writeHead(401, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ message: 'Token non fourni dans les cookies' }))
+            res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
             return false
         }
 
         const token = cookies.split(';').find((c): boolean => c.trim().startsWith('token='))
         if (!token) {
-            res.writeHead(401, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ message: 'Token introuvable dans les cookies' }))
+            res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
             return false
         }
 
         const jwtToken = token.split('=')[1]
         let isTokenValid: TIncomingMessage | boolean = false
-        jwt.verify(jwtToken, SECRET_KEY, (err, user): void => {
+        jwt.verify(jwtToken, SECRET_KEY, async (err, user): Promise<void> => {
             if (err) {
-                res.writeHead(403, { 'Content-Type': 'application/json' })
-                res.end(JSON.stringify({ message: 'Token invalide' }))
+                res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
+                res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
             }
             req.user = user
             isTokenValid = err ? false : req

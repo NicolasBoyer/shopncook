@@ -58,3 +58,9 @@ export type TIncomingMessage = http.IncomingMessage & {
     params: Record<string, string>
     user?: string | JwtPayload
 }
+
+export type TValidateReturn = {
+    success: boolean
+    message?: string
+    token?: string
+}
