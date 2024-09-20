@@ -64,3 +64,12 @@ export type TValidateReturn = {
     message?: string
     token?: string
 }
+
+export type TUser = {
+    _id: string
+    firstName: string
+    lastName: string
+    email: string
+    password: string
+    role: { db: string; permissions: string[] }[]
+}

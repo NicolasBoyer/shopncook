@@ -1,10 +1,10 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
-import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient } from '../front/javascript/types.js'
+import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
-import { JwtPayload } from 'jsonwebtoken'
 
 export const client = new MongoClient(DB_URL)
+export let userDb: Db
 
 /**
  * Permet la déclaration de la db et de résoudre les requêtes passées dans la fonction request
@@ -29,8 +29,8 @@ export default class Database {
         return db
     }
 
-    static init(user: JwtPayload): void {
-        const userDb = client.db(`foodshop_${user.userId}`)
+    static init(user: TUser): void {
+        userDb = client.db(`foodshop_${user._id}`)
         this.ingredients = userDb.collection('ingredients')
         this.lists = userDb.collection('lists')
         this.categories = userDb.collection('categories')

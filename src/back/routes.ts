@@ -1,15 +1,15 @@
 import { Utils } from './utils.js'
-import { mimetype, Server } from './server.js'
+import { Server } from './server.js'
 import Database from './database.js'
 import http from 'http'
 import Auth from './auth.js'
-import { TIncomingMessage } from '../front/javascript/types.js'
-import { JwtPayload } from 'jsonwebtoken'
+import { TIncomingMessage, TUser } from '../front/javascript/types.js'
 
 export default class Routes {
     routes: Record<string, string>[] = []
 
     constructor(pServer: Server) {
+        // PUBLIC
         pServer.get('/', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             res?.end(await Utils.page({ file: 'presentation.html', className: 'presentation', templateHtml: 'home.html' }))
         })
@@ -22,6 +22,7 @@ export default class Routes {
             res?.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
         })
 
+        // PRIVATE
         this.request(pServer, '/app', 'lists.html', 'home', '', true, 'Gérer votre liste')
 
         this.request(pServer, '/app/recipe/add', 'recipe.html', 'recipe', 'Les recettes', true, 'Ajouter une recette')
@@ -36,54 +37,29 @@ export default class Routes {
 
         this.request(pServer, '/app/dishes', 'dishes.html', 'dishes', 'Les plats de la semaine', true, 'Plats de la semaine')
 
-        pServer.get(
-            '/app/routes.json',
-            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(this.routes))
-            },
-            // TODO A supprimer
-            mimetype.JSON
-        )
+        pServer.get('/app/routes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(this.routes))
+        })
 
-        pServer.get(
-            '/app/ingredients.json',
-            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getIngredients: '{}' })))
-            },
-            mimetype.JSON
-        )
+        pServer.get('/app/ingredients.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getIngredients: '{}' })))
+        })
 
-        pServer.get(
-            '/app/lists.json',
-            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getListIngredients: '{}' })))
-            },
-            mimetype.JSON
-        )
+        pServer.get('/app/lists.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getListIngredients: '{}' })))
+        })
 
-        pServer.get(
-            '/app/recipes.json',
-            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getRecipes: '{}' })))
-            },
-            mimetype.JSON
-        )
+        pServer.get('/app/recipes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getRecipes: '{}' })))
+        })
 
-        pServer.get(
-            '/app/categories.json',
-            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getCategories: '{}' })))
-            },
-            mimetype.JSON
-        )
+        pServer.get('/app/categories.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getCategories: '{}' })))
+        })
 
-        pServer.get(
-            '/app/dishes.json',
-            async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-                if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getDishes: '{}' })))
-            },
-            mimetype.JSON
-        )
+        pServer.get('/app/dishes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getDishes: '{}' })))
+        })
 
         pServer.post('/db', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             let body = ''
@@ -93,7 +69,8 @@ export default class Routes {
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
                 try {
                     const req = (await Auth.authenticateToken(_req, res!)) as TIncomingMessage
-                    Database.init(req.user as JwtPayload)
+                    console.log(req.user)
+                    Database.init(req.user as TUser)
                     res!.writeHead(200, { 'Content-Type': 'application/json' })
                     return res!.end(JSON.stringify(await Database.request(JSON.parse(body))))
                 } catch (err) {
@@ -128,7 +105,7 @@ export default class Routes {
                     const { firstName, lastName, mail, password, passwordBis } = JSON.parse(body)
                     const result = await Auth.createUser(mail, firstName, lastName, password, passwordBis)
                     res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
-                    return res!.end(JSON.stringify({ message: result.message }))
+                    return res!.end(JSON.stringify({ message: result.message, success: result.success }))
                 } catch (err) {
                     console.error(err)
                     res!.writeHead(400, { 'Content-Type': 'application/json' })

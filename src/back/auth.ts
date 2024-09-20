@@ -4,16 +4,8 @@ import { SECRET_KEY } from './config.js'
 import Database, { client } from './database.js'
 import http from 'http'
 import { ObjectId } from 'mongodb'
-import { TIncomingMessage, TValidateReturn } from '../front/javascript/types.js'
+import { TIncomingMessage, TUser, TValidateReturn } from '../front/javascript/types.js'
 import { Utils } from './utils.js'
-
-type TUser = {
-    username: string
-    email: string
-    password: string
-    role: string
-    userDbName: string
-}
 
 export default class Auth {
     // TODO compte et possibilité de logout
@@ -87,33 +79,13 @@ export default class Auth {
                 return { success: false, message: 'Identifiants invalides' }
             }
 
-            const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '1h' })
+            const token = jwt.sign({ _id: user._id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' })
 
             return { success: true, token }
         } catch (err) {
             console.error(err)
             return { success: false, message: 'Erreur serveur' }
         }
-    }
-
-    static authorizeRole(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>, requiredRole: string): boolean {
-        // TODO - A finir
-        const user = req.user
-
-        if (typeof user === 'string' || !user) {
-            res.writeHead(403, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ message: 'Access denied' }))
-            return false
-        }
-
-        // Vérification du rôle utilisateur
-        if (user.role !== requiredRole) {
-            res.writeHead(403, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ message: 'Insufficient permissions' }))
-            return false
-        }
-
-        return true
     }
 
     static async authenticateToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<TIncomingMessage | boolean> {
@@ -141,7 +113,28 @@ export default class Auth {
             req.user = user
             isTokenValid = err ? false : req
         })
+        // console.log(userDb)
         // Retourne false ou req si valide
         return isTokenValid
+    }
+
+    static authorizeRole(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): boolean {
+        // TODO - A finir
+        const user = req.user as TUser
+
+        if (!user) {
+            res.writeHead(403, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ message: 'Access denied' }))
+            return false
+        }
+
+        // Vérification du rôle utilisateur
+        // if (user.role.permissions.includes('admin') || user.role.permissions.includes('author')) {
+        //     res.writeHead(403, { 'Content-Type': 'application/json' })
+        //     res.end(JSON.stringify({ message: 'Insufficient permissions' }))
+        //     return false
+        // }
+
+        return true
     }
 }

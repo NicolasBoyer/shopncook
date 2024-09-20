@@ -7,7 +7,6 @@ import { TIncomingMessage } from '../front/javascript/types.js'
 type TMethod = {
     path: string
     callback: (_req?: http.IncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }) => void
-    type: symbol
 }
 
 const GET: TMethod[] = []
@@ -125,11 +124,11 @@ export class Server {
         server.listen(pPort)
     }
 
-    get(pPath: string, pCallback: () => void, pType = mimetype.HTML): void {
-        GET.push({ path: pPath, callback: pCallback, type: pType })
+    get(pPath: string, pCallback: () => void): void {
+        GET.push({ path: pPath, callback: pCallback })
     }
 
-    post(pPath: string, pCallback: () => void, pType = mimetype.JSON): void {
-        POST.push({ path: pPath, callback: pCallback, type: pType })
+    post(pPath: string, pCallback: () => void): void {
+        POST.push({ path: pPath, callback: pCallback })
     }
 }
