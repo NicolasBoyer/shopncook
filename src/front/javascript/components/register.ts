@@ -1,5 +1,6 @@
 import { html, render } from 'lit'
 import { Utils } from '../classes/utils.js'
+import { TValidateReturn } from '../types.js'
 
 export default class Register extends HTMLElement {
     connectedCallback(): void {
@@ -11,8 +12,9 @@ export default class Register extends HTMLElement {
         const form = this.querySelector('form')
         form?.addEventListener('submit', async (pEvent): Promise<void> => {
             pEvent.preventDefault()
-            await Utils.request('/register', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })
-            //location.href = '/auth'
+            const result = (await Utils.request('/register', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })) as TValidateReturn
+            if (result.success) location.href = 'app'
+            else Utils.toast('error', result.message as string)
         })
     }
 
