@@ -30,13 +30,7 @@ export class Utils {
 
     static async request(pUrl: string, pMethod = 'GET', pOptions: Record<string, unknown> | null = {}, pReturnType = ''): Promise<string | number | Blob | Response | Record<string, unknown> | Record<string, unknown>[] | undefined> {
         const response = await fetch(pUrl, { ...{ method: pMethod }, ...pOptions })
-        console.log(response)
         if (pReturnType === 'status' && pMethod === 'HEAD') return response.status
-        // if (response.status !== 200 && response.status !== 204) {
-        //     console.error('Request failed : ' + response.status)
-        //     console.log(response)
-        //     return response.json()
-        // } else {
         switch (pReturnType) {
             case 'blob':
                 return response.blob()
@@ -47,7 +41,6 @@ export class Utils {
             default:
                 return response.json()
         }
-        // }
     }
 
     static async getFragmentHtml(pUrl: string): Promise<Record<string, string>> {
