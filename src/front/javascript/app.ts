@@ -17,6 +17,7 @@ import Link from './components/link.js'
 import { Websocket } from './classes/websocket.js'
 import Menu from './components/menu.js'
 import Register from './components/register.js'
+import LoggedUser from './components/loggedUser.js'
 
 class App {
     // TODO images pour la page de home
@@ -82,3 +83,4 @@ customElements.define('fs-animated-section', AnimatedSection)
 customElements.define('fs-dishes', Dishes)
 customElements.define('fs-link', Link)
 customElements.define('fs-menu', Menu)
+customElements.define('fs-logged-user', LoggedUser)
