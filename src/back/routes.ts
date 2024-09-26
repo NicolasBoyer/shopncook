@@ -61,6 +61,10 @@ export default class Routes {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getDishes: '{}' })))
         })
 
+        pServer.get('/currentUser', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getCurrentUser: '{}' })))
+        })
+
         pServer.post('/db', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             let body = ''
             _req?.on('data', (pChunk): void => {

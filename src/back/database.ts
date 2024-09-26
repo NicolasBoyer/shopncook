@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
-import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient } from '../front/javascript/types.js'
+import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
 
 export const client = new MongoClient(DB_URL)
@@ -16,6 +16,7 @@ export default class Database {
     private static lists: Collection
     private static categories: Collection
     private static dishes: Collection
+    private static users: Collection
 
     static async connect(): Promise<void> {
         try {
@@ -37,6 +38,7 @@ export default class Database {
             this.categories = userDb.collection('categories')
             this.dishes = userDb.collection('dishes')
             this.recipes = db.collection('recipes')
+            this.users = db.collection('users')
         } catch (err) {
             console.error('Failed to connect to the database', err)
             throw err
@@ -236,6 +238,10 @@ export default class Database {
                 if (id) await Database.dishes.deleteOne({ _id: new ObjectId(id) })
                 else await Database.dishes.deleteMany({})
                 return resolvers.getDishes()
+            },
+
+            async getCurrentUser(email: string): Promise<TUser> {
+                return (await Database.users.findOne({ email })) as unknown as TUser
             },
         }
         const resArr: TIngredient | TIngredient[] | TRecipe | TRecipe[] | TListIngredient | TListIngredient[] | TDish[] = []
