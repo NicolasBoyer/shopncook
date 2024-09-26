@@ -112,6 +112,7 @@ export class Server {
                 }
             }
         })
+        // TODO revoir websocket pour limiter au compte en cours
         const webSocketServer = new WebSocketServer({ server })
         webSocketServer.on('connection', (ws): void => {
             ws.on('message', (data): void => {

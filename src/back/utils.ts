@@ -17,7 +17,7 @@ export class Utils {
     static async page(options: { file?: string; className: string; title?: string; templateHtml?: string }): Promise<string> {
         const fragment = options.file && (await fs.readFile(fromFragments(options.file), 'utf8'))
         let template = await fs.readFile(fromTemplate(options.templateHtml || 'page.html'), 'utf8')
-        if (options.title) template = replaceTagAndGetHtml(template, '§§title§§', `<div class='subtitle' data-replaced-title>${options.title}</div>`)
+        template = replaceTagAndGetHtml(template, '§§title§§', `<div class='subtitle' data-replaced-title>${options.title}</div>`)
         if (options.className) template = replaceTagAndGetHtml(template, '§§className§§', options.className)
         if (process.env.NODE_ENV === 'dev') {
             template = replaceTagAndGetHtml(

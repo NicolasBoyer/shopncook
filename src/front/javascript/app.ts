@@ -38,7 +38,8 @@ class App {
 
     constructor() {
         Utils.helpers()
-        this.wakeLock()
+        // TODO à remettre ?
+        // this.wakeLock()
         Websocket.init()
         if (location.href.charAt(location.href.length - 1) === '/') history.replaceState({}, '', location.href.replace(/\/$/, ''))
     }
