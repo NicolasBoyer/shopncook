@@ -1,9 +1,11 @@
 import { html, render } from 'lit'
 import { Utils } from '../classes/utils.js'
 import { TValidateReturn } from '../types.js'
+import { Caches } from '../classes/caches.js'
 
 export default class Login extends HTMLElement {
-    connectedCallback(): void {
+    async connectedCallback(): Promise<void> {
+        await Caches.clear()
         this.render()
         this.setFormListener()
     }

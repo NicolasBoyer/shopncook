@@ -32,6 +32,13 @@ export class Caches {
         datas = datas.filter((pEntry): IDBPDatabase => pEntry)
         return datas.length === 1 && datas.length === args.length ? datas[0] : datas.length && datas.length === args.length ? datas : null
     }
+
+    static async clear(): Promise<void> {
+        for (const db of await indexedDB.databases()) {
+            indexedDB.deleteDatabase(db.name!)
+        }
+        sessionStorage.clear()
+    }
 }
 
 window.addEventListener('beforeunload', (): void => indexedDBCaches.forEach((dbName): Promise<void> => deleteDB(dbName)))
