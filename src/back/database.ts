@@ -1,10 +1,11 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
-import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
+import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
 
 export const client = new MongoClient(DB_URL)
 export let userDb: Db
+export let db: Db
 
 /**
  * Permet la déclaration de la db et de résoudre les requêtes passées dans la fonction request
@@ -16,27 +17,30 @@ export default class Database {
     private static categories: Collection
     private static dishes: Collection
 
-    static async connectDB(): Promise<Db> {
-        let db: Db
+    static async connect(): Promise<void> {
         try {
             await client.connect()
             db = client.db(DB_NAME)
-            console.log('Connected to database')
+            console.log('Connected to database : ', DB_NAME)
         } catch (err) {
             console.error('Failed to connect to the database', err)
             throw err
         }
-        return db
     }
 
-    static init(user: TUser): void {
-        userDb = client.db(`foodshop_${user._id}`)
-        this.ingredients = userDb.collection('ingredients')
-        this.lists = userDb.collection('lists')
-        this.categories = userDb.collection('categories')
-        this.dishes = userDb.collection('dishes')
-        const foodshopDb = client.db('foodshop')
-        this.recipes = foodshopDb.collection('recipes')
+    static async initUserDbAndCollections(id: string): Promise<void> {
+        try {
+            userDb = client.db(`${DB_NAME}_${id}`)
+            console.log('Connected to user database : ', userDb.databaseName)
+            this.ingredients = userDb.collection('ingredients')
+            this.lists = userDb.collection('lists')
+            this.categories = userDb.collection('categories')
+            this.dishes = userDb.collection('dishes')
+            this.recipes = db.collection('recipes')
+        } catch (err) {
+            console.error('Failed to connect to the database', err)
+            throw err
+        }
     }
 
     /**

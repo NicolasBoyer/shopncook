@@ -3,7 +3,7 @@ import { Server } from './server.js'
 import Database from './database.js'
 import http from 'http'
 import Auth from './auth.js'
-import { TIncomingMessage, TUser } from '../front/javascript/types.js'
+import { TIncomingMessage } from '../front/javascript/types.js'
 
 export default class Routes {
     routes: Record<string, string>[] = []
@@ -68,9 +68,7 @@ export default class Routes {
             })
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
                 try {
-                    const req = (await Auth.authenticateToken(_req, res!)) as TIncomingMessage
-                    console.log(req.user)
-                    Database.init(req.user as TUser)
+                    await Auth.authenticateToken(_req, res!)
                     res!.writeHead(200, { 'Content-Type': 'application/json' })
                     return res!.end(JSON.stringify(await Database.request(JSON.parse(body))))
                 } catch (err) {

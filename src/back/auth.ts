@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { SECRET_KEY } from './config.js'
-import Database, { client } from './database.js'
+import Database, { client, db, userDb } from './database.js'
 import http from 'http'
 import { ObjectId } from 'mongodb'
 import { TIncomingMessage, TUser, TValidateReturn } from '../front/javascript/types.js'
@@ -27,7 +27,7 @@ export default class Auth {
             return { success: false, message: 'Le mot de passe doit avoir au moins 6 caractères' }
         }
 
-        const db = await Database.connectDB()
+        await Database.connect()
 
         try {
             const existingUser = await db.collection('users').findOne({ email })
@@ -40,17 +40,17 @@ export default class Auth {
             const _id = new ObjectId()
             const userDbName = `foodshop_${_id}`
 
-            const role = [
+            const roles = [
                 {
                     db: 'foodshop',
                     permissions: ['author'],
                 },
                 {
                     db: userDbName,
-                    permissions: ['admin'],
+                    permissions: ['admin', 'author'],
                 },
             ]
-            await db.collection('users').insertOne({ _id, firstName, lastName, email, password: hashedPassword, role })
+            await db.collection('users').insertOne({ _id, firstName, lastName, email, password: hashedPassword, roles })
 
             const userDb = client.db(userDbName)
             await userDb.createCollection('dishes')
@@ -66,7 +66,7 @@ export default class Auth {
     }
 
     static async authenticateUser(email: string, password: string): Promise<TValidateReturn> {
-        const db = await Database.connectDB()
+        await Database.connect()
 
         try {
             const user = await db.collection<TUser>('users').findOne({ email })
@@ -79,12 +79,18 @@ export default class Auth {
                 return { success: false, message: 'Identifiants invalides' }
             }
 
-            const token = jwt.sign({ _id: user._id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' })
+            const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' })
+
+            await Database.initUserDbAndCollections(user._id)
+
+            if (!this.authorizeRole(user, 'author')) {
+                return { success: false, message: 'Utilisateur non autorisé' }
+            }
 
             return { success: true, token }
         } catch (err) {
             console.error(err)
-            return { success: false, message: 'Erreur serveur' }
+            return { success: false, message: `Erreur serveur : ${err}` }
         }
     }
 
@@ -106,35 +112,18 @@ export default class Auth {
         const jwtToken = token.split('=')[1]
         let isTokenValid: TIncomingMessage | boolean = false
         jwt.verify(jwtToken, SECRET_KEY, async (err, user): Promise<void> => {
-            if (err) {
-                res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
-                res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
-            }
             req.user = user
-            isTokenValid = err ? false : req
+            isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
         })
-        // console.log(userDb)
+        if (!isTokenValid) {
+            res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
+        }
         // Retourne false ou req si valide
         return isTokenValid
     }
 
-    static authorizeRole(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): boolean {
-        // TODO - A finir
-        const user = req.user as TUser
-
-        if (!user) {
-            res.writeHead(403, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ message: 'Access denied' }))
-            return false
-        }
-
-        // Vérification du rôle utilisateur
-        // if (user.role.permissions.includes('admin') || user.role.permissions.includes('author')) {
-        //     res.writeHead(403, { 'Content-Type': 'application/json' })
-        //     res.end(JSON.stringify({ message: 'Insufficient permissions' }))
-        //     return false
-        // }
-
-        return true
+    static authorizeRole(user: TUser, role: string): boolean {
+        return !(!user || !user.roles.find((pRole): boolean => pRole.permissions.includes(role) && pRole.db === userDb?.databaseName))
     }
 }
