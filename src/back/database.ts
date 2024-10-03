@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
-import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
+import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
 
 export const client = new MongoClient(DB_URL)
@@ -16,7 +16,6 @@ export default class Database {
     private static lists: Collection
     private static categories: Collection
     private static dishes: Collection
-    private static users: Collection
 
     static async connect(): Promise<void> {
         try {
@@ -38,7 +37,6 @@ export default class Database {
             this.categories = userDb.collection('categories')
             this.dishes = userDb.collection('dishes')
             this.recipes = db.collection('recipes')
-            this.users = db.collection('users')
         } catch (err) {
             console.error('Failed to connect to the database', err)
             throw err
@@ -56,7 +54,18 @@ export default class Database {
      * @param datas requête à traiter par la fonction
      * @returns {*|[]|*[]} retourne un array si request est un array sinon un objet
      */
-    static async request(datas: Record<string, string>[] | Record<string, string>): Promise<TIngredient | TIngredient[] | TRecipe | TRecipe[] | TListIngredient | TListIngredient[] | TDish[] | { error: string }> {
+    static async request(datas: Record<string, string>[] | Record<string, string>): Promise<
+        | TIngredient
+        | TIngredient[]
+        | TRecipe
+        | TRecipe[]
+        | TListIngredient
+        | TListIngredient[]
+        | TDish[]
+        | {
+              error: string
+          }
+    > {
         const resolvers = {
             async getRecipes(args?: Record<string, string>): Promise<TRecipe | TRecipe[]> {
                 let recipes: TRecipe[] = []
@@ -73,7 +82,13 @@ export default class Database {
                     for (const recipe of recipes) {
                         recipe!.ingredients = (await Database.ingredients.find({ recipes: { $elemMatch: { recipeId: recipe!._id.toString() } } }).toArray()).map((ingredient): TListIngredient => {
                             const currentRecipe = ingredient.recipes.find((pRecipe: TRecipeInIngredient): boolean => pRecipe.recipeId === recipe!._id.toString()) as TRecipeInIngredient
-                            return currentRecipe ? { title: ingredient.title, size: currentRecipe.size, unit: currentRecipe.unit } : ingredient.title
+                            return currentRecipe
+                                ? {
+                                      title: ingredient.title,
+                                      size: currentRecipe.size,
+                                      unit: currentRecipe.unit,
+                                  }
+                                : ingredient.title
                         })
                     }
                 }
@@ -82,7 +97,16 @@ export default class Database {
 
             async setRecipe(args: Record<string, string>): Promise<[TRecipe | TRecipe[], TIngredient | TIngredient[]]> {
                 const title = args.title
-                const updateResult = await Database.recipes.updateOne({ _id: new ObjectId(args.id) }, { $set: { title, slug: Utils.slugify(title) } }, { upsert: true })
+                const updateResult = await Database.recipes.updateOne(
+                    { _id: new ObjectId(args.id) },
+                    {
+                        $set: {
+                            title,
+                            slug: Utils.slugify(title),
+                        },
+                    },
+                    { upsert: true }
+                )
                 args.recipeId = args.id || (updateResult.upsertedId?.toString() as string)
                 const ingredients = await resolvers.setIngredients(args as TDatabaseIngredient)
                 return [await resolvers.getRecipes(), ingredients]
@@ -167,10 +191,26 @@ export default class Database {
                 let isEdit = false
                 let isNewCategory = false
                 for (const ingredient of args.ingredients) {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { id, ...currentIngredient }: TIngredient & TListIngredient & { id?: string | undefined; filter: { _id?: ObjectId | undefined } | { title?: string | undefined; unit?: string | undefined } } = ingredient
+                    const {
+                        id,
+                        ...currentIngredient
+                    }: TIngredient &
+                        TListIngredient & {
+                            id?: string | undefined
+                            filter:
+                                | { _id?: ObjectId | undefined }
+                                | {
+                                      title?: string | undefined
+                                      unit?: string | undefined
+                                  }
+                        } = ingredient
                     if (ingredient.title) currentIngredient.title = ingredient.title
-                    ingredient.filter = ingredient.id ? { _id: new ObjectId(ingredient.id) } : { title: ingredient.title, unit: ingredient.unit }
+                    ingredient.filter = ingredient.id
+                        ? { _id: new ObjectId(ingredient.id) }
+                        : {
+                              title: ingredient.title,
+                              unit: ingredient.unit,
+                          }
                     if (!ingredient.id) {
                         const listIngredient = await Database.lists.findOne(ingredient.filter)
                         currentIngredient.size = (listIngredient?.unit === ingredient.unit ? Number(listIngredient?.size) + Number(ingredient.size) : ingredient.size) as string
@@ -230,7 +270,17 @@ export default class Database {
             },
 
             async setDish(args: Record<string, string>): Promise<TDish[]> {
-                await Database.dishes.updateOne({ _id: new ObjectId(args._id) }, { $set: { day: args.day, time: args.time, name: args.name } }, { upsert: true })
+                await Database.dishes.updateOne(
+                    { _id: new ObjectId(args._id) },
+                    {
+                        $set: {
+                            day: args.day,
+                            time: args.time,
+                            name: args.name,
+                        },
+                    },
+                    { upsert: true }
+                )
                 return await resolvers.getDishes()
             },
 
@@ -238,10 +288,6 @@ export default class Database {
                 if (id) await Database.dishes.deleteOne({ _id: new ObjectId(id) })
                 else await Database.dishes.deleteMany({})
                 return resolvers.getDishes()
-            },
-
-            async getCurrentUser(email: string): Promise<TUser> {
-                return (await Database.users.findOne({ email })) as unknown as TUser
             },
         }
         const resArr: TIngredient | TIngredient[] | TRecipe | TRecipe[] | TListIngredient | TListIngredient[] | TDish[] = []

@@ -1,12 +1,13 @@
 import { html, render } from 'lit'
+import { User } from '../classes/user.js'
+import { TUser } from '../types.js'
 
 export default class LoggedUser extends HTMLElement {
-    constructor() {
-        super()
-        this.render()
-    }
+    private currentUser: TUser | null = null
 
-    connectedCallback(): void {
+    async connectedCallback(): Promise<void> {
+        this.currentUser = await User.getCurrentUser()
+        this.render()
         // const image = this.querySelector('img') as HTMLImageElement
         // image.style.transform = `translate3d(0, ${window.scrollY}px, 0)`
         // window.addEventListener('scroll', (): void => {
@@ -18,12 +19,12 @@ export default class LoggedUser extends HTMLElement {
 
     private render(): void {
         render(
-            html`
-                <button><span>Nicolas</span></button>
-                <div class="menu">
-                    <a href="#"><span>Se déconnecter</span></a>
-                </div>
-            `,
+            this.currentUser
+                ? html`<button><span>${this.currentUser.firstName} ${this.currentUser.lastName}</span></button>
+                      <div class="menu">
+                          <a href="#"><span>Se déconnecter</span></a>
+                      </div>`
+                : html`<button><span>Se connecter</span></button>`,
             this
         )
     }
