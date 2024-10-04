@@ -6,7 +6,8 @@ export class User {
     static currentUser: TUser | null = null
 
     static async getCurrentUser(): Promise<void> {
-        this.currentUser = (await Utils.request('/currentUser')) as TUser
+        const user = (await Utils.request('/currentUser')) as TUser & { error: string }
+        this.currentUser = user.error ? null : user
     }
 
     static async logout(): Promise<void> {

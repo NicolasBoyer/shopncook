@@ -103,8 +103,7 @@ export default class Auth {
         }
         const jwtToken = token.split('=')[1]
         if (this.isTokenBlacklisted(jwtToken)) {
-            res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
-            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion', errorMessage: 'Le token a été invalidé' }))
+            await this.loginResponse(req, res, 403, 'Le token a été invalidé')
             return false
         }
 
@@ -113,10 +112,7 @@ export default class Auth {
             req.user = user
             isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
         })
-        if (!isTokenValid) {
-            res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
-            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion', errorMessage: 'Le token est invalide' }))
-        }
+        if (!isTokenValid) await this.loginResponse(req, res, 403, 'Le token est invalide')
         // Retourne false ou req si valide
         return isTokenValid
     }
@@ -132,15 +128,13 @@ export default class Auth {
     static async getToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<string | false> {
         const cookies = req.headers.cookie
         if (!cookies) {
-            res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
-            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
+            await this.loginResponse(req, res, 401, 'Aucun cookie fourni', false)
             return false
         }
 
         const token = cookies.split(';').find((c): boolean => c.trim().startsWith('token='))
         if (!token) {
-            res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
-            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
+            await this.loginResponse(req, res, 401, 'Aucun token dans les cookies', false)
             return false
         }
         return token
@@ -148,5 +142,16 @@ export default class Auth {
 
     private static isTokenBlacklisted(token: string): boolean {
         return this.tokenBlacklist.has(token)
+    }
+
+    private static async loginResponse(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>, code: number, message: string, isMessageInHtml: boolean = true): Promise<void> {
+        // TODO nom token à changer + revoir soucis avec le menu dans les logs comme currentUser + message dnas la page html à ne pas mettre tout le temps
+        if (req.headers['sec-fetch-mode'] === 'cors') {
+            res.writeHead(code, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ error: true, message }))
+        } else {
+            res.writeHead(code, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion', errorMessage: isMessageInHtml ? message : '' }))
+        }
     }
 }
