@@ -22,7 +22,7 @@ export default class LoggedUser extends HTMLElement {
     private render(): void {
         render(
             this.currentUser
-                ? html`<button><span>${this.currentUser.firstName} ${this.currentUser.lastName}</span></button>
+                ? html` <button><span>${this.currentUser.firstName} ${this.currentUser.lastName}</span></button>
                       <div class="menu">
                           <a
                               @click="${async (pEvent: PointerEvent): Promise<void> => {
@@ -36,7 +36,7 @@ export default class LoggedUser extends HTMLElement {
                               ><span>Se déconnecter</span></a
                           >
                       </div>`
-                : html`<button>
+                : html` <button>
                       <span>Se connecter</span>
                   </button>`,
             this
