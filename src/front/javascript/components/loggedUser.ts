@@ -1,6 +1,8 @@
 import { html, render } from 'lit'
 import { User } from '../classes/user.js'
 import { TUser } from '../types.js'
+import { Utils } from '../classes/utils.js'
+import { Caches } from '../classes/caches.js'
 
 export default class LoggedUser extends HTMLElement {
     private currentUser: TUser | null = null
@@ -22,9 +24,21 @@ export default class LoggedUser extends HTMLElement {
             this.currentUser
                 ? html`<button><span>${this.currentUser.firstName} ${this.currentUser.lastName}</span></button>
                       <div class="menu">
-                          <a href="#"><span>Se déconnecter</span></a>
+                          <a
+                              @click="${async (pEvent: PointerEvent): Promise<void> => {
+                                  // TODO à mettre dans une fonction user
+                                  pEvent.preventDefault()
+                                  await Caches.clear()
+                                  await Utils.request('/logout', 'POST')
+                                  location.reload()
+                              }}"
+                              href="#"
+                              ><span>Se déconnecter</span></a
+                          >
                       </div>`
-                : html`<button><span>Se connecter</span></button>`,
+                : html`<button>
+                      <span>Se connecter</span>
+                  </button>`,
             this
         )
     }

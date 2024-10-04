@@ -8,6 +8,8 @@ import { TIncomingMessage, TUser, TValidateReturn } from '../front/javascript/ty
 import { Utils } from './utils.js'
 
 export default class Auth {
+    private static tokenBlacklist: Set<string> = new Set()
+
     // TODO compte et possibilité de logout
     static async createUser(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
         if (!firstName || !lastName || !email || !password || !passwordBis) {
@@ -110,6 +112,13 @@ export default class Auth {
         }
 
         const jwtToken = token.split('=')[1]
+
+        if (this.isTokenBlacklisted(jwtToken)) {
+            res.writeHead(403, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify({ message: 'Ce token a été invalidé' }))
+            return false
+        }
+
         let isTokenValid: TIncomingMessage | boolean = false
         jwt.verify(jwtToken, SECRET_KEY, async (err, user): Promise<void> => {
             req.user = user
@@ -125,5 +134,13 @@ export default class Auth {
 
     static authorizeRole(user: TUser, role: string): boolean {
         return !(!user || !user.roles.find((pRole): boolean => pRole.permissions.includes(role) && pRole.db === userDb?.databaseName))
+    }
+
+    static addToBlacklist(token: string): void {
+        this.tokenBlacklist.add(token)
+    }
+
+    private static isTokenBlacklisted(token: string): boolean {
+        return this.tokenBlacklist.has(token)
     }
 }

@@ -3,7 +3,7 @@ import { Server } from './server.js'
 import Database from './database.js'
 import http from 'http'
 import Auth from './auth.js'
-import { TIncomingMessage } from '../front/javascript/types.js'
+import { TIncomingMessage, TUser } from '../front/javascript/types.js'
 
 export default class Routes {
     routes: Record<string, string>[] = []
@@ -62,7 +62,10 @@ export default class Routes {
         })
 
         pServer.get('/currentUser', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(_req?.user))
+            if (await Auth.authenticateToken(_req!, res!)) {
+                const user = _req?.user as TUser
+                res?.end(JSON.stringify({ firstName: user.firstName, lastName: user.lastName, email: user.email }))
+            }
         })
 
         pServer.post('/db', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
@@ -113,6 +116,37 @@ export default class Routes {
                     res!.writeHead(400, { 'Content-Type': 'application/json' })
                     return res!.end(JSON.stringify({ message: 'Invalid request format' }))
                 }
+            })
+        })
+
+        pServer.post('/logout', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            // TODO à mettre sur la route ou pas + ajout blacklist -> blacklist qui doit etre sur auth pas de fonction login
+            let body = ''
+            _req?.on('data', (pChunk): void => {
+                body += pChunk
+            })
+            _req?.on('end', async (): Promise<void> => {
+                // TODO faire un getcookie dans Auth ?
+
+                const cookieHeader = _req.headers['cookie']
+                if (!cookieHeader) {
+                    res?.writeHead(400, { 'Content-Type': 'application/json' })
+                    res?.end(JSON.stringify({ message: 'No cookie provided' }))
+                    return
+                }
+
+                const tokenCookie = cookieHeader.split(';').find((cookie): boolean => cookie.trim().startsWith('token='))
+                if (!tokenCookie) {
+                    res?.writeHead(400, { 'Content-Type': 'application/json' })
+                    res?.end(JSON.stringify({ message: 'No token in cookies' }))
+                    return
+                }
+                Auth.addToBlacklist(tokenCookie.split('=')[1])
+
+                res?.setHeader('Set-Cookie', 'token=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
+                // res?.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=0')
+                res?.writeHead(200, { 'Content-Type': 'application/json' })
+                res?.end(JSON.stringify({ result: 'Logged out successfully' }))
             })
         })
     }
