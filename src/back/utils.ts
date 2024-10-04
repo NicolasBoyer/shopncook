@@ -14,11 +14,12 @@ export class Utils {
         return fromSrc(`front${pFile}`)
     }
 
-    static async page(options: { file?: string; className: string; title?: string; templateHtml?: string }): Promise<string> {
+    static async page(options: { file?: string; className: string; title?: string; templateHtml?: string; errorMessage?: string }): Promise<string> {
         const fragment = options.file && (await fs.readFile(fromFragments(options.file), 'utf8'))
         let template = await fs.readFile(fromTemplate(options.templateHtml || 'page.html'), 'utf8')
         template = replaceTagAndGetHtml(template, '§§title§§', `<div class='subtitle' data-replaced-title>${options.title}</div>`)
         if (options.className) template = replaceTagAndGetHtml(template, '§§className§§', options.className)
+        template = replaceTagAndGetHtml(template, '§§errorMessage§§', `<div class="error">${options.errorMessage || ''}</div>`)
         if (process.env.NODE_ENV === 'dev') {
             template = replaceTagAndGetHtml(
                 template,

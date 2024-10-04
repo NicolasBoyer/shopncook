@@ -97,6 +97,39 @@ export default class Auth {
     }
 
     static async authenticateToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<TIncomingMessage | boolean> {
+        const token = await this.getToken(req, res)
+        if (!token) {
+            return false
+        }
+        const jwtToken = token.split('=')[1]
+        if (this.isTokenBlacklisted(jwtToken)) {
+            res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion', errorMessage: 'Le token a été invalidé' }))
+            return false
+        }
+
+        let isTokenValid: TIncomingMessage | boolean = false
+        jwt.verify(jwtToken, SECRET_KEY, async (err, user): Promise<void> => {
+            req.user = user
+            isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
+        })
+        if (!isTokenValid) {
+            res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion', errorMessage: 'Le token est invalide' }))
+        }
+        // Retourne false ou req si valide
+        return isTokenValid
+    }
+
+    static authorizeRole(user: TUser, role: string): boolean {
+        return !(!user || !user.roles.find((pRole): boolean => pRole.permissions.includes(role) && pRole.db === userDb?.databaseName))
+    }
+
+    static addToBlacklist(token: string): void {
+        this.tokenBlacklist.add(token)
+    }
+
+    static async getToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<string | false> {
         const cookies = req.headers.cookie
         if (!cookies) {
             res.writeHead(401, { 'Content-Type': 'text/html; charset=utf-8' })
@@ -110,34 +143,7 @@ export default class Auth {
             res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
             return false
         }
-
-        const jwtToken = token.split('=')[1]
-
-        if (this.isTokenBlacklisted(jwtToken)) {
-            res.writeHead(403, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify({ message: 'Ce token a été invalidé' }))
-            return false
-        }
-
-        let isTokenValid: TIncomingMessage | boolean = false
-        jwt.verify(jwtToken, SECRET_KEY, async (err, user): Promise<void> => {
-            req.user = user
-            isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
-        })
-        if (!isTokenValid) {
-            res.writeHead(403, { 'Content-Type': 'text/html; charset=utf-8' })
-            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
-        }
-        // Retourne false ou req si valide
-        return isTokenValid
-    }
-
-    static authorizeRole(user: TUser, role: string): boolean {
-        return !(!user || !user.roles.find((pRole): boolean => pRole.permissions.includes(role) && pRole.db === userDb?.databaseName))
-    }
-
-    static addToBlacklist(token: string): void {
-        this.tokenBlacklist.add(token)
+        return token
     }
 
     private static isTokenBlacklisted(token: string): boolean {

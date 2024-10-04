@@ -120,33 +120,16 @@ export default class Routes {
         })
 
         pServer.post('/logout', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            // TODO à mettre sur la route ou pas + ajout blacklist -> blacklist qui doit etre sur auth pas de fonction login
-            let body = ''
-            _req?.on('data', (pChunk): void => {
-                body += pChunk
-            })
+            _req?.on('data', (): void => {})
             _req?.on('end', async (): Promise<void> => {
-                // TODO faire un getcookie dans Auth ?
-
-                const cookieHeader = _req.headers['cookie']
-                if (!cookieHeader) {
-                    res?.writeHead(400, { 'Content-Type': 'application/json' })
-                    res?.end(JSON.stringify({ message: 'No cookie provided' }))
-                    return
-                }
-
-                const tokenCookie = cookieHeader.split(';').find((cookie): boolean => cookie.trim().startsWith('token='))
+                const tokenCookie = await Auth.getToken(_req, res!)
                 if (!tokenCookie) {
-                    res?.writeHead(400, { 'Content-Type': 'application/json' })
-                    res?.end(JSON.stringify({ message: 'No token in cookies' }))
                     return
                 }
                 Auth.addToBlacklist(tokenCookie.split('=')[1])
-
                 res?.setHeader('Set-Cookie', 'token=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
-                // res?.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=0')
                 res?.writeHead(200, { 'Content-Type': 'application/json' })
-                res?.end(JSON.stringify({ result: 'Logged out successfully' }))
+                res?.end(JSON.stringify({ result: 'Déconnecté avec succès' }))
             })
         })
     }
