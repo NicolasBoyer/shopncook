@@ -14,8 +14,8 @@ export default class Menu extends HTMLElement {
     }
 
     async connectedCallback(): Promise<void> {
-        this.links = ((await Caches.get('routes')) || (await Utils.request('/app/routes.json'))) as TRoute[]
-        if (!this.links) return
+        this.links = ((await Caches.get('routes')) || (await Utils.request('/app/routes.json'))) as TRoute[] & { error: string }
+        if (!this.links || (this.links as unknown as { error: string }).error) return
         await Caches.set(false, 'routes', this.links)
         this.removeAttribute('style')
         this.displayMenu()
