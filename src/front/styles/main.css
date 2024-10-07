@@ -8,9 +8,9 @@
 	/*--pico-h4-color: #564a37;*/
 	/*--pico-h5-color: #625841;*/
 	/*--pico-h6-color: #6d624d;*/
-	/*--pico-primary: #805d00;*/
-	/*--pico-primary-background: #805d00;*/
-	/*--pico-primary-hover-background: #ffc01a;*/
+	--pico-primary: #805d00;
+	--pico-primary-background: #805d00;
+	--pico-primary-hover-background: #ffc01a;
 	/*--pico-form-element-border-color: #b9b2a2;*/
 	/*--pico-primary-focus: rgb(193 147 16 / 13%);*/
 	/*--pico-backgroud-secondary: #ffcf4f;*/
@@ -18,7 +18,7 @@
 	/*--pico-secondary: #787159;*/
 	/*--pico-secondary-hover: #625941;*/
 	/*--pico-tooltip-background-color: #805d00;*/
-	/*--pico-background-color-loader: rgb(237 240 243 / 60%);*/
+	--background-color-loader: rgb(237 240 243 / 60%);
 }
 
 a,
@@ -61,7 +61,7 @@ body {
 
 fs-header {
 	background: var(--pico-secondary-background);
-	height: 16rem;
+	height: 7rem;
 	display: flex;
 	padding: 0;
 	position: relative;
@@ -99,9 +99,15 @@ fs-logged-user {
     z-index: 2;
 }
 
+fs-logged-user details {
+	font-size: 0.8em;
+}
+
 fs-logged-user details.dropdown summary:not([role]) {
-    padding: 0.3em;
+    padding: 0 var(--pico-form-element-spacing-horizontal);
     height: fit-content;
+	display: flex;
+	align-items: center;
 }
 
 #main {
@@ -109,7 +115,7 @@ fs-logged-user details.dropdown summary:not([role]) {
 }
 
 footer {
-	background: var(--backgroud-secondary);
+	/*background: var(--pico-secondary-background);*/
 	min-height: 6rem;
 	padding: 0;
 	text-align: center;
@@ -163,7 +169,7 @@ h2 {
 	top: 2rem;
 	padding: 1rem;
 	right: 0;
-	color: var(--h1-color);
+	color:var(--pico-h1-color);
 }
 
 /*** HOME ***/
@@ -387,8 +393,8 @@ fieldset.ingredients legend {
 	top: 3.8rem;
 	position: absolute;
 	background: var(--background-color);
-	border-radius: var(--border-radius);
-	border: var(--border-width) solid var(--form-element-border-color);
+	border-radius: var(--pico-border-radius);
+	border: var(--pico-border-width) solid var(--pico-form-element-border-color);
 	width: 100%;
 }
 
@@ -430,7 +436,7 @@ fieldset.ingredients legend {
 
 .notFound .subtitle {
 	font-family: 'Press Start 2P', cursive;
-	color: var(--del-color);
+	color: var(--pico-del-color);
 	position: static;
 	font-size: 85%;
 	padding: 0;
@@ -506,7 +512,7 @@ fs-loader {
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
-	background: var(--accordion-border-color);
+	background: var(--pico-accordion-border-color);
 	width: 100%;
 }
 
@@ -865,8 +871,8 @@ fs-menu > div > ul > li {
 }
 
 fs-menu > div > ul > li[data-selected='true'] > * {
-	--background-color: var(--pico-primary-hover);
-	--border-color: var(--pico-primary-hover);
+	--background-color: var(--pico-primary-hover-background);
+	--border-color: var(--pico-primary-hover-background);
 	--box-shadow: var(--button-hover-box-shadow, 0 0 0 rgba(0, 0, 0, 0));
 	--color: var(--pico-primary-inverse);
 	pointer-events: none;
