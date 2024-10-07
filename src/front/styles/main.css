@@ -28,8 +28,8 @@ fs-link[role='button'] {
 	justify-content: center;
 }
 
-.error {
-	color: #721c24;
+div.error {
+	color: #c62828;
 	font-style: italic;
 	text-align: center;
 }
