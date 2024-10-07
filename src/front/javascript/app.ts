@@ -1,3 +1,5 @@
+import '@picocss/pico'
+import '../styles/main.css'
 import Toast from './components/toast.js'
 import Propose from './components/propose.js'
 import { Utils } from './classes/utils.js'

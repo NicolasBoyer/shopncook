@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "0.8.2",
+    "@picocss/pico": "^2.0.6",
     "bcryptjs": "2.4.3",
     "html2canvas": "1.4.1",
     "idb": "8.0.0",

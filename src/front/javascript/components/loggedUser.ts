@@ -10,12 +10,13 @@ export default class LoggedUser extends HTMLElement {
 
     private render(): void {
         render(
-            html` <button><span>${User.currentUser?.firstName} ${User.currentUser?.lastName}</span></button>
-                <div class="menu">
-                    <button @click="${(): Promise<void> => User.logout()}" role="link">
-                        <span>Se déconnecter</span>
-                    </button>
-                </div>`,
+            html` <details class="dropdown">
+                <summary>${User.currentUser?.firstName} ${User.currentUser?.lastName}</summary>
+                <ul>
+                    <li><a href="#">Compte</a></li>
+                    <li><a @click="${(): Promise<void> => User.logout()}" href="#">Se déconnecter</a></li>
+                </ul>
+            </details>`,
             this
         )
     }
