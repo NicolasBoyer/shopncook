@@ -145,7 +145,7 @@ export default class Auth {
     }
 
     private static async loginResponse(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>, code: number, message: string, isMessageInHtml: boolean = true): Promise<void> {
-        // TODO nom token à changer + finaliser reprise pico.css
+        // TODO nom token à changer
         if (req.headers['sec-fetch-mode'] === 'cors') {
             res.writeHead(code, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ error: true, message }))
