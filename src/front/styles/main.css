@@ -62,6 +62,10 @@ body {
 	overflow-x: hidden;
 }
 
+h1 > a:hover {
+	--pico-color: var(--pico-primary) !important;
+}
+
 fs-header {
 	background: var(--pico-secondary-background);
 	height: 7rem;
