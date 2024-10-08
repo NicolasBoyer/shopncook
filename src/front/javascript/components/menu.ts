@@ -2,7 +2,6 @@ import { html, render, TemplateResult } from 'lit'
 import { TRoute } from '../types.js'
 import { Caches } from '../classes/caches.js'
 import { Utils } from '../classes/utils.js'
-import { User } from '../classes/user.js'
 
 export default class Menu extends HTMLElement {
     private links: TRoute[] = []
@@ -14,14 +13,16 @@ export default class Menu extends HTMLElement {
         this.style.display = 'none'
     }
 
-    async connectedCallback(): Promise<void> {
-        this.links = ((await Caches.get('routes')) || (await Utils.request('/app/routes.json'))) as TRoute[] & { error: string }
-        if (!User.currentUser || !this.links || (this.links as unknown as { error: string }).error) return
-        await Caches.set(false, 'routes', this.links)
-        this.removeAttribute('style')
-        this.displayMenu()
-        window.addEventListener('resize', (): void => this.displayMenu())
-        window.addEventListener('popstate', (): void => this.render())
+    connectedCallback(): void {
+        document.body.addEventListener('currentUserAvailable', async (): Promise<void> => {
+            this.links = ((await Caches.get('routes')) || (await Utils.request('/app/routes.json'))) as TRoute[] & { error: string }
+            if (!this.links || (this.links as unknown as { error: string }).error) return
+            await Caches.set(false, 'routes', this.links)
+            this.removeAttribute('style')
+            this.displayMenu()
+            window.addEventListener('resize', (): void => this.displayMenu())
+            window.addEventListener('popstate', (): void => this.render())
+        })
     }
 
     private displayMenu(): void {

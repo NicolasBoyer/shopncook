@@ -9,6 +9,7 @@ export class User {
     static async getCurrentUser(): Promise<void> {
         const user = (await Utils.request('/currentUser')) as TUser & { error: string }
         this.currentUser = user.error ? null : user
+        document.body.dispatchEvent(new CustomEvent('currentUserAvailable'))
     }
 
     static async logout(): Promise<void> {
@@ -19,7 +20,7 @@ export class User {
 
     static getAccount(): void {
         Utils.confirm(
-            html`<form>
+            html` <form>
                 <label>
                     <span>Identifiant</span>
                     <input name="email" required type="email" value="${User.currentUser?.email}" />
