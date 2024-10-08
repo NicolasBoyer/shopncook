@@ -14,7 +14,7 @@ export default class LoggedUser extends HTMLElement {
                 <summary>${User.currentUser?.firstName} ${User.currentUser?.lastName}</summary>
                 <ul>
                     <li>
-                        <button role="link" href="#">Compte</button>
+                        <button @click="${(): void => User.getAccount()}" role="link" href="#">Compte</button>
                     </li>
                     <li>
                         <button @click="${(): Promise<void> => User.logout()}" role="link">Se déconnecter</button>
