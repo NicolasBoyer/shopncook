@@ -132,7 +132,7 @@ export default class Auth {
             return false
         }
 
-        const token = cookies.split(';').find((c): boolean => c.trim().startsWith('token='))
+        const token = cookies.split(';').find((c): boolean => c.trim().startsWith('fsTk='))
         if (!token) {
             await this.loginResponse(req, res, 401, 'Aucun token dans les cookies', false)
             return false
@@ -145,7 +145,6 @@ export default class Auth {
     }
 
     private static async loginResponse(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>, code: number, message: string, isMessageInHtml: boolean = true): Promise<void> {
-        // TODO nom token à changer
         if (req.headers['sec-fetch-mode'] === 'cors') {
             res.writeHead(code, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ error: true, message }))
