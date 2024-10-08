@@ -14,7 +14,7 @@ export default class LoggedUser extends HTMLElement {
                 <summary>${User.currentUser?.firstName} ${User.currentUser?.lastName}</summary>
                 <ul>
                     <li><a href="#">Compte</a></li>
-                    <li><a @click="${(): Promise<void> => User.logout()}" href="#">Se déconnecter</a></li>
+                    <li><button @click="${(): Promise<void> => User.logout()}" role="link">Se déconnecter</button></li>
                 </ul>
             </details>`,
             this

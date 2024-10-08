@@ -9,14 +9,16 @@
 	/*--pico-h5-color: #625841;*/
 	/*--pico-h6-color: #6d624d;*/
 	--pico-primary: #805d00;
+	--pico-primary-hover: #ffc01a;
 	--pico-primary-background: #805d00;
 	--pico-primary-hover-background: #ffc01a;
 	/*--pico-form-element-border-color: #b9b2a2;*/
 	/*--pico-primary-focus: rgb(193 147 16 / 13%);*/
-	/*--pico-backgroud-secondary: #ffcf4f;*/
+	--pico-secondary-background: #787159;
+	--pico-secondary-hover-background: #625941;
 	/*--pico-modal-overlay-background-color: rgb(226 224 213 / 80%);*/
-	/*--pico-secondary: #787159;*/
-	/*--pico-secondary-hover: #625941;*/
+	--pico-secondary: #787159;
+	--pico-secondary-hover: #625941;
 	/*--pico-tooltip-background-color: #805d00;*/
 	--background-color-loader: rgb(237 240 243 / 60%);
 }
@@ -94,7 +96,7 @@ fs-header img {
 
 fs-logged-user {
     position: absolute;
-    top: 3.5em;
+    top: 5.2em;
     right: 1em;
     z-index: 2;
 }
@@ -110,15 +112,40 @@ fs-logged-user details.dropdown summary:not([role]) {
 	align-items: center;
 }
 
+fs-logged-user details.dropdown summary+ul li button {
+    display: block;
+    margin: calc(var(--pico-form-element-spacing-vertical)* -.5) calc(var(--pico-form-element-spacing-horizontal)* -1);
+    padding: calc(var(--pico-form-element-spacing-vertical)* .5) var(--pico-form-element-spacing-horizontal);
+    overflow: hidden;
+    border-radius: 0;
+    color: var(--pico-dropdown-color);
+    text-decoration: none;
+    text-overflow: ellipsis;
+    border: none;
+	font-size: inherit;
+}
+
+fs-logged-user details.dropdown summary+ul li button:hover {
+    background-color: var(--pico-dropdown-hover-background-color);
+}
+
+fs-logged-user details.dropdown summary+ul li button[role=link]:is([aria-current]:not([aria-current=false]),:hover,:active,:focus) {
+	background-color: var(--pico-dropdown-hover-background-color);
+	--pico-color: transparent;
+	--pico-underline: none;
+	--pico-text-decoration: none;
+	--pico-box-shadow: none;
+}
+
 #main {
 	flex: 1;
 }
 
 footer {
-	/*background: var(--pico-secondary-background);*/
-	min-height: 6rem;
+	min-height: 3rem;
 	padding: 0;
 	text-align: center;
+	font-size: 0.8em;
 }
 
 /*** LAYOUT ***/
@@ -166,7 +193,7 @@ h2 {
 	font-family: 'Rubik Glitch', cursive;
 	position: absolute;
 	font-size: 1.2rem;
-	top: 2rem;
+	top: 1.2em;
 	padding: 1rem;
 	right: 0;
 	color:var(--pico-h1-color);
@@ -301,15 +328,15 @@ fs-recipe form{
 	font-size: 85%;
 }
 
-.recipes ul button,
+.recipes main ul button,
 .recipes ul a,
 .recipes aside ul fs-link,
-.ingredients ul button,
+.ingredients main ul button,
 .ingredients ul a,
-.home ul button,
-.home .title button,
-.dishes .title button,
-.categories ul button {
+.home main ul button,
+.home main .title button,
+.dishes main .title button,
+.categories main ul button {
 	width: 2rem;
 	height: 2rem;
 	padding: 0;
