@@ -19,6 +19,9 @@ export class User {
     }
 
     static getAccount(): void {
+        document.body.addEventListener('modalConfirm', (pEvent): void => {
+            console.log((pEvent as CustomEvent).detail)
+        })
         Utils.confirm(
             html` <fs-account />`,
             (): void => {},

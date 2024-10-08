@@ -17,29 +17,40 @@ export default class Account extends HTMLElement {
     //     })
     // }
 
+    private setFormListener(): void {
+        // const form = this.querySelector('form')
+        // let detail: { choices: string[]; title?: string } = { choices }
+        // if (this.choiceMode === 'radio') {
+        // 	detail = { ...detail, title: pRecipe.title }
+        // }
+        console.log(new FormData(this.querySelector('form')))
+        const detail = Object.fromEntries(new FormData(this.querySelector('form')!).entries())
+        document.body.dispatchEvent(new CustomEvent('modalConfirm', detail))
+    }
+
     private render(): void {
         render(
             html`
                 <form>
                     <label>
                         <span>Identifiant</span>
-                        <input name="email" required type="email" value="${User.currentUser?.email}" />
+                        <input name="email" type="email" value="${User.currentUser?.email}" @keyup="${(): void => this.setFormListener()}" />
                     </label>
                     <label>
                         <span>Prénom</span>
-                        <input name="firstName" required type="text" value="${User.currentUser?.firstName}" />
+                        <input name="firstName" type="text" value="${User.currentUser?.firstName}" />
                     </label>
                     <label>
                         <span>Nom</span>
-                        <input name="lastName" required type="text" value="${User.currentUser?.lastName}" />
+                        <input name="lastName" type="text" value="${User.currentUser?.lastName}" />
                     </label>
                     <label>
                         <span>Ancien mot de passe</span>
-                        <input name="oldPassword" required type="password" />
+                        <input name="oldPassword" type="password" />
                     </label>
                     <label>
                         <span>Nouveau mot de passe</span>
-                        <input name="password" required type="password" />
+                        <input name="password" type="password" />
                     </label>
                 </form>
             `,
