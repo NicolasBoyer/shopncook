@@ -118,7 +118,7 @@ export default class Dishes extends HTMLElement {
                                 ${pDays.map((pDay): TemplateResult => {
                                     const dish = (this.dishesByCalendar[pTime] && this.dishesByCalendar[pTime][pDay]) ?? { time: pTime, day: pDay }
                                     return html`
-                                        <details role="list">
+                                        <details class="dropdown">
                                             <summary aria-haspopup="listbox" role="button">${dish.name}</summary>
                                             <ul role="listbox">
                                                 <li>
