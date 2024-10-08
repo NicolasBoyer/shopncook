@@ -10,7 +10,7 @@ import { Utils } from './utils.js'
 export default class Auth {
     private static tokenBlacklist: Set<string> = new Set()
 
-    // TODO compte
+    // TODO compte + websocket + changement mdp
     static async createUser(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
         if (!firstName || !lastName || !email || !password || !passwordBis) {
             return { success: false, message: 'Tous les champs sont recquis' }
