@@ -20,7 +20,7 @@ export class User {
 
     static getAccount(): void {
         Utils.confirm(
-            html`<form>
+            html` <form>
                 <label>
                     <span>Identifiant</span>
                     <input name="email" type="email" value="${User.currentUser?.email}" />
@@ -44,11 +44,9 @@ export class User {
             </form>`,
             async (): Promise<void> => {
                 const accountEntries = Object.fromEntries(new FormData(document.querySelector('form') as HTMLFormElement).entries())
-                console.log(this.currentUser)
-                console.log(accountEntries)
                 for (const key of Object.keys(this.currentUser!)) {
                     if (key !== '_id' && this.currentUser![key as keyof typeof this.currentUser] !== accountEntries[key]) {
-                        await Utils.request('/db', 'POST', { body: `{ "setUser": { "_id": "${this.currentUser!._id}", "${key}": "${accountEntries[key]}" } }` })
+                        this.currentUser = (await Utils.request('/db', 'POST', { body: `{ "setUser": { "_id": "${this.currentUser!._id}", "${key}": "${accountEntries[key]}" } }` })) as TUser
                     }
                 }
             },

@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
-import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient } from '../front/javascript/types.js'
+import { TCategory, TDatabaseIngredient, TDish, TIncomingMessage, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
 
 export const client = new MongoClient(DB_URL)
@@ -54,9 +54,14 @@ export default class Database {
      * { "getRecipes": {"slug": "Tartiflette"} } retourne la recette tartiflette avec ses ingrédients via un objet
      * { "setRecipe": {"slug": "Tagliatelle à la carbonara"} } enregistre {"slug": "Tagliatelle à la carbonara"} dans la db recipes.json
      * @param datas requête à traiter par la fonction
+     * @param _req
      * @returns {*|[]|*[]} retourne un array si request est un array sinon un objet
      */
-    static async request(datas: Record<string, string>[] | Record<string, string>): Promise<
+
+    static async request(
+        datas: Record<string, string>[] | Record<string, string>,
+        _req?: TIncomingMessage
+    ): Promise<
         | TIngredient
         | TIngredient[]
         | TRecipe
@@ -293,10 +298,16 @@ export default class Database {
                 return resolvers.getDishes()
             },
 
-            async setUser(args: Record<string, string>): Promise<void> {
+            async getUser(id: string): Promise<TUser> {
+                return (await Database.users.findOne({ _id: new ObjectId(id) })) as unknown as TUser
+            },
+
+            async setUser(args: Record<string, string>): Promise<TUser> {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { _id, ...entries } = args
                 await Database.users.updateOne({ _id: new ObjectId(args._id) }, { $set: entries }, { upsert: true })
+                _req!.user = resolvers.getUser(args._id)
+                return _req!.user as TUser
             },
         }
         const resArr: TIngredient | TIngredient[] | TRecipe | TRecipe[] | TListIngredient | TListIngredient[] | TDish[] = []
