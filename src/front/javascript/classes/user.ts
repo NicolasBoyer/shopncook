@@ -19,12 +19,39 @@ export class User {
     }
 
     static getAccount(): void {
-        document.body.addEventListener('modalConfirm', (pEvent): void => {
-            console.log((pEvent as CustomEvent).detail)
-        })
         Utils.confirm(
-            html` <fs-account />`,
-            (): void => {},
+            html`<form>
+                <label>
+                    <span>Identifiant</span>
+                    <input name="email" type="email" value="${User.currentUser?.email}" />
+                </label>
+                <label>
+                    <span>Prénom</span>
+                    <input name="firstName" type="text" value="${User.currentUser?.firstName}" />
+                </label>
+                <label>
+                    <span>Nom</span>
+                    <input name="lastName" type="text" value="${User.currentUser?.lastName}" />
+                </label>
+                <label>
+                    <span>Ancien mot de passe</span>
+                    <input name="oldPassword" type="password" />
+                </label>
+                <label>
+                    <span>Nouveau mot de passe</span>
+                    <input name="password" type="password" />
+                </label>
+            </form>`,
+            async (): Promise<void> => {
+                const accountEntries = Object.fromEntries(new FormData(document.querySelector('form') as HTMLFormElement).entries())
+                console.log(this.currentUser)
+                console.log(accountEntries)
+                for (const key of Object.keys(this.currentUser!)) {
+                    if (key !== '_id' && this.currentUser![key as keyof typeof this.currentUser] !== accountEntries[key]) {
+                        await Utils.request('/db', 'POST', { body: `{ "setUser": { "_id": "${this.currentUser!._id}", "${key}": "${accountEntries[key]}" } }` })
+                    }
+                }
+            },
             (): void => {}
         )
     }

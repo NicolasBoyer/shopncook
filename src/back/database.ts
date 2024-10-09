@@ -16,6 +16,7 @@ export default class Database {
     private static lists: Collection
     private static categories: Collection
     private static dishes: Collection
+    private static users: Collection
 
     static async connect(): Promise<void> {
         try {
@@ -37,6 +38,7 @@ export default class Database {
             this.categories = userDb.collection('categories')
             this.dishes = userDb.collection('dishes')
             this.recipes = db.collection('recipes')
+            this.users = db.collection('users')
         } catch (err) {
             console.error('Failed to connect to the database', err)
             throw err
@@ -192,6 +194,7 @@ export default class Database {
                 let isNewCategory = false
                 for (const ingredient of args.ingredients) {
                     const {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                         id,
                         ...currentIngredient
                     }: TIngredient &
@@ -288,6 +291,12 @@ export default class Database {
                 if (id) await Database.dishes.deleteOne({ _id: new ObjectId(id) })
                 else await Database.dishes.deleteMany({})
                 return resolvers.getDishes()
+            },
+
+            async setUser(args: Record<string, string>): Promise<void> {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { _id, ...entries } = args
+                await Database.users.updateOne({ _id: new ObjectId(args._id) }, { $set: entries }, { upsert: true })
             },
         }
         const resArr: TIngredient | TIngredient[] | TRecipe | TRecipe[] | TListIngredient | TListIngredient[] | TDish[] = []

@@ -64,7 +64,7 @@ export default class Routes {
         pServer.get('/currentUser', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) {
                 const user = _req?.user as TUser
-                res?.end(JSON.stringify({ firstName: user.firstName, lastName: user.lastName, email: user.email }))
+                res?.end(JSON.stringify({ _id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email }))
             }
         })
 
