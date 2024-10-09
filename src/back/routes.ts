@@ -3,7 +3,7 @@ import { Server } from './server.js'
 import Database from './database.js'
 import http from 'http'
 import Auth from './auth.js'
-import { TIncomingMessage, TUser } from '../front/javascript/types.js'
+import { TIncomingMessage } from '../front/javascript/types.js'
 
 export default class Routes {
     routes: Record<string, string>[] = []
@@ -61,13 +61,12 @@ export default class Routes {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getDishes: '{}' })))
         })
 
-        pServer.get('/currentUser', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            if (await Auth.authenticateToken(_req!, res!)) {
-                const user = _req?.user as TUser
-                console.log(user)
-                res?.end(JSON.stringify({ _id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email }))
-            }
-        })
+        // pServer.get('/currentUser', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        //     if (await Auth.authenticateToken(_req!, res!)) {
+        //         const user = _req?.user as TUser
+        //         res?.end(JSON.stringify({ _id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email }))
+        //     }
+        // })
 
         pServer.post('/db', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             let body = ''
@@ -76,13 +75,15 @@ export default class Routes {
             })
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
                 try {
-                    await Auth.authenticateToken(_req, res!)
+                    // if (await Auth.authenticateToken(_req, res!)) {
                     res!.writeHead(200, { 'Content-Type': 'application/json' })
                     return res!.end(JSON.stringify(await Database.request(JSON.parse(body), _req)))
+                    // }
+                    // return res!.end(JSON.stringify({ error: true, message: 'Server error' }))
                 } catch (err) {
                     console.error(err)
-                    res!.writeHead(500, { 'Content-Type': 'application/json' })
-                    return res!.end(JSON.stringify({ message: 'Server error' }))
+                    // res!.writeHead(500, { 'Content-Type': 'application/json' })
+                    return res!.end(JSON.stringify({ error: true, message: 'Server error' }))
                 }
             })
         })

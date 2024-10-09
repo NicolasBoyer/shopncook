@@ -298,16 +298,19 @@ export default class Database {
                 return resolvers.getDishes()
             },
 
+            async getCurrentUser(): Promise<TUser> {
+                console.log(_req!.user)
+                return (await Database.users.findOne({ _id: new ObjectId((_req!.user as TUser)?._id) })) as unknown as TUser
+            },
+
             async getUser(id: string): Promise<TUser> {
                 return (await Database.users.findOne({ _id: new ObjectId(id) })) as unknown as TUser
             },
 
             async setUser(args: Record<string, string>): Promise<TUser> {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { _id, ...entries } = args
                 await Database.users.updateOne({ _id: new ObjectId(args._id) }, { $set: entries }, { upsert: true })
-                _req!.user = resolvers.getUser(args._id)
-                return _req!.user as TUser
+                return await resolvers.getUser(_id)
             },
         }
         const resArr: TIngredient | TIngredient[] | TRecipe | TRecipe[] | TListIngredient | TListIngredient[] | TDish[] = []
