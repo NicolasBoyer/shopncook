@@ -41,6 +41,10 @@ export class User {
             async (): Promise<void> => {
                 const accountEntries = Object.fromEntries(new FormData(document.querySelector('form') as HTMLFormElement).entries())
                 for (const key of Object.keys(this.currentUser!)) {
+                    // if (key !== 'password' && accountEntries[key]) {
+                    // 	const salt = await bcrypt.genSalt(10)
+                    // 	const hashedPassword = await bcrypt.hash(accountEntries[key] as string, salt)
+                    // }
                     if (key !== '_id' && this.currentUser![key as keyof typeof this.currentUser] !== accountEntries[key]) {
                         this.currentUser = (await Utils.request('/db', 'POST', { body: `{ "setUser": { "_id": "${this.currentUser!._id}", "${key}": "${accountEntries[key]}" } }` })) as TUser
                     }
