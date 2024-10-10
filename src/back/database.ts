@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
-import { TCategory, TDatabaseIngredient, TDish, TIncomingMessage, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
+import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
 
 export const client = new MongoClient(DB_URL)
@@ -54,14 +54,10 @@ export default class Database {
      * { "getRecipes": {"slug": "Tartiflette"} } retourne la recette tartiflette avec ses ingrédients via un objet
      * { "setRecipe": {"slug": "Tagliatelle à la carbonara"} } enregistre {"slug": "Tagliatelle à la carbonara"} dans la db recipes.json
      * @param datas requête à traiter par la fonction
-     * @param _req
      * @returns {*|[]|*[]} retourne un array si request est un array sinon un objet
      */
 
-    static async request(
-        datas: Record<string, string>[] | Record<string, string>,
-        _req?: TIncomingMessage
-    ): Promise<
+    static async request(datas: Record<string, string>[] | Record<string, string>): Promise<
         | TIngredient
         | TIngredient[]
         | TRecipe
@@ -296,11 +292,6 @@ export default class Database {
                 if (id) await Database.dishes.deleteOne({ _id: new ObjectId(id) })
                 else await Database.dishes.deleteMany({})
                 return resolvers.getDishes()
-            },
-
-            async getCurrentUser(): Promise<TUser> {
-                console.log(_req!.user)
-                return (await Database.users.findOne({ _id: new ObjectId((_req!.user as TUser)?._id) })) as unknown as TUser
             },
 
             async getUser(id: string): Promise<TUser> {

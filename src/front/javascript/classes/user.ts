@@ -7,7 +7,7 @@ export class User {
     static currentUser: TUser | null = null
 
     static async getCurrentUser(): Promise<void> {
-        const user = (await Utils.request('/db', 'POST', { body: '{ "getCurrentUser": "" }' })) as TUser & { error: string }
+        const user = (await Utils.request('/currentUser')) as TUser & { error: string }
         this.currentUser = user.error ? null : user
         document.body.dispatchEvent(new CustomEvent('currentUserAvailable'))
     }
@@ -34,11 +34,7 @@ export class User {
                     <input name="lastName" type="text" value="${User.currentUser?.lastName}" />
                 </label>
                 <label>
-                    <span>Ancien mot de passe</span>
-                    <input name="oldPassword" type="password" />
-                </label>
-                <label>
-                    <span>Nouveau mot de passe</span>
+                    <span>Mot de passe</span>
                     <input name="password" type="password" />
                 </label>
             </form>`,
@@ -49,7 +45,6 @@ export class User {
                         this.currentUser = (await Utils.request('/db', 'POST', { body: `{ "setUser": { "_id": "${this.currentUser!._id}", "${key}": "${accountEntries[key]}" } }` })) as TUser
                     }
                 }
-                console.log(this.currentUser)
             },
             (): void => {}
         )
