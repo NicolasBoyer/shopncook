@@ -64,7 +64,8 @@ export default class Routes {
         pServer.get('/currentUser', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) {
                 res!.writeHead(200, { 'Content-Type': 'application/json' })
-                res!.end(JSON.stringify(await Database.request({ getUser: (_req!.user as TUser)._id })))
+                const currentUser = (await Database.request({ getUser: (_req!.user as TUser)._id })) as unknown as TUser
+                res!.end(JSON.stringify({ _id: currentUser._id, firstName: currentUser.firstName, lastName: currentUser.lastName, email: currentUser.email }))
             }
         })
 
