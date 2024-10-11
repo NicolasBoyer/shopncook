@@ -3,9 +3,11 @@ import { User } from '../classes/user.js'
 
 export default class LoggedUser extends HTMLElement {
     async connectedCallback(): Promise<void> {
+		// TODO menu doit etre présent si pas de logged user
         await User.getCurrentUser()
         if (!User.currentUser) return
         this.render()
+        document.body.addEventListener('currentUserUpdated', (): void => this.render())
     }
 
     private render(): void {

@@ -54,6 +54,7 @@ export class User {
                 if (Object.keys(userRequest.setUser).length > 0) {
                     userRequest.setUser['_id'] = this.currentUser!._id
                     this.currentUser = (await Utils.request('/db', 'POST', { body: JSON.stringify(userRequest) })) as TUser
+                    document.body.dispatchEvent(new CustomEvent('currentUserUpdated'))
                 }
             },
             (): void => {}
