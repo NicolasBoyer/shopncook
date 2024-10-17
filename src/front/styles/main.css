@@ -148,6 +148,22 @@ fs-logged-user details.dropdown summary+ul li button[role=link]:is([aria-current
 	--pico-box-shadow: none;
 }
 
+fs-login form {
+	position: relative;
+}
+
+fs-login .passwordLost {
+    position: absolute;
+    right: 0;
+    border: none;
+    padding: 0;
+}
+
+fs-login .passwordLost:hover {
+	background: transparent;
+	text-decoration: none;
+}
+
 #main {
 	flex: 1;
 }

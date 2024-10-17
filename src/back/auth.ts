@@ -1,16 +1,17 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { SECRET_KEY } from './config.js'
+import { FRONTEND_URL, SECRET_KEY } from './config.js'
 import Database, { client, db, userDb } from './database.js'
 import http from 'http'
 import { ObjectId } from 'mongodb'
 import { TIncomingMessage, TUser, TValidateReturn } from '../front/javascript/types.js'
 import { Utils } from './utils.js'
+import Mailer from './mailer.js'
 
 export default class Auth {
     private static tokenBlacklist: Set<string> = new Set()
 
-    // TODO compte + websocket + changement mdp
+    // TODO websocket + login et register pas dispo si co
     static async createUser(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
         if (!firstName || !lastName || !email || !password || !passwordBis) {
             return { success: false, message: 'Tous les champs sont recquis' }
@@ -69,7 +70,6 @@ export default class Auth {
 
     static async authenticateUser(email: string, password: string): Promise<TValidateReturn> {
         await Database.connect()
-
         try {
             const user = await db.collection<TUser>('users').findOne({ email })
             if (!user) {
@@ -90,6 +90,47 @@ export default class Auth {
             }
 
             return { success: true, token }
+        } catch (err) {
+            console.error(err)
+            return { success: false, message: `Erreur serveur : ${err}` }
+        }
+    }
+
+    static async requestPasswordReset(email: string): Promise<TValidateReturn> {
+        await Database.connect()
+        try {
+            const user = await db.collection<TUser>('users').findOne({ email })
+            if (!user) {
+                return { success: false, message: 'Utilisateur non trouvé' }
+            }
+            const resetToken = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' })
+            const resetLink = `${FRONTEND_URL}/resetPassword?token=${resetToken}`
+            await Mailer.sendMail(
+                email,
+                'Demande de réinitialisation du mot de passe',
+                `Vous avez demandé une réinitialisation du mot de passe. Veuillez cliquer sur le lien suivant pour réinitialiser votre mot de passe : ${resetLink}`,
+                `<p>Vous avez demandé une réinitialisation du mot de passe. Veuillez cliquer sur le lien suivant pour réinitialiser votre mot de passe :</p>
+				 <a href="${resetLink}">Réinitialiser le mot de passe</a>`
+            )
+            return { success: true, message: 'Email de réinitialisation du mot de passe envoyé' }
+        } catch (err) {
+            console.error(err)
+            return { success: false, message: `Erreur serveur : ${err}` }
+        }
+    }
+
+    static async resetPassword(token: string, password: string): Promise<TValidateReturn> {
+        try {
+            const decoded = jwt.verify(token, SECRET_KEY) as { email: string }
+            await Database.connect()
+            const user = await db.collection<TUser>('users').findOne({ email: decoded.email })
+            if (!user) {
+                return { success: false, message: 'Invalid token or user not found' }
+            }
+            const salt = await bcrypt.genSalt(10)
+            const hashedPassword = await bcrypt.hash(password, salt)
+            await db.collection('users').updateOne({ email: user.email }, { $set: { password: hashedPassword } })
+            return { success: true, message: 'Réinitialisation du mot de passe réussie' }
         } catch (err) {
             console.error(err)
             return { success: false, message: `Erreur serveur : ${err}` }

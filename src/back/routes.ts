@@ -22,6 +22,36 @@ export default class Routes {
             res?.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
         })
 
+        pServer.get('/resetPassword?token=:id', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            res?.end(await Utils.page({ file: 'resetPassword.html', className: 'resetPassword', title: 'Réinitialisation du mot de passe' }))
+        })
+
+        pServer.post('/resetPassword', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            let body = ''
+            _req?.on('data', (pChunk): void => {
+                body += pChunk
+            })
+            _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
+                const { token, password } = JSON.parse(body)
+                const result = await Auth.resetPassword(token, password)
+                res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
+                return res!.end(JSON.stringify({ message: result.message, success: result.success }))
+            })
+        })
+
+        pServer.post('/requestPasswordReset', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            let body = ''
+            _req?.on('data', (pChunk): void => {
+                body += pChunk
+            })
+            _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
+                const { email } = JSON.parse(body)
+                const result = await Auth.requestPasswordReset(email)
+                res!.writeHead(result.success ? 201 : 400, { 'Content-Type': 'application/json' })
+                return res!.end(JSON.stringify({ message: result.message, success: result.success }))
+            })
+        })
+
         // PRIVATE
         this.request(pServer, '/app', 'lists.html', 'home', '', true, 'Gérer votre liste')
 

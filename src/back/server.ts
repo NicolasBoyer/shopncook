@@ -62,11 +62,15 @@ export class Server {
                     let id = ''
                     if (pathArr.length === urlArr?.length) {
                         const indexId = pathArr.findIndex((pPath: string): boolean => pPath.includes(':'))
-                        if (
-                            indexId &&
-                            pathArr.filter((_pPath: string, pIndex: number): boolean => pIndex !== indexId).every((pPath: string, pIndex: number): boolean => pPath === urlArr.filter((_pPath, pIndex): boolean => pIndex !== indexId)[pIndex])
-                        )
+                        if (urlArr[indexId]?.includes(pathArr[indexId]?.split(':')[0])) {
                             id = urlArr[indexId]
+                            // Gestion du token de requestPassword -> token
+                            const search = id?.split('?')[1]
+                            if (search) {
+                                const splitSearch = search.split('=')
+                                id = splitSearch[0] === 'token' ? splitSearch[1] : ''
+                            }
+                        }
                     }
                     if (req.url === pRoute.path || id) {
                         if (id) {

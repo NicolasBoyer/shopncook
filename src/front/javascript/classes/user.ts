@@ -40,7 +40,7 @@ export class User {
                 </label>
             </form>`,
             async (): Promise<void> => {
-                const accountEntries = Object.fromEntries(new FormData(document.querySelector('form') as HTMLFormElement).entries())
+                const accountEntries = Object.fromEntries(new FormData(document.querySelector('fs-confirm form') as HTMLFormElement).entries())
                 const userRequest: { setUser: Record<string, string> } = { setUser: {} }
                 if (accountEntries['password']) {
                     const salt = await bcrypt.genSalt(10)
