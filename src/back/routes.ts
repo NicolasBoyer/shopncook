@@ -15,14 +15,17 @@ export default class Routes {
         })
 
         pServer.get('/register', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(await Utils.page({ file: 'lists.html', className: 'home', title: 'Gérer votre liste' }))
             res?.end(await Utils.page({ file: 'register.html', className: 'register', title: 'Inscription' }))
         })
 
         pServer.get('/login', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(await Utils.page({ file: 'lists.html', className: 'home', title: 'Gérer votre liste' }))
             res?.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion' }))
         })
 
         pServer.get('/resetPassword?token=:id', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+            if (await Auth.authenticateToken(_req!, res!)) res?.end(await Utils.page({ file: 'lists.html', className: 'home', title: 'Gérer votre liste' }))
             res?.end(await Utils.page({ file: 'resetPassword.html', className: 'resetPassword', title: 'Réinitialisation du mot de passe' }))
         })
 

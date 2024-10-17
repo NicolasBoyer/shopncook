@@ -16,6 +16,7 @@ export default class ResetPassword extends HTMLElement {
             entries['token'] = location.search.split('=')[1]
             const result = (await Utils.request('/resetPassword', 'POST', { body: JSON.stringify(entries) })) as TValidateReturn
             if (result.success) {
+                // TODO Toast à améliorer ? Pour permettre une réponse après sans setTimeout ?
                 Utils.toast('success', result.message as string)
                 setTimeout((): void => {
                     location.href = 'app'
