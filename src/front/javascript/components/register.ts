@@ -4,6 +4,9 @@ import { TValidateReturn } from '../types.js'
 
 export default class Register extends HTMLElement {
     connectedCallback(): void {
+        document.body.addEventListener('currentUserAvailable', async (): Promise<void> => {
+            location.href = 'app'
+        })
         this.render()
         this.setFormListener()
     }

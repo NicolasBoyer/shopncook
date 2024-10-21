@@ -10,7 +10,7 @@ export class User {
     static async getCurrentUser(): Promise<void> {
         const user = (await Utils.request('/currentUser')) as TUser & { error: string }
         this.currentUser = user.error ? null : user
-        document.body.dispatchEvent(new CustomEvent('currentUserAvailable'))
+        if (this.currentUser) document.body.dispatchEvent(new CustomEvent('currentUserAvailable'))
     }
 
     static async logout(): Promise<void> {

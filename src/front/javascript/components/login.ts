@@ -5,6 +5,9 @@ import { Caches } from '../classes/caches.js'
 
 export default class Login extends HTMLElement {
     async connectedCallback(): Promise<void> {
+        document.body.addEventListener('currentUserAvailable', async (): Promise<void> => {
+            location.href = 'app'
+        })
         await Caches.clear()
         this.render()
         this.setFormListener()
