@@ -3,6 +3,9 @@ import fs from 'fs'
 import { Utils } from './utils.js'
 import { WebSocketServer } from 'ws'
 import { TIncomingMessage } from '../front/javascript/types.js'
+import Auth from './auth.js'
+import jwt from 'jsonwebtoken'
+import { SECRET_KEY } from './config.js'
 
 type TMethod = {
     path: string
@@ -118,7 +121,33 @@ export class Server {
         })
         // TODO revoir websocket pour limiter au compte en cours
         const webSocketServer = new WebSocketServer({ server })
-        webSocketServer.on('connection', (ws): void => {
+        webSocketServer.on('connection', (ws: WebSocket, req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): void => {
+            const token = Auth.getToken(req, res)
+
+            if (!token) {
+                ws.close(1008, 'Authentication token required')
+                return
+            }
+
+            try {
+                // Vérifie le token JWT
+                const decoded = jwt.verify(token, SECRET_KEY) as { email: string }
+                const userId = (decoded as { id: string }).id // Utilisateur authentifié
+                console.log(`User ${userId} connected`)
+
+                // Gérer la communication une fois connecté
+                ws.on('message', (message) => {
+                    console.log(`Received message from user ${userId}: ${message}`)
+                    // Ici, on peut gérer les messages pour ce compte utilisateur
+                })
+
+                ws.on('close', () => {
+                    console.log(`User ${userId} disconnected`)
+                })
+            } catch (error) {
+                ws.close(1008, 'Invalid authentication token') // Ferme la connexion si le token est invalide
+            }
+
             ws.on('message', (data): void => {
                 webSocketServer.clients.forEach((client): void => {
                     // Si le client n'est pas le sender, on envoie les datas
