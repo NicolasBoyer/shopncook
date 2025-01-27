@@ -36,7 +36,7 @@ export default class Database {
             this.lists = userDb.collection('lists')
             this.categories = userDb.collection('categories')
             this.dishes = userDb.collection('dishes')
-            this.recipes = db.collection('recipes')
+            this.recipes = userDb.collection('recipes')
             this.users = db.collection('users')
         } catch (err) {
             console.error('Failed to connect to the database', err)

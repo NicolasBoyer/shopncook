@@ -56,6 +56,7 @@ export default class Auth {
             await db.collection('users').insertOne({ _id, firstName, lastName, email, password: hashedPassword, roles, userDbName })
             const userDb = client.db(userDbName)
             await userDb.createCollection('dishes')
+            await userDb.createCollection('recipes')
             await userDb.createCollection('categories')
             await userDb.createCollection('ingredients')
             await userDb.createCollection('lists')
