@@ -26,7 +26,6 @@ class App {
     // TODO images pour la page de home
     // TODO Liste de ce qui est présent dans le congelé
     // TODO Choix pour activer les fonctionnalités
-    // TODO permettre qu'il existe plusieurs sessions différentes pour que plusieurs personnes puissent l'utiliser sans être sur le même compte
     // TODO permettre de rendre payant
     // TODO minifier et combiner les fichiers js clients dans app.js
     // TODO Si possible de plus minifier
