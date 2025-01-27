@@ -72,4 +72,5 @@ export type TUser = {
     email: string
     password: string
     roles: { db: string; permissions: string[] }[]
+    userDbName: string
 }

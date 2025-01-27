@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { FRONTEND_URL, SECRET_KEY } from './config.js'
-import Database, { client, db, userDb } from './database.js'
+import Database, { client, db } from './database.js'
 import http from 'http'
 import { ObjectId } from 'mongodb'
 import { TIncomingMessage, TUser, TValidateReturn } from '../front/javascript/types.js'
@@ -53,8 +53,7 @@ export default class Auth {
                     permissions: ['admin', 'author'],
                 },
             ]
-            await db.collection('users').insertOne({ _id, firstName, lastName, email, password: hashedPassword, roles })
-
+            await db.collection('users').insertOne({ _id, firstName, lastName, email, password: hashedPassword, roles, userDbName })
             const userDb = client.db(userDbName)
             await userDb.createCollection('dishes')
             await userDb.createCollection('categories')
@@ -154,12 +153,13 @@ export default class Auth {
             isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
         })
         if (!isTokenValid) await this.loginResponse(req, res, 403, 'Le token est invalide')
+        await Database.initUserDbAndCollections((req.user as TUser)._id)
         // Retourne false ou req si valide
         return isTokenValid
     }
 
     static authorizeRole(user: TUser, role: string): boolean {
-        return !(!user || !user.roles.find((pRole): boolean => pRole.permissions.includes(role) && pRole.db === userDb?.databaseName))
+        return !(!user || !user.roles.find((pRole): boolean => pRole.permissions.includes(role) && pRole.db === user?.userDbName))
     }
 
     static addToBlacklist(token: string): void {

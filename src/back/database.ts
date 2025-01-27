@@ -4,7 +4,6 @@ import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TR
 import { DB_NAME, DB_URL } from './config.js'
 
 export const client = new MongoClient(DB_URL)
-export let userDb: Db
 export let db: Db
 
 /**
@@ -31,7 +30,7 @@ export default class Database {
 
     static async initUserDbAndCollections(id: string): Promise<void> {
         try {
-            userDb = client.db(`${DB_NAME}_${id}`)
+            const userDb = client.db(`${DB_NAME}_${id}`)
             console.log('Connected to user database : ', userDb.databaseName)
             this.ingredients = userDb.collection('ingredients')
             this.lists = userDb.collection('lists')

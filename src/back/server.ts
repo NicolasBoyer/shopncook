@@ -1,9 +1,8 @@
 import http from 'http'
 import fs from 'fs'
 import { Utils } from './utils.js'
-import { WebSocketServer } from 'ws'
+import WebSocket, { WebSocketServer } from 'ws'
 import { TIncomingMessage } from '../front/javascript/types.js'
-import Auth from './auth.js'
 import jwt from 'jsonwebtoken'
 import { SECRET_KEY } from './config.js'
 
@@ -88,7 +87,6 @@ export class Server {
                         //         res.writeHead(200, { 'Content-Type': 'application/json' })
                         //         break
                         // }
-                        // webSocketServer.emit('connection', 'blop')
                         pRoute.callback(req, res)
                         return true
                     }
@@ -104,56 +102,55 @@ export class Server {
                         return
                     }
                 }
-                // if (req.url?.split('/')[1] && (await Auth.authenticateToken(req as TIncomingMessage, res))) Database.init()
-                // Database.init()
                 if (!(await response(GET))) {
                     res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
                     res.end(await Utils.page({ className: 'notFound', templateHtml: '404.html' }))
                 }
             }
             if (req.method === 'POST') {
-                // if (req.url?.split('/')[1] && (await Auth.authenticateToken(req as TIncomingMessage, res))) Database.init()
                 if (!(await response(POST))) {
                     res.writeHead(404, { 'Content-Type': 'application/json' })
                     res.end(JSON.stringify({ url: '404' }))
                 }
             }
         })
-        // TODO revoir websocket pour limiter au compte en cours
         const webSocketServer = new WebSocketServer({ server })
-        webSocketServer.on('connection', (ws: WebSocket, req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): void => {
-            const token = Auth.getToken(req, res)
-
+        const userConnections: { [userId: string]: WebSocket[] } = {}
+        webSocketServer.on('connection', async (ws: WebSocket, req): Promise<void> => {
+            const token = req.headers.cookie?.split(';').find((c): boolean => c.trim().startsWith('fsTk='))
             if (!token) {
                 ws.close(1008, 'Authentication token required')
                 return
             }
 
             try {
-                // Vérifie le token JWT
-                const decoded = jwt.verify(token, SECRET_KEY) as { email: string }
-                const userId = (decoded as { id: string }).id // Utilisateur authentifié
+                const decoded = jwt.verify(token.split('=')[1], SECRET_KEY)
+                const userId = (decoded as { email: string }).email
+                if (!userConnections[userId]) {
+                    userConnections[userId] = []
+                }
+                userConnections[userId].push(ws)
                 console.log(`User ${userId} connected`)
+                console.log(`Current connections for user ${userId}:`, userConnections[userId]?.length || 0)
 
-                // Gérer la communication une fois connecté
-                ws.on('message', (message) => {
+                ws.on('message', (message): void => {
                     console.log(`Received message from user ${userId}: ${message}`)
-                    // Ici, on peut gérer les messages pour ce compte utilisateur
+                    userConnections[userId].forEach((client): void => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(message)
+                        }
+                    })
                 })
 
-                ws.on('close', () => {
+                ws.on('close', (): void => {
                     console.log(`User ${userId} disconnected`)
+                    userConnections[userId] = userConnections[userId].filter((client): boolean => client !== ws)
+                    console.log(`Current connections for user ${userId}:`, userConnections[userId]?.length || 0)
                 })
             } catch (error) {
-                ws.close(1008, 'Invalid authentication token') // Ferme la connexion si le token est invalide
+                console.error('Invalid authentication token:', error)
+                ws.close(1008, 'Invalid authentication token')
             }
-
-            ws.on('message', (data): void => {
-                webSocketServer.clients.forEach((client): void => {
-                    // Si le client n'est pas le sender, on envoie les datas
-                    if (client !== ws) client.send(data)
-                })
-            })
         })
         server.listen(pPort)
     }

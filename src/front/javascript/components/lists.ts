@@ -47,7 +47,7 @@ export default class Lists extends HTMLElement {
         try {
             autoAnimate(document.querySelector('ul') as HTMLElement)
         } catch (e) {
-            // console.error(e)
+            console.error(e)
         }
     }
 
