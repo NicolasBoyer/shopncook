@@ -42,7 +42,6 @@
     "jsonwebtoken": "9.0.2",
     "lit": "3.2.1",
     "tsimp": "2.0.12",
-    "vite-plugin-css-injected-by-js": "^3.5.2",
     "ws": "8.18.0"
   }
 }
