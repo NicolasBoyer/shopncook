@@ -126,7 +126,9 @@ export default class Routes {
             _req?.on('end', async (): Promise<http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }> => {
                 const { email, password } = JSON.parse(body)
                 const result = await Auth.authenticateUser(email, password)
-                res!.setHeader('Set-Cookie', `fsTk=${result.token}; Path=/; Secure;`)
+                // TODO supprimer car secure ne fonctionne pas si pas en https
+                // res!.setHeader('Set-Cookie', `fsTk=${result.token}; HttpOnly; Path=/; Secure; SameSite=Strict`)
+                res!.setHeader('Set-Cookie', `fsTk=${result.token}; HttpOnly; Path=/; SameSite=Strict`)
                 res!.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' })
                 return res!.end(JSON.stringify({ message: result.success ? 'Connexion réussie' : result.message, success: result.success }))
             })
