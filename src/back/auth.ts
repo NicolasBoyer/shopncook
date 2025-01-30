@@ -137,7 +137,7 @@ export default class Auth {
         }
         const jwtToken = token.split('=')[1]
         if (this.isTokenBlacklisted(jwtToken)) {
-            await this.loginResponse(req, res, 403, 'Le token a été invalidé')
+            await this.loginResponse(res, 403, 'Le token a été invalidé')
             return false
         }
 
@@ -146,7 +146,7 @@ export default class Auth {
             req.user = user
             isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
         })
-        if (!isTokenValid) await this.loginResponse(req, res, 403, 'Le token est invalide')
+        if (!isTokenValid) await this.loginResponse(res, 403, 'Le token est invalide')
         await Database.initUserDbAndCollections((req.user as TUser)._id)
         // Retourne false ou req si valide
         return isTokenValid
@@ -163,13 +163,13 @@ export default class Auth {
     static async getToken(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>): Promise<string | false> {
         const cookies = req.headers.cookie
         if (!cookies) {
-            await this.loginResponse(req, res, 401, 'Aucun cookie fourni', false)
+            await this.loginResponse(res, 401, 'Aucun cookie fourni', false)
             return false
         }
 
         const token = cookies.split(';').find((c): boolean => c.trim().startsWith('fsTk='))
         if (!token) {
-            await this.loginResponse(req, res, 401, 'Aucun token dans les cookies', false)
+            await this.loginResponse(res, 401, 'Aucun token dans les cookies', false)
             return false
         }
         return token
@@ -201,13 +201,13 @@ export default class Auth {
         return this.tokenBlacklist.has(token)
     }
 
-    private static async loginResponse(req: TIncomingMessage, res: http.ServerResponse<http.IncomingMessage>, code: number, message: string, isMessageInHtml: boolean = true): Promise<void> {
-        if (req.headers['sec-fetch-mode'] === 'cors') {
+    private static async loginResponse(res: http.ServerResponse<http.IncomingMessage>, code: number, message: string, isMessageInHtml: boolean = true): Promise<void> {
+        if (isMessageInHtml) {
             res.writeHead(code, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify({ error: true, message }))
         } else {
             res.writeHead(code, { 'Content-Type': 'text/html; charset=utf-8' })
-            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion', errorMessage: isMessageInHtml ? message : '' }))
+            res.end(await Utils.page({ file: 'login.html', className: 'login', title: 'Connexion', errorMessage: message }))
         }
     }
 }
