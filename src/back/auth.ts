@@ -122,7 +122,7 @@ export default class Auth {
             if (!user) {
                 return { success: false, message: 'Invalid token or user not found' }
             }
-            await db.collection('users').updateOne({ email: user.email }, { $set: { password: this.hashPassword(password) } })
+            await db.collection('users').updateOne({ email: user.email }, { $set: { password: await this.hashPassword(password) } })
             return { success: true, message: 'Réinitialisation du mot de passe réussie' }
         } catch (err) {
             console.error(err)
