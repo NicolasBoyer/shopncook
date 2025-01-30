@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { FRONTEND_URL, SECRET_KEY } from './config.js'
 import Database, { client, db } from './database.js'
@@ -7,11 +6,11 @@ import { ObjectId } from 'mongodb'
 import { TIncomingMessage, TUser, TValidateReturn } from '../front/javascript/types.js'
 import { Utils } from './utils.js'
 import Mailer from './mailer.js'
+import argon2 from 'argon2'
 
 export default class Auth {
     private static tokenBlacklist: Set<string> = new Set()
 
-    // TODO websocket
     static async createUser(email: string, firstName: string, lastName: string, password: string, passwordBis: string): Promise<TValidateReturn> {
         if (!firstName || !lastName || !email || !password || !passwordBis) {
             return { success: false, message: 'Tous les champs sont recquis' }
@@ -37,9 +36,6 @@ export default class Auth {
             if (existingUser) {
                 return { success: false, message: 'L\'utilisateur existe déjà' }
             }
-
-            const salt = await bcrypt.genSalt(10)
-            const hashedPassword = await bcrypt.hash(password, salt)
             const _id = new ObjectId()
             const userDbName = `foodshop_${_id}`
 
@@ -53,7 +49,7 @@ export default class Auth {
                     permissions: ['admin', 'author'],
                 },
             ]
-            await db.collection('users').insertOne({ _id, firstName, lastName, email, password: hashedPassword, roles, userDbName })
+            await db.collection('users').insertOne({ _id, firstName, lastName, email, password: await this.hashPassword(password), roles, userDbName })
             const userDb = client.db(userDbName)
             await userDb.createCollection('dishes')
             await userDb.createCollection('recipes')
@@ -76,8 +72,7 @@ export default class Auth {
                 return { success: false, message: 'Utilisateur non trouvé' }
             }
 
-            const isMatch = await bcrypt.compare(password, user.password)
-            if (!isMatch) {
+            if (!(await this.verifyPassword(user.password, password))) {
                 return { success: false, message: 'Identifiants invalides' }
             }
 
@@ -127,9 +122,7 @@ export default class Auth {
             if (!user) {
                 return { success: false, message: 'Invalid token or user not found' }
             }
-            const salt = await bcrypt.genSalt(10)
-            const hashedPassword = await bcrypt.hash(password, salt)
-            await db.collection('users').updateOne({ email: user.email }, { $set: { password: hashedPassword } })
+            await db.collection('users').updateOne({ email: user.email }, { $set: { password: this.hashPassword(password) } })
             return { success: true, message: 'Réinitialisation du mot de passe réussie' }
         } catch (err) {
             console.error(err)
@@ -180,6 +173,28 @@ export default class Auth {
             return false
         }
         return token
+    }
+
+    static async hashPassword(password: string): Promise<string> {
+        try {
+            return await argon2.hash(password, {
+                type: argon2.argon2id,
+                memoryCost: 2 ** 16,
+                timeCost: 3,
+                parallelism: 1,
+            })
+        } catch (err) {
+            throw new Error(`Erreur lors du hachage du mot de passe : ${err}`)
+        }
+    }
+
+    static async verifyPassword(hash: string, password: string): Promise<boolean> {
+        try {
+            return await argon2.verify(hash, password)
+        } catch (err) {
+            console.error(err)
+            return false
+        }
     }
 
     private static isTokenBlacklisted(token: string): boolean {

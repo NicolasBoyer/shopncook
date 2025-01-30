@@ -2,7 +2,6 @@ import { TUser } from '../types.js'
 import { Utils } from './utils.js'
 import { Caches } from './caches.js'
 import { html } from 'lit'
-import bcrypt from 'bcryptjs'
 
 export class User {
     static currentUser: TUser | null = null
@@ -43,8 +42,7 @@ export class User {
                 const accountEntries = Object.fromEntries(new FormData(document.querySelector('fs-confirm form') as HTMLFormElement).entries())
                 const userRequest: { setUser: Record<string, string> } = { setUser: {} }
                 if (accountEntries['password']) {
-                    const salt = await bcrypt.genSalt(10)
-                    userRequest.setUser['password'] = await bcrypt.hash(accountEntries['password'] as string, salt)
+                    userRequest.setUser['password'] = accountEntries['password'] as string
                 }
                 for (const key of Object.keys(this.currentUser!)) {
                     if (key !== '_id' && this.currentUser![key as keyof typeof this.currentUser] !== accountEntries[key]) {
@@ -56,6 +54,7 @@ export class User {
                     this.currentUser = (await Utils.request('/db', 'POST', { body: JSON.stringify(userRequest) })) as TUser
                     document.body.dispatchEvent(new CustomEvent('currentUserUpdated'))
                 }
+                console.log(userRequest)
             },
             (): void => {}
         )

@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient, ObjectId } from 'mongodb'
 import { Utils } from './utils.js'
 import { TCategory, TDatabaseIngredient, TDish, TIngredient, TListIngredient, TRecipe, TRecipeInIngredient, TUser } from '../front/javascript/types.js'
 import { DB_NAME, DB_URL } from './config.js'
+import Auth from './auth.js'
 
 export const client = new MongoClient(DB_URL)
 export let db: Db
@@ -298,6 +299,9 @@ export default class Database {
             },
 
             async setUser(args: Record<string, string>): Promise<TUser> {
+                if (args.password) {
+                    args.password = await Auth.hashPassword(args.password)
+                }
                 const { _id, ...entries } = args
                 await Database.users.updateOne({ _id: new ObjectId(args._id) }, { $set: entries }, { upsert: true })
                 return await resolvers.getUser(_id)
