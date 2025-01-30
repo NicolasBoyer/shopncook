@@ -54,7 +54,6 @@ export class User {
                     this.currentUser = (await Utils.request('/db', 'POST', { body: JSON.stringify(userRequest) })) as TUser
                     document.body.dispatchEvent(new CustomEvent('currentUserUpdated'))
                 }
-                console.log(userRequest)
             },
             (): void => {}
         )
