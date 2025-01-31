@@ -15,7 +15,7 @@ export default class Menu extends HTMLElement {
 
     connectedCallback(): void {
         document.body.addEventListener('currentUserAvailable', async (): Promise<void> => {
-            this.links = ((await Caches.get('routes')) || (await Utils.request('/app/routes.json'))) as TRoute[] & { error: string }
+            this.links = ((await Caches.get('routes')) || (await Utils.request('/routes.json'))) as TRoute[] & { error: string }
             if (!this.links || (this.links as unknown as { error: string }).error) return
             await Caches.set(false, 'routes', this.links)
             this.removeAttribute('style')

@@ -69,7 +69,7 @@ export default class Recipe extends HTMLElement {
                 ]
                 await Caches.set(false, 'recipes', response[0], 'ingredients', response[1])
                 Utils.loader(false)
-                if (this.isInEditMode) location.href = '/app/recipes'
+                if (this.isInEditMode) location.href = '/recipes'
                 else {
                     this.newIngredients = []
                     document.querySelectorAll('input').forEach((input): void => {

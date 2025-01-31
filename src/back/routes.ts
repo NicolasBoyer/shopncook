@@ -10,9 +10,9 @@ export default class Routes {
 
     constructor(pServer: Server) {
         // PUBLIC
-        pServer.get('/', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
-            res?.end(await Utils.page({ file: 'presentation.html', className: 'presentation', templateHtml: 'home.html' }))
-        })
+        // pServer.get('/', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        //     res?.end(await Utils.page({ file: 'presentation.html', className: 'presentation', templateHtml: 'home.html' }))
+        // })
 
         pServer.get('/register', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             res?.end(await Utils.page({ file: 'register.html', className: 'register', title: 'Inscription' }))
@@ -53,41 +53,41 @@ export default class Routes {
         })
 
         // PRIVATE
-        this.request(pServer, '/app', 'lists.html', 'home', '', true, 'Gérer votre liste')
+        this.request(pServer, '/', 'lists.html', 'home', '', true, 'Gérer votre liste')
 
-        this.request(pServer, '/app/recipe/add', 'recipe.html', 'recipe', 'Les recettes', true, 'Ajouter une recette')
+        this.request(pServer, '/recipe/add', 'recipe.html', 'recipe', 'Les recettes', true, 'Ajouter une recette')
 
-        this.request(pServer, '/app/recipe/edit/:id', 'recipe.html', 'recipe', 'Les recettes', true)
+        this.request(pServer, '/recipe/edit/:id', 'recipe.html', 'recipe', 'Les recettes', true)
 
-        this.request(pServer, '/app/recipes', 'recipes.html', 'recipes', 'Les recettes', true, 'Recettes')
+        this.request(pServer, '/recipes', 'recipes.html', 'recipes', 'Les recettes', true, 'Recettes')
 
-        this.request(pServer, '/app/ingredients', 'ingredients.html', 'ingredients', 'Les ingrédients', true, 'Ingrédients')
+        this.request(pServer, '/ingredients', 'ingredients.html', 'ingredients', 'Les ingrédients', true, 'Ingrédients')
 
-        this.request(pServer, '/app/categories', 'categories.html', 'categories', 'Les catégories', true, 'Catégories')
+        this.request(pServer, '/categories', 'categories.html', 'categories', 'Les catégories', true, 'Catégories')
 
-        this.request(pServer, '/app/dishes', 'dishes.html', 'dishes', 'Les plats de la semaine', true, 'Plats de la semaine')
+        this.request(pServer, '/dishes', 'dishes.html', 'dishes', 'Les plats de la semaine', true, 'Plats de la semaine')
 
-        pServer.get('/app/routes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.get('/routes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(this.routes))
         })
 
-        pServer.get('/app/ingredients.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.get('/ingredients.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getIngredients: '{}' })))
         })
 
-        pServer.get('/app/lists.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.get('/lists.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getListIngredients: '{}' })))
         })
 
-        pServer.get('/app/recipes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.get('/recipes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getRecipes: '{}' })))
         })
 
-        pServer.get('/app/categories.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.get('/categories.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getCategories: '{}' })))
         })
 
-        pServer.get('/app/dishes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
+        pServer.get('/dishes.json', async (_req?: TIncomingMessage, res?: http.ServerResponse<http.IncomingMessage> & { req: http.IncomingMessage }): Promise<void> => {
             if (await Auth.authenticateToken(_req!, res!)) res?.end(JSON.stringify(await Database.request({ getDishes: '{}' })))
         })
 

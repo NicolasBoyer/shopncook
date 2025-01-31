@@ -37,11 +37,11 @@ export default class Auth {
                 return { success: false, message: 'L\'utilisateur existe déjà' }
             }
             const _id = new ObjectId()
-            const userDbName = `foodshop_${_id}`
+            const userDbName = `shopncook_${_id}`
 
             const roles = [
                 {
-                    db: 'foodshop',
+                    db: 'shopncook',
                     permissions: ['author'],
                 },
                 {

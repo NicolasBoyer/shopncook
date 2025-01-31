@@ -12,18 +12,18 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v2
-      
+
       - name: Login to Dockerhub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       - name: Build and push Docker image
         run: |
-          docker build -t nicolasboyer252/foodshop:latest .
-          docker push nicolasboyer252/foodshop:latest
-      
+          docker build -t nicolasboyer252/shopncook:latest .
+          docker push nicolasboyer252/shopncook:latest
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
@@ -31,6 +31,6 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            docker pull nicolasboyer252/foodshop:latest
-            cd /opt/docker/foodshop
+            docker pull nicolasboyer252/shopncook:latest
+            cd /opt/docker/shopncook
             docker compose up -d --build

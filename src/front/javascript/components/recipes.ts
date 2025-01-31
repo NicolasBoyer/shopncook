@@ -97,7 +97,7 @@ export default class Recipes extends HTMLElement {
                                                   : html`
                                                         <div>
                                                             <span>${pRecipe.title}</span>
-                                                            <fs-link role="button" class="edit" href="/app/recipe/edit/${pRecipe.slug}">
+                                                            <fs-link role="button" class="edit" href="/recipe/edit/${pRecipe.slug}">
                                                                 <svg class="edit">
                                                                     <use href="#edit"></use>
                                                                 </svg>

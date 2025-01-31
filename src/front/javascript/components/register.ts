@@ -16,7 +16,7 @@ export default class Register extends HTMLElement {
         form?.addEventListener('submit', async (pEvent): Promise<void> => {
             pEvent.preventDefault()
             const result = (await Utils.request('/register', 'POST', { body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) })) as TValidateReturn
-            if (result.success) location.href = 'app'
+            if (result.success) location.href = '/'
             else Utils.toast('error', result.message as string)
         })
     }
