@@ -123,11 +123,5 @@
   ],
   "typeAcquisition": {
   	"disableFilenameBasedTypeAcquisition": true
-  },
-  "tsimp": {
-	"compilerOptions": {
-	  "skipLibCheck": true,
-	  "strict": false
-	}
   }
 }

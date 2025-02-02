@@ -6,9 +6,9 @@
   "scripts": {
     "update": "npx npm-check-updates -u & npm i",
     "dev:frontend": "vite",
-    "dev:backend": "node --import=tsimp/import src/back/dev.ts",
+    "dev:backend": "node --import=tsx src/back/dev.ts",
     "dev": "cross-env NODE_ENV=dev concurrently 'npm:dev:frontend' 'npm:dev:backend'",
-    "start": "vite build & node --import=tsimp/import src/back/prod.ts"
+    "start": "vite build & node --import=tsx src/back/prod.ts"
   },
   "author": "Nicolas Boyer",
   "license": "ISC",
@@ -40,6 +40,7 @@
     "jsonwebtoken": "9.0.2",
     "lit": "3.2.1",
     "tsimp": "2.0.12",
+    "tsx": "4.19.2",
     "vite-plugin-css-injected-by-js": "3.5.2",
     "ws": "8.18.0"
   }
