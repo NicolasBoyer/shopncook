@@ -6,9 +6,9 @@
   "scripts": {
     "update": "npx npm-check-updates -u & npm i",
     "dev:frontend": "vite",
-    "dev:backend": "tsimp src/back/dev.ts",
+    "dev:backend": "node --import=tsimp/import src/back/dev.ts",
     "dev": "cross-env NODE_ENV=dev concurrently 'npm:dev:frontend' 'npm:dev:backend'",
-    "start": "vite build & tsimp src/back/prod.ts"
+    "start": "vite build & node --import=tsimp/import src/back/prod.ts"
   },
   "author": "Nicolas Boyer",
   "license": "ISC",
