@@ -147,7 +147,9 @@ export default class Auth {
             isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
         })
         if (!isTokenValid) await this.loginResponse(req, res, 403, 'Le token est invalide')
-        await Database.initUserDbAndCollections((req.user as TUser)._id)
+        if (req.user) {
+            await Database.initUserDbAndCollections((req.user as TUser)._id)
+        }
         // Retourne false ou req si valide
         return isTokenValid
     }
