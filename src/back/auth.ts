@@ -18,7 +18,7 @@ export default class Auth {
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
-            return { success: false, message: 'Format d\'email invalide' }
+            return { success: false, message: "Format d'email invalide" }
         }
 
         if (password !== passwordBis) {
@@ -34,7 +34,7 @@ export default class Auth {
         try {
             const existingUser = await db.collection('users').findOne({ email })
             if (existingUser) {
-                return { success: false, message: 'L\'utilisateur existe déjà' }
+                return { success: false, message: "L'utilisateur existe déjà" }
             }
             const _id = new ObjectId()
             const userDbName = `shopncook_${_id}`
@@ -57,7 +57,7 @@ export default class Auth {
             await userDb.createCollection('ingredients')
             await userDb.createCollection('lists')
 
-            return { success: true, message: 'L\'utilisateur a été créé avec succès' }
+            return { success: true, message: "L'utilisateur a été créé avec succès" }
         } catch (err) {
             console.error(err)
             return { success: false, message: 'Erreur serveur' }

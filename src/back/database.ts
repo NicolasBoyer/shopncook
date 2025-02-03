@@ -38,6 +38,9 @@ export default class Database {
             this.categories = userDb.collection('categories')
             this.dishes = userDb.collection('dishes')
             this.recipes = userDb.collection('recipes')
+            if (!db) {
+                await this.connect()
+            }
             this.users = db.collection('users')
         } catch (err) {
             console.error('Failed to connect to the database', err)
@@ -295,7 +298,7 @@ export default class Database {
             },
 
             async getUser(id: string): Promise<TUser> {
-                return (await Database.users.findOne({ _id: new ObjectId(id) })) as unknown as TUser
+                return (await Database.users?.findOne({ _id: new ObjectId(id) })) as unknown as TUser
             },
 
             async setUser(args: Record<string, string>): Promise<TUser> {
