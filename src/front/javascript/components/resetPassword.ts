@@ -22,7 +22,7 @@ export default class ResetPassword extends HTMLElement {
                 // TODO Toast à améliorer ? Pour permettre une réponse après sans setTimeout ?
                 Utils.toast('success', result.message as string)
                 setTimeout((): void => {
-                    location.href = 'app'
+                    location.href = '/'
                 }, 4225)
             } else Utils.toast('error', result.message as string)
         })
