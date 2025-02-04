@@ -127,8 +127,7 @@ export default class Routes {
                 const { email, password } = JSON.parse(body)
                 const result = await Auth.authenticateUser(email, password)
                 // TODO secure ne fonctionne pas si pas en https. A enlever lors de la mise en place en http
-                // res!.setHeader('Set-Cookie', `fsTk=${result.token}; HttpOnly; Path=/; Secure; SameSite=Strict; Max-Age=2147483647`)
-                res!.setHeader('Set-Cookie', `fsTk=${result.token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=2147483647`)
+                res!.setHeader('Set-Cookie', `fsTk=${result.token}; HttpOnly; Path=/; Secure; SameSite=Strict; Max-Age=2147483647`)
                 // res!.setHeader('Set-Cookie', `fsTk=${result.token}; HttpOnly; Path=/; SameSite=Strict`)
                 res!.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' })
                 return res!.end(JSON.stringify({ message: result.success ? 'Connexion réussie' : result.message, success: result.success }))
