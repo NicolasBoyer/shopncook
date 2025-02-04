@@ -2,7 +2,7 @@ export class Websocket {
     static connection: WebSocket
 
     static init(): void {
-        this.connection = new WebSocket(`ws//${location.host}`)
+        this.connection = new WebSocket(`ws://${location.host}`)
     }
 
     static listen(onClientsMessage: (event: MessageEvent) => Promise<void>, onOpenMessage = (): void => {}): void {
