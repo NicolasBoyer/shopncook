@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { FRONTEND_URL, SECRET_KEY } from './config.js'
+import { DB_NAME, FRONTEND_URL, SECRET_KEY } from './config.js'
 import Database, { client, db } from './database.js'
 import http from 'http'
 import { ObjectId } from 'mongodb'
@@ -37,11 +37,11 @@ export default class Auth {
                 return { success: false, message: "L'utilisateur existe déjà" }
             }
             const _id = new ObjectId()
-            const userDbName = `shopncook_${_id}`
+            const userDbName = `${DB_NAME}_${_id}`
 
             const roles = [
                 {
-                    db: 'shopncook',
+                    db: DB_NAME,
                     permissions: ['author'],
                 },
                 {
