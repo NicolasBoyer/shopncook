@@ -43,7 +43,7 @@ export default class Ingredients extends HTMLElement {
         document.body.addEventListener('modalConfirm', (pEvent): void => {
             categoryId = (pEvent as CustomEvent).detail.id
         })
-        Utils.confirm(html` <fs-categories choiceMode="${selectedCategoryId}" /> `, async (): Promise<void> => {
+        Utils.confirm(html` <sc-categories choiceMode="${selectedCategoryId}" /> `, async (): Promise<void> => {
             this.savedIngredients = (await Utils.request('/db', 'POST', { body: `{ "setIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }` })) as TIngredient[]
             await Caches.set(false, 'ingredients', this.savedIngredients)
             this.search()

@@ -39,7 +39,7 @@ export class User {
                 </label>
             </form>`,
             async (): Promise<void> => {
-                const accountEntries = Object.fromEntries(new FormData(document.querySelector('fs-confirm form') as HTMLFormElement).entries())
+                const accountEntries = Object.fromEntries(new FormData(document.querySelector('sc-confirm form') as HTMLFormElement).entries())
                 const userRequest: { setUser: Record<string, string> } = { setUser: {} }
                 if (accountEntries['password']) {
                     userRequest.setUser['password'] = accountEntries['password'] as string

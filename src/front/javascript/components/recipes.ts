@@ -97,12 +97,12 @@ export default class Recipes extends HTMLElement {
                                                   : html`
                                                         <div>
                                                             <span>${pRecipe.title}</span>
-                                                            <fs-link role="button" class="edit" href="/recipe/edit/${pRecipe.slug}">
+                                                            <sc-link role="button" class="edit" href="/recipe/edit/${pRecipe.slug}">
                                                                 <svg class="edit">
                                                                     <use href="#edit"></use>
                                                                 </svg>
                                                                 <span>Éditer</span>
-                                                            </fs-link>
+                                                            </sc-link>
                                                             <button type="button" class="remove" @click="${(): void => this.removeRecipe(pRecipe)}">
                                                                 <svg class="remove">
                                                                     <use href="#remove"></use>

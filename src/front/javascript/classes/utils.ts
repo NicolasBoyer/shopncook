@@ -8,8 +8,8 @@ export class Utils {
         const cancel = cbCancel as () => void
         render(
             html`
-                <fs-loader ?visible="${loaderVisible}"></fs-loader>
-                <fs-confirm .message="${confirmMessage}" ?open="${isConfirmInit ? !isConfirmInit : Math.random()}" @modalConfirm="${(): void => confirm()}" @modalCancel="${(): void => cancel()}"></fs-confirm>
+                <sc-loader ?visible="${loaderVisible}"></sc-loader>
+                <sc-confirm .message="${confirmMessage}" ?open="${isConfirmInit ? !isConfirmInit : Math.random()}" @modalConfirm="${(): void => confirm()}" @modalCancel="${(): void => cancel()}"></sc-confirm>
             `,
             document.body
         )
@@ -25,7 +25,7 @@ export class Utils {
 
     static toast(type: string, message: string): void {
         const bd = Dom.newDom(document.body)
-        bd.elt('fs-toast').att('type', type).att('message', message)
+        bd.elt('sc-toast').att('type', type).att('message', message)
     }
 
     static async request(pUrl: string, pMethod = 'GET', pOptions: Record<string, unknown> | null = {}, pReturnType = ''): Promise<string | number | Blob | Response | Record<string, unknown> | Record<string, unknown>[] | undefined> {

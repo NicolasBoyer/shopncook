@@ -31,7 +31,7 @@ a:hover {
 
 /*** HTML TAG ***/
 a[role='button'],
-fs-link[role='button'] {
+sc-link[role='button'] {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -66,7 +66,7 @@ h1 > a:hover {
 	--pico-color: var(--pico-primary) !important;
 }
 
-fs-header {
+sc-header {
 	background: var(--pico-secondary-background);
 	height: 7rem;
 	display: flex;
@@ -74,13 +74,13 @@ fs-header {
 	position: relative;
 }
 
-fs-header > div.image {
+sc-header > div.image {
 	overflow: hidden;
 	display: flex;
 	width: 100%;
 }
 
-fs-header > div:first-child {
+sc-header > div:first-child {
 	position: fixed;
 	top: 0.5em;
 	left: 0;
@@ -89,39 +89,39 @@ fs-header > div:first-child {
 	z-index: 2;
 }
 
-fs-header > div.titles {
+sc-header > div.titles {
 	background: rgb(255 255 255 / 70%);
 }
 
-fs-header img {
+sc-header img {
 	object-fit: cover;
 	object-position: 50% 50%;
 	width: 100%;
 }
 
-fs-logged-user {
+sc-logged-user {
     position: absolute;
     top: 5.2em;
     right: 1em;
     z-index: 2;
 }
 
-fs-logged-user details {
+sc-logged-user details {
 	font-size: 0.8em;
 }
 
-fs-logged-user details.dropdown summary+ul li {
+sc-logged-user details.dropdown summary+ul li {
     padding: 0;
 }
 
-fs-logged-user details.dropdown summary:not([role]) {
+sc-logged-user details.dropdown summary:not([role]) {
     padding: 0 var(--pico-form-element-spacing-horizontal);
     height: fit-content;
 	display: flex;
 	align-items: center;
 }
 
-fs-logged-user details.dropdown summary+ul li button {
+sc-logged-user details.dropdown summary+ul li button {
     display: block;
 	width: 100%;
 	margin: 0;
@@ -136,11 +136,11 @@ fs-logged-user details.dropdown summary+ul li button {
 	text-align: left;
 }
 
-fs-logged-user details.dropdown summary+ul li button:hover {
+sc-logged-user details.dropdown summary+ul li button:hover {
     background-color: var(--pico-dropdown-hover-background-color);
 }
 
-fs-logged-user details.dropdown summary+ul li button[role=link]:is([aria-current]:not([aria-current=false]),:hover,:active,:focus) {
+sc-logged-user details.dropdown summary+ul li button[role=link]:is([aria-current]:not([aria-current=false]),:hover,:active,:focus) {
 	background-color: var(--pico-dropdown-hover-background-color);
 	--pico-color: transparent;
 	--pico-underline: none;
@@ -148,18 +148,18 @@ fs-logged-user details.dropdown summary+ul li button[role=link]:is([aria-current
 	--pico-box-shadow: none;
 }
 
-fs-login form {
+sc-login form {
 	position: relative;
 }
 
-fs-login .passwordLost {
+sc-login .passwordLost {
     position: absolute;
     right: 0;
     border: none;
     padding: 0;
 }
 
-fs-login .passwordLost:hover {
+sc-login .passwordLost:hover {
 	background: transparent;
 	text-decoration: none;
 }
@@ -301,7 +301,7 @@ a.ordered {
 .ingredients ul,
 .home ul,
 .categories ul,
-fs-recipe form{
+sc-recipe form{
 	max-width: 35rem;
 	margin: auto !important;
 }
@@ -357,7 +357,7 @@ fs-recipe form{
 
 .recipes main ul button,
 .recipes ul a,
-.recipes aside ul fs-link,
+.recipes aside ul sc-link,
 .ingredients main ul button,
 .ingredients ul a,
 .home main ul button,
@@ -377,7 +377,7 @@ fs-recipe form{
 }
 
 .recipes ul button > span,
-.recipes aside ul fs-link > span,
+.recipes aside ul sc-link > span,
 .recipes ul a > span,
 .ingredients ul button > span,
 .ingredients ul a > span,
@@ -401,7 +401,7 @@ fs-recipe form{
 	fill: currentColor;
 }
 
-fs-confirm .addIngredient {
+sc-confirm .addIngredient {
 	position: relative;
 }
 
@@ -560,7 +560,7 @@ dialog footer > a[role=button]:not([href]) {
 }
 
 /*** LOADER ***/
-fs-loader {
+sc-loader {
 	position: fixed;
 	display: flex;
 	justify-content: center;
@@ -570,7 +570,7 @@ fs-loader {
 	width: 100%;
 }
 
-.recipe fs-loader {
+.recipe sc-loader {
 	background: var(--background-color-loader);
 }
 
@@ -584,7 +584,7 @@ fs-loader {
 }
 
 /*** ANIMATED SECTION ***/
-fs-animated-section > div {
+sc-animated-section > div {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -601,7 +601,7 @@ fs-animated-section > div {
 	position: relative;
 }
 
-.presentation fs-animated-section {
+.presentation sc-animated-section {
 	margin: 0;
 	padding: 1rem;
 }
@@ -613,7 +613,7 @@ fs-animated-section > div {
 	box-shadow: 0 13px 27px -5px hsl(240deg 30% 28% / 25%), 0 8px 16px -8px hsl(0deg 0% 0% / 30%), 0 -6px 16px -6px hsl(0deg 0% 0% / 3%);
 }
 
-.presentation fs-animated-section {
+.presentation sc-animated-section {
 	padding: 5rem 12rem;
 }
 
@@ -677,113 +677,113 @@ fs-animated-section > div {
 	font-weight: 800;
 }
 
-.presentation fs-animated-section.first {
+.presentation sc-animated-section.first {
 	background: #000;
 	padding: 10rem 18rem;
 	position: relative;
 	margin-bottom: 0;
 }
 
-.presentation fs-animated-section.first .grid {
+.presentation sc-animated-section.first .grid {
 	grid-template-columns: 2fr 1.5fr;
 }
 
-.presentation fs-animated-section.first .grid > div {
+.presentation sc-animated-section.first .grid > div {
 	color: #ffcf4f;
 	font-size: 3.5rem;
 	padding-right: 3rem;
 	font-weight: 800;
 }
 
-.presentation fs-animated-section.first .grid > img {
+.presentation sc-animated-section.first .grid > img {
 	margin-top: 10rem;
 }
 
-.presentation fs-animated-section.first .alt {
+.presentation sc-animated-section.first .alt {
 	color: #d5c08a;
 	display: inline-block;
 }
 
-.presentation fs-animated-section.first > div > div {
+.presentation sc-animated-section.first > div > div {
 	width: 100%;
 }
 
-.presentation fs-animated-section.second {
+.presentation sc-animated-section.second {
 	background: #d5d1c6;
 	padding: 0;
 	position: relative;
 	margin-bottom: 0;
 }
 
-.presentation fs-animated-section.second div.grid {
+.presentation sc-animated-section.second div.grid {
 	gap: 0;
 	position: absolute;
 	left: 0;
 	right: 0;
 }
 
-.presentation fs-animated-section.second > div > div:first-child {
+.presentation sc-animated-section.second > div > div:first-child {
 	font-size: 3.5rem;
 	padding: 8rem 40rem 0 18rem;
 	font-weight: 800;
 }
 
-.presentation fs-animated-section.second div.grid > div:first-child {
+.presentation sc-animated-section.second div.grid > div:first-child {
 	color: #fff;
 	font-size: 2rem;
 	padding: 5rem 1rem 0 18rem;
 }
 
-.presentation fs-animated-section.second div.grid.one > div:first-child {
+.presentation sc-animated-section.second div.grid.one > div:first-child {
 	background: var(--pico-color);
 }
 
-.presentation fs-animated-section.second div.grid.two > div:first-child {
+.presentation sc-animated-section.second div.grid.two > div:first-child {
 	background: #b9a97f;
 }
 
-.presentation fs-animated-section.second div.grid.three > div:first-child {
+.presentation sc-animated-section.second div.grid.three > div:first-child {
 	background: #74726c;
 }
 
-.presentation fs-animated-section.second div.grid.one > div:last-child {
+.presentation sc-animated-section.second div.grid.one > div:last-child {
 	background: #e3e3e3;
 }
 
-.presentation fs-animated-section.second div.grid.two > div:last-child {
+.presentation sc-animated-section.second div.grid.two > div:last-child {
 	background: #d5d2cb;
 }
 
-.presentation fs-animated-section.second div.grid.three > div:last-child {
+.presentation sc-animated-section.second div.grid.three > div:last-child {
 	background: #fbf1d8;
 }
 
-.presentation fs-animated-section.second img {
+.presentation sc-animated-section.second img {
 	box-shadow: none;
 	border-radius: 0;
 }
 
-.presentation fs-animated-section.second .infos {
+.presentation sc-animated-section.second .infos {
 	padding-left: 18rem;
 }
 
-.presentation fs-animated-section.three {
+.presentation sc-animated-section.three {
 	position: relative;
 	padding: 0;
 }
 
-.presentation fs-animated-section.three > div {
+.presentation sc-animated-section.three > div {
 	justify-content: center;
 	align-items: unset;
 }
 
-.presentation fs-animated-section.three > div > div.grid:first-child > div:first-child {
+.presentation sc-animated-section.three > div > div.grid:first-child > div:first-child {
 	padding: 0 2rem 5rem 7rem;
 	font-size: 3.5rem;
 	font-weight: 800;
 }
 
-.presentation fs-animated-section.three .infos {
+.presentation sc-animated-section.three .infos {
 	padding-left: 1rem;
 	padding-top: 5rem;
 	text-shadow: 0 0 black;
@@ -805,51 +805,51 @@ fs-animated-section > div {
 
 /*** DISHES ***/
 @media (max-width: 992px) {
-	fs-dishes > .content {
+	sc-dishes > .content {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 	}
 
-	fs-dishes > .content > .grid {
+	sc-dishes > .content > .grid {
 		border: none !important;
 		padding: 0 !important;
 	}
 
-	fs-dishes > .content > .grid > div,
-	fs-dishes summary {
+	sc-dishes > .content > .grid > div,
+	sc-dishes summary {
 		border-bottom: var(--pico-border-width) solid var(--pico-table-border-color) !important;
 		border-right: var(--pico-border-width) solid var(--pico-table-border-color) !important;
 		min-height: 4rem;
 	}
 
-	fs-dishes > .content > .grid:last-child > div,
-	fs-dishes > .content > .grid:last-child summary {
+	sc-dishes > .content > .grid:last-child > div,
+	sc-dishes > .content > .grid:last-child summary {
 		border-right: none !important;
 	}
 
-	fs-dishes > .content > .grid > div:first-child {
+	sc-dishes > .content > .grid > div:first-child {
 		padding: calc(var(--pico-spacing) / 2) 0;
 		border-bottom: calc(var(--pico-border-width) * 3) solid var(--pico-table-border-color) !important;
 	}
 }
 
-fs-dishes > .title {
+sc-dishes > .title {
 	margin-bottom: 2.625rem;
 }
 
-fs-dishes > .content > .grid {
+sc-dishes > .content > .grid {
 	border-bottom: var(--pico-border-width) solid var(--pico-table-border-color);
 	min-height: 6rem;
 }
 
-fs-dishes > .content > .grid:first-child {
+sc-dishes > .content > .grid:first-child {
 	padding: calc(var(--pico-spacing) / 2) 0;
 	border-bottom: calc(var(--pico-border-width) * 3) solid var(--pico-table-border-color);
 	min-height: auto;
 }
 
-fs-dishes > .content > .grid > *,
-fs-dishes > .content > .grid summary {
+sc-dishes > .content > .grid > *,
+sc-dishes > .content > .grid summary {
 	font-size: 0.875em;
 	display: flex;
 	justify-content: center;
@@ -862,35 +862,35 @@ fs-dishes > .content > .grid summary {
 	border: none;
 }
 
-fs-dishes details.dropdown summary + ul {
+sc-dishes details.dropdown summary + ul {
 	font-size: 0.875em;
 }
 
-fs-dishes details.dropdown summary + ul > li {
+sc-dishes details.dropdown summary + ul > li {
 	padding: 0;
 }
 
-fs-dishes > .content > .grid summary {
+sc-dishes > .content > .grid summary {
 	width: 100%;
 	height: 100%;
 	user-select: none;
 }
 
-fs-dishes > .content > .grid summary::after {
+sc-dishes > .content > .grid summary::after {
 	display: none;
 }
 
-fs-dishes > .content > .grid summary:hover,
+sc-dishes > .content > .grid summary:hover,
 details[open] summary {
 	background: var(--pico-modal-overlay-background-color);
 }
 
-fs-dishes > .content > .grid summary[role=button]:focus,
-fs-dishes > .content > .grid details button:focus {
+sc-dishes > .content > .grid summary[role=button]:focus,
+sc-dishes > .content > .grid details button:focus {
 	--box-shadow: none;
 }
 
-fs-dishes > .content > .grid details button {
+sc-dishes > .content > .grid details button {
 	background: none;
 	border: none;
 	color: unset;
@@ -900,72 +900,72 @@ fs-dishes > .content > .grid details button {
 	border-radius: 0;
 }
 
-fs-dishes > .content > .grid details button:hover {
+sc-dishes > .content > .grid details button:hover {
 	background-color: var(--pico-dropdown-hover-background-color);
 }
 
-fs-dishes > .content > .grid:first-child > * {
+sc-dishes > .content > .grid:first-child > * {
 	font-size: 1em;
 }
 
-fs-dishes > .content > .grid > div:first-child {
+sc-dishes > .content > .grid > div:first-child {
 	font-size: 1em;
 }
 
-/*** fs-menu ***/
-fs-menu > div > ul {
+/*** sc-menu ***/
+sc-menu > div > ul {
 	display: flex;
 	justify-content: center;
 	max-width: none !important;
 }
-fs-menu > div > ul > li {
+sc-menu > div > ul > li {
 	list-style: none;
 	margin: 0;
 	padding: var(--pico-nav-element-spacing-vertical) var(--pico-nav-element-spacing-horizontal);
 }
 
-fs-menu > div > ul > li[data-selected='true'] > * {
+sc-menu > div > ul > li[data-selected='true'] > * {
 	--pico-background-color: var(--pico-primary-hover-background);
 	--pico-border-color: var(--pico-primary-hover-background);
 	pointer-events: none;
 }
 
-fs-menu[data-burger] > div {
+sc-menu[data-burger] > div {
 	background: var(--pico-background-color);
 	position: absolute;
 	z-index: 2;
 	inset: 0;
 }
 
-fs-menu[data-burger] > div > ul {
+sc-menu[data-burger] > div > ul {
 	display: list-item;
 }
 
-fs-menu > div[data-hidden='true'] {
+sc-menu > div[data-hidden='true'] {
 	display: none;
 }
 
-fs-menu[data-burger] button.back,
-fs-menu[data-burger] button.burger {
+sc-menu[data-burger] button.back,
+sc-menu[data-burger] button.burger {
 	background: transparent;
 	border: none;
 	color: var(--pico-primary);
 	width: auto;
 }
 
-fs-menu[data-burger] button.burger {
+sc-menu[data-burger] button.burger {
 	position: absolute;
 	top: 0;
 	z-index: 2;
 }
 
-fs-menu[data-burger] button.back > span,
-fs-menu[data-burger] button.burger > span {
+sc-menu[data-burger] button.back > span,
+sc-menu[data-burger] button.burger > span {
 	display: none;
 }
 
-fs-menu[data-burger] button.back > svg,
-fs-menu[data-burger] button.burger > svg {
+sc-menu[data-burger] button.back > svg,
+sc-menu[data-burger] button.burger > svg {
 	width: 2rem;
 	height: 2rem;
 }

@@ -44,7 +44,7 @@ export default class Login extends HTMLElement {
                                         </label>
                                     </form>`,
                                 async (): Promise<void> => {
-                                    const entries = Object.fromEntries(new FormData(document.querySelector('fs-confirm form') as HTMLFormElement).entries())
+                                    const entries = Object.fromEntries(new FormData(document.querySelector('sc-confirm form') as HTMLFormElement).entries())
                                     const result = (await Utils.request('/requestPasswordReset', 'POST', { body: JSON.stringify(entries) })) as TValidateReturn
                                     Utils.toast(result.success ? 'success' : 'error', result.message as string)
                                 },

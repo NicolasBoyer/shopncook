@@ -99,7 +99,7 @@ export default class Lists extends HTMLElement {
         document.body.addEventListener('modalConfirm', (pEvent): void => {
             this.recipeChoices = (pEvent as CustomEvent).detail.choices
         })
-        Utils.confirm(html` <fs-recipes choiceMode="checkbox" /> `, async (): Promise<void> => {
+        Utils.confirm(html` <sc-recipes choiceMode="checkbox" /> `, async (): Promise<void> => {
             if (this.recipeChoices.length) {
                 const newIngredients: TListIngredient[] = []
                 Commons.savedIngredients.forEach((pIngredient): void => {
@@ -126,7 +126,7 @@ export default class Lists extends HTMLElement {
         document.body.addEventListener('modalConfirm', (pEvent): void => {
             categoryId = (pEvent as CustomEvent).detail.id
         })
-        Utils.confirm(html` <fs-categories choiceMode /> `, async (): Promise<void> => {
+        Utils.confirm(html` <sc-categories choiceMode /> `, async (): Promise<void> => {
             const response = (await Utils.request('/db', 'POST', {
                 body: `[{ "setListIngredients": { "ingredients": [ { "title": "${ingredientTitle}", "id": "${ingredientId}", "category": "${categoryId}" } ] } }, { "getIngredients": "" }]`,
             })) as unknown as [TListIngredient[], TIngredient[]]

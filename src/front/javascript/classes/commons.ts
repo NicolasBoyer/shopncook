@@ -16,7 +16,7 @@ export class Commons {
     static savedIngredients: TIngredient[]
 
     static renderAddIngredientInDialog(ingredient: TListIngredient, isReset = false): void {
-        const element = document.querySelector('fs-confirm > dialog > article')
+        const element = document.querySelector('sc-confirm > dialog > article')
         render(
             isReset
                 ? ''
@@ -37,13 +37,13 @@ export class Commons {
                                   }
                               }}"
                           />
-                          <fs-propose
+                          <sc-propose
                               list="${Commons.propositions}"
                               @listReset="${(): void => {
                                   Commons.setPropositions()
                                   this.renderAddIngredientInDialog(ingredient, isReset)
                               }}"
-                          ></fs-propose>
+                          ></sc-propose>
                       </div>
                       <input
                           autocomplete="off"
@@ -81,7 +81,7 @@ export class Commons {
     static managePropositions(pEvent: HTMLElementEvent<HTMLInputElement>): void {
         const input = pEvent.target
         this.setPropositions(input.value)
-        if (pEvent.key === 'ArrowDown' && this.propositions) (input.closest('article')?.querySelector('fs-propose a:first-child') as HTMLElement).focus()
+        if (pEvent.key === 'ArrowDown' && this.propositions) (input.closest('article')?.querySelector('sc-propose a:first-child') as HTMLElement).focus()
         else if (input.value.length === 0 || (this.propositions.length && this.propositions.length === 1 && this.propositions[0].toLowerCase() === input.value?.toLowerCase())) {
             if (this.propositions[0]?.toLowerCase() === input.value?.toLowerCase()) input.value = this.propositions[0]
             this.setPropositions()

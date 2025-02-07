@@ -44,7 +44,7 @@ export default class Dishes extends HTMLElement {
                           />
                       </label>
                   `
-                : html` <fs-recipes choiceMode="radio" /> `,
+                : html` <sc-recipes choiceMode="radio" /> `,
             async (): Promise<void> => {
                 if (this.dishName) {
                     dish.name = this.dishName
