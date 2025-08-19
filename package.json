@@ -8,7 +8,7 @@
     "dev:frontend": "vite",
     "dev:backend": "node --import=tsx src/back/dev.ts",
     "dev": "cross-env NODE_ENV=dev concurrently 'npm:dev:frontend' 'npm:dev:backend'",
-    "start": "vite build && pm2 startOrRestart ecosystem.config.cjs",
+    "start": "vite build && pm2-runtime start ecosystem.config.cjs",
     "stop": "pm2 stop shopncook"
   },
   "author": "Nicolas Boyer",
