@@ -18,7 +18,8 @@ import com.shopncook.ui.theme.ShopNCookTheme
 @Composable
 fun RegistrationScreen(
     authViewModel: AuthViewModel = viewModel(),
-    onRegistrationSuccess: () -> Unit
+    onRegistrationSuccess: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -109,6 +110,10 @@ fun RegistrationScreen(
                 enabled = authState !is AuthState.Loading
             ) {
                 Text("Register")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = onNavigateToLogin) {
+                Text("Already have an account? Login")
             }
         }
         if (authState is AuthState.Loading) {

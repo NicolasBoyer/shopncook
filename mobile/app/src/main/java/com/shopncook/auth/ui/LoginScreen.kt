@@ -18,7 +18,8 @@ import com.shopncook.ui.theme.ShopNCookTheme
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel = viewModel(),
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onNavigateToRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -78,6 +79,10 @@ fun LoginScreen(
                 enabled = authState !is AuthState.Loading
             ) {
                 Text("Login")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = onNavigateToRegister) {
+                Text("Don't have an account? Sign up")
             }
         }
 

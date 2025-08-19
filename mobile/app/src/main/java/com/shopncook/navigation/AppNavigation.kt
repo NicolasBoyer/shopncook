@@ -31,6 +31,9 @@ fun AppNavigation(startDestination: String) {
                         }
                         launchSingleTop = true
                     }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
                 }
             )
         }
@@ -40,6 +43,9 @@ fun AppNavigation(startDestination: String) {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route)
                 }
             )
         }
