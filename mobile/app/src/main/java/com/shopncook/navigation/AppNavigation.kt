@@ -9,12 +9,14 @@ import com.shopncook.auth.ui.RegistrationScreen
 import com.shopncook.home.ui.HomeScreen
 
 import com.shopncook.recipes.ui.RecipeListScreen
+import com.shopncook.shoppinglist.ui.ShoppingListScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object Home : Screen("home")
     object Recipes : Screen("recipes")
+    object ShoppingList : Screen("shopping_list")
 }
 
 @Composable
@@ -58,11 +60,25 @@ fun AppNavigation(startDestination: String) {
                 },
                 onNavigateToRecipes = {
                     navController.navigate(Screen.Recipes.route)
+                },
+                onNavigateToShoppingList = {
+                    navController.navigate(Screen.ShoppingList.route)
                 }
             )
         }
         composable(Screen.Recipes.route) {
-            RecipeListScreen()
+            RecipeListScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+        composable(Screen.ShoppingList.route) {
+            ShoppingListScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }

@@ -13,7 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeScreen(onLogout: () -> Unit, onNavigateToRecipes: () -> Unit) {
+fun HomeScreen(
+    onLogout: () -> Unit,
+    onNavigateToRecipes: () -> Unit,
+    onNavigateToShoppingList: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -21,6 +25,10 @@ fun HomeScreen(onLogout: () -> Unit, onNavigateToRecipes: () -> Unit) {
     ) {
         Text("Welcome to ShopNCook!")
         Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onNavigateToShoppingList) {
+            Text("Shopping List")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onNavigateToRecipes) {
             Text("View Recipes")
         }
