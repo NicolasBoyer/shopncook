@@ -22,12 +22,9 @@ class AuthInterceptor : Interceptor {
         // sending it as a Bearer token is a more standard approach.
         // I will assume the backend can be modified to accept this.
         // If not, I'll need to adjust to send it as a Cookie header.
-        // For now, I'll use the standard 'Authorization' header.
+        // The backend expects the token in a cookie named 'fsTk'.
         if (token != null && token.isNotBlank()) {
-            requestBuilder.addHeader("Authorization", "Bearer $token")
-            // The original web app used a cookie named 'fsTk'.
-            // If the backend strictly requires a cookie, the header would be:
-            // requestBuilder.addHeader("Cookie", "fsTk=$token")
+            requestBuilder.addHeader("Cookie", "fsTk=$token")
         }
 
         return chain.proceed(requestBuilder.build())
