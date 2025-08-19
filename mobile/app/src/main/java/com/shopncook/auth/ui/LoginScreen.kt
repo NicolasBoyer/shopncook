@@ -97,6 +97,6 @@ fun LoginScreen(
 fun LoginScreenPreview() {
     ShopNCookTheme {
         // The preview won't have a real ViewModel, so it shows the initial state.
-        LoginScreen(onLoginSuccess = {})
+        LoginScreen(onLoginSuccess = {}, onNavigateToRegister = {})
     }
 }

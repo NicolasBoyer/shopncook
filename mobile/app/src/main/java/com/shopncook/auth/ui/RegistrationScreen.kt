@@ -126,6 +126,6 @@ fun RegistrationScreen(
 @Composable
 fun RegistrationScreenPreview() {
     ShopNCookTheme {
-        RegistrationScreen(onRegistrationSuccess = {})
+        RegistrationScreen(onRegistrationSuccess = {}, onNavigateToLogin = {})
     }
 }
