@@ -76,7 +76,7 @@ export default class Auth {
                 return { success: false, message: 'Identifiants invalides' }
             }
 
-            const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' })
+            const token = jwt.sign(user, SECRET_KEY, { expiresIn: '365d' })
 
             await Database.initUserDbAndCollections(user._id)
 
