@@ -6,8 +6,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,7 +49,7 @@ fun ShoppingListScreen(
                 },
                 actions = {
                     IconButton(onClick = { viewModel.clearList() }) {
-                        Icon(Icons.Default.ClearAll, contentDescription = "Clear List")
+                        Icon(Icons.Default.DeleteSweep, contentDescription = "Clear List")
                     }
                 }
             )
