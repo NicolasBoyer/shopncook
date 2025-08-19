@@ -15,25 +15,36 @@ class AuthRepository {
         val response = apiService.login(request)
         if (response.isSuccessful) {
             val authResponse = response.body()!!
-            if (authResponse.success && authResponse.token != null) {
-                tokenManager.saveAuthToken(authResponse.token)
+            if (authResponse.success) {
+                // The backend sends the token in a 'Set-Cookie' header.
+                // We need to parse it to get the token value.
+                val cookieHeader = response.headers()["Set-Cookie"]
+                if (cookieHeader != null) {
+                    val token = parseTokenFromCookie(cookieHeader)
+                    if (token.isNotBlank()) {
+                        tokenManager.saveAuthToken(token)
+                    }
+                }
             }
             return authResponse
         } else {
-            // A more robust implementation would parse the error body
             throw Exception("Login failed: ${response.message()}")
         }
+    }
+
+    private fun parseTokenFromCookie(cookieHeader: String): String {
+        // Example cookie: "fsTk=some_long_token_string; HttpOnly; Path=/; Secure; SameSite=Strict"
+        val tokenPart = cookieHeader.split(";").firstOrNull { it.trim().startsWith("fsTk=") }
+        return tokenPart?.split("=")?.getOrNull(1)?.trim() ?: ""
     }
 
     suspend fun register(firstName: String, lastName: String, email: String, password: String, confirmPass: String): ApiService.AuthResponse {
         val request = ApiService.RegistrationRequest(firstName, lastName, email, password, confirmPass)
         val response = apiService.register(request)
         if (response.isSuccessful) {
-            val authResponse = response.body()!!
-            if (authResponse.success && authResponse.token != null) {
-                tokenManager.saveAuthToken(authResponse.token)
-            }
-            return authResponse
+            // Assuming registration does not automatically log the user in / set a cookie.
+            // If it does, the same cookie parsing logic would be needed here.
+            return response.body()!!
         } else {
             throw Exception("Registration failed: ${response.message()}")
         }
