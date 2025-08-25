@@ -135,23 +135,36 @@ export default class Auth {
         if (!token) {
             return false
         }
+
         const jwtToken = token.split('=')[1]
         if (this.isTokenBlacklisted(jwtToken)) {
             await this.loginResponse(req, res, 403, 'Le token a été invalidé')
             return false
         }
 
-        let isTokenValid: TIncomingMessage | boolean = false
-        jwt.verify(jwtToken, SECRET_KEY, async (err, user): Promise<void> => {
+        try {
+            const user = await new Promise((resolve, reject) => {
+                jwt.verify(jwtToken, SECRET_KEY, (err, user) => {
+                    if (err) {
+                        return reject(err)
+                    }
+                    resolve(user)
+                })
+            })
+
             req.user = user
-            isTokenValid = err || !this.authorizeRole(req.user as TUser, 'author') ? false : req
-        })
-        if (!isTokenValid) await this.loginResponse(req, res, 403, 'Le token est invalide')
-        if (req.user) {
-            await Database.initUserDbAndCollections((req.user as TUser)._id)
+            if (!this.authorizeRole(req.user as TUser, 'author')) {
+                throw new Error('User not authorized')
+            }
+
+            if (req.user) {
+                await Database.initUserDbAndCollections((req.user as TUser)._id)
+            }
+            return req
+        } catch (err) {
+            await this.loginResponse(req, res, 403, 'Le token est invalide')
+            return false
         }
-        // Retourne false ou req si valide
-        return isTokenValid
     }
 
     static authorizeRole(user: TUser, role: string): boolean {
